@@ -1107,6 +1107,174 @@
     font-size: 10px;
     border: 1px solid var(--line);
   }
+
+  /* OTT SELECT BUTTON */
+  .ott-select-btn {
+    width: 100%;
+    padding: 12px 13px;
+    background: var(--bg-elev);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 400;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    text-align: left;
+  }
+  .ott-select-btn:active { background: var(--bg-soft); }
+  .ott-select-btn .ott-select-text { color: var(--ink-mute); }
+  .ott-select-btn.has-value .ott-select-text { color: var(--ink); font-weight: 500; }
+  .ott-select-btn-icon { color: var(--ink-mute); font-size: 12px; }
+
+  /* OTT CHIP */
+  .ott-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 9px;
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    border-radius: 100px;
+    font-size: 10px;
+    color: var(--ink-dim);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .ott-chip-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+  }
+
+  /* OTT PICKER MODAL (selection) */
+  .ott-picker-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .ott-picker-item {
+    padding: 14px 12px;
+    background: var(--bg-elev);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--ink);
+    font-weight: 500;
+    text-align: left;
+  }
+  .ott-picker-item:active { background: var(--bg-soft); }
+  .ott-picker-item.selected {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .ott-picker-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .ott-picker-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .ott-picker-clear {
+    width: 100%;
+    padding: 12px;
+    background: var(--bg-soft);
+    border: 1px dashed var(--line);
+    border-radius: 10px;
+    color: var(--ink-mute);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: var(--sans);
+    margin-bottom: 12px;
+  }
+  .ott-picker-clear:active { background: var(--line-soft); }
+
+  /* OTT MANAGER */
+  .ott-manage-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    background: var(--bg-elev);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    margin-bottom: 6px;
+  }
+  .ott-manage-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .ott-manage-name {
+    flex: 1;
+    font-size: 13px;
+    color: var(--ink);
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .ott-manage-btn {
+    width: 28px;
+    height: 28px;
+    background: var(--bg-soft);
+    border: none;
+    border-radius: 6px;
+    color: var(--ink-dim);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-family: var(--sans);
+    line-height: 1;
+    padding: 0;
+  }
+  .ott-manage-btn:active { background: var(--line); }
+  .ott-manage-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .ott-manage-btn.danger { color: var(--red); }
+  .ott-manage-btn.edit { color: var(--accent); }
+
+  /* COLOR PICKER for OTT */
+  .color-picker {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 6px;
+  }
+  .color-swatch {
+    aspect-ratio: 1;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: transform 0.1s;
+  }
+  .color-swatch.active {
+    border-color: var(--ink);
+    transform: scale(1.1);
+  }
 </style>
 </head>
 <body>
@@ -1205,6 +1373,7 @@
     <div style="margin-top: 24px;">
       <h3 style="font-size: 13px; font-weight: 600; color: var(--ink-mute); letter-spacing: 0.04em; margin-bottom: 10px;">템플릿 관리</h3>
       <button class="btn" onclick="openTemplateManager()" style="width: 100%; margin-bottom: 8px;">노트 템플릿 관리</button>
+      <button class="btn" onclick="openOttManagerFromSettings()" style="width: 100%; margin-bottom: 8px;">OTT 플랫폼 관리</button>
     </div>
 
     <div style="margin-top: 24px;">
@@ -1219,7 +1388,7 @@
     </div>
 
     <div style="text-align: center; margin-top: 40px; font-size: 11px; color: var(--ink-mute); letter-spacing: 0.04em; font-weight: 500;">
-      v1.3 · 데이터는 브라우저에 저장됩니다
+      v1.4 · 데이터는 브라우저에 저장됩니다
     </div>
   </section>
 </main>
@@ -1305,6 +1474,14 @@
           <input type="text" class="form-input" id="fCast" placeholder="배우, 등장인물 (쉼표로 구분)">
         </div>
 
+        <div class="form-group form-section" id="section-ott">
+          <label class="form-label">OTT 플랫폼</label>
+          <button type="button" class="ott-select-btn" id="ottSelectBtn" onclick="openOttPicker()">
+            <span class="ott-select-text" id="ottSelectText">선택 안 함</span>
+            <span class="ott-select-btn-icon">▼</span>
+          </button>
+        </div>
+
         <div class="form-group form-section" id="section-youtube">
           <label class="form-label">유튜브 링크</label>
           <input type="url" class="form-input" id="fLink" placeholder="https://youtube.com/...">
@@ -1313,8 +1490,8 @@
         <div class="form-group form-section" id="section-drama">
           <label class="form-label">회차</label>
           <div class="form-row">
-            <input type="number" class="form-input" id="fTotalEp" placeholder="전체 회차" min="1">
             <input type="number" class="form-input" id="fCurrentEp" placeholder="현재 회차" min="0">
+            <input type="number" class="form-input" id="fTotalEp" placeholder="전체 회차" min="1">
           </div>
         </div>
 
@@ -1343,8 +1520,8 @@
         <div class="form-group form-section" id="section-book">
           <label class="form-label">페이지 (종이책 기준)</label>
           <div class="form-row">
-            <input type="number" class="form-input" id="fTotalPage" placeholder="전체 페이지" min="1">
             <input type="number" class="form-input" id="fCurrentPage" placeholder="현재 페이지" min="0">
+            <input type="number" class="form-input" id="fTotalPage" placeholder="전체 페이지" min="1">
           </div>
         </div>
 
@@ -1538,6 +1715,67 @@
   </div>
 </div>
 
+<!-- OTT PICKER MODAL -->
+<div class="modal" id="ottPickerModal">
+  <div class="modal-content">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title">OTT 플랫폼 선택</div>
+      <button class="modal-close" onclick="closeOttPicker()">×</button>
+    </div>
+    <div class="modal-body">
+      <button type="button" class="ott-picker-clear" onclick="selectOtt(null)">선택 안 함</button>
+      <div class="ott-picker-grid" id="ottPickerGrid"></div>
+      <button type="button" class="btn" onclick="openOttManager()" style="width: 100%; margin-top: 16px;">⚙ OTT 목록 관리</button>
+    </div>
+  </div>
+</div>
+
+<!-- OTT MANAGER MODAL -->
+<div class="modal" id="ottManagerModal">
+  <div class="modal-content">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title">OTT 플랫폼 관리</div>
+      <button class="modal-close" onclick="closeOttManager()">×</button>
+    </div>
+    <div class="modal-body">
+      <div style="font-size: 12px; color: var(--ink-mute); margin-bottom: 12px;">↑↓ 버튼으로 순서 변경 · ✎ 수정 · × 삭제</div>
+      <button class="btn btn-primary" onclick="openOttEditor()" style="width: 100%; margin-bottom: 16px;">+ 새 OTT 추가</button>
+      <div id="ottManagerList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- OTT EDITOR MODAL -->
+<div class="modal" id="ottEditorModal">
+  <div class="modal-content">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title" id="ottEditorTitle">새 OTT</div>
+      <button class="modal-close" onclick="closeOttEditor()">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="ottEditId">
+
+      <div class="form-group">
+        <label class="form-label">이름</label>
+        <input type="text" class="form-input" id="ottEditName" placeholder="예: Netflix, 티빙, 디즈니+">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">색상</label>
+        <div class="color-picker" id="ottColorPicker"></div>
+      </div>
+
+      <div class="btn-row">
+        <button type="button" class="btn" onclick="closeOttEditor()">취소</button>
+        <button type="button" class="btn btn-primary" onclick="saveOtt()">저장</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- HIDDEN export render -->
 <div id="exportRender" style="position: fixed; left: -9999px; top: 0; width: 600px; background: white; padding: 40px; font-family: 'Pretendard Variable', Pretendard, sans-serif; color: #1c1b1a;"></div>
 
@@ -1571,11 +1809,25 @@ const DEFAULT_TEMPLATES = [
   { id: 'def-yt-2', type: 'youtube', name: '강의형', content: `## 주제\n\n\n## 주요 포인트\n1. \n2. \n3. \n\n## 액션 아이템\n- \n- \n` },
 ];
 
+// ============ DEFAULT OTT PLATFORMS ============
+const OTT_COLORS = ['#e50914', '#0063e5', '#ff3355', '#0080ff', '#1b1b1b', '#0099ff', '#5a3ec8', '#00a8e1', '#c87f3f', '#5a7a3c', '#9e9a93', '#c4923a'];
+const DEFAULT_OTT = [
+  { id: 'ott-netflix', name: 'Netflix', color: '#e50914' },
+  { id: 'ott-disney', name: 'Disney+', color: '#0063e5' },
+  { id: 'ott-tving', name: '티빙', color: '#ff3355' },
+  { id: 'ott-wavve', name: '웨이브', color: '#0080ff' },
+  { id: 'ott-watcha', name: '왓챠', color: '#ff0558' },
+  { id: 'ott-coupang', name: '쿠팡플레이', color: '#5a3ec8' },
+  { id: 'ott-apple', name: 'Apple TV+', color: '#1b1b1b' },
+  { id: 'ott-prime', name: 'Prime Video', color: '#00a8e1' },
+];
+
 // ============ STATE ============
 const STORAGE_KEY = 'contentsArchive_v1';
 let state = {
   items: [],
   templates: [],
+  ottPlatforms: [],
   currentTab: 'timeline',
   typeFilter: 'all',
   templateFilter: 'all',
@@ -1586,11 +1838,14 @@ let state = {
   noteEditingNoteId: null,
   templateEditingId: null,
   templateEditingType: 'youtube',
+  ottEditingId: null,
+  ottEditingColor: OTT_COLORS[0],
   selectedType: 'youtube',
   selectedStatus: 'watching',
   selectedRating: 0,
   selectedBookFormat: 'paper',
   selectedBookSource: 'own',
+  selectedOtt: null,
   ytThumb: null
 };
 
@@ -1619,11 +1874,19 @@ function load() {
         } else if (!Array.isArray(item.notes)) {
           item.notes = [];
         }
+        // Ensure ott field exists (null = no OTT)
+        if (item.ott === undefined) item.ott = null;
       });
       state.templates = Array.isArray(data.templates) ? data.templates : [];
-      // If no templates yet, seed with defaults
       if (state.templates.length === 0) {
         state.templates = DEFAULT_TEMPLATES.map(t => ({ ...t, createdAt: Date.now() }));
+      }
+      state.ottPlatforms = Array.isArray(data.ottPlatforms) ? data.ottPlatforms : [];
+      if (state.ottPlatforms.length === 0) {
+        state.ottPlatforms = DEFAULT_OTT.map((o, i) => ({ ...o, order: i, createdAt: Date.now() }));
+      } else {
+        // Ensure order field
+        state.ottPlatforms.forEach((o, i) => { if (o.order === undefined) o.order = i; });
       }
       if (data.settings) {
         state.sortBy = data.settings.sortBy || 'updated';
@@ -1631,11 +1894,13 @@ function load() {
       }
     } else {
       state.templates = DEFAULT_TEMPLATES.map(t => ({ ...t, createdAt: Date.now() }));
+      state.ottPlatforms = DEFAULT_OTT.map((o, i) => ({ ...o, order: i, createdAt: Date.now() }));
     }
   } catch(e) {
     console.error('Load failed', e);
     state.items = [];
     state.templates = DEFAULT_TEMPLATES.map(t => ({ ...t, createdAt: Date.now() }));
+    state.ottPlatforms = DEFAULT_OTT.map((o, i) => ({ ...o, order: i, createdAt: Date.now() }));
   }
 }
 
@@ -1644,6 +1909,7 @@ function save() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
       items: state.items,
       templates: state.templates,
+      ottPlatforms: state.ottPlatforms,
       settings: { sortBy: state.sortBy, sortDir: state.sortDir },
       savedAt: Date.now()
     }));
@@ -1651,6 +1917,15 @@ function save() {
     console.error(e);
     showToast('저장 실패 (저장공간 가득)');
   }
+}
+
+// Helper: get sorted OTT list
+function getOttSorted() {
+  return [...state.ottPlatforms].sort((a, b) => (a.order || 0) - (b.order || 0));
+}
+
+function getOttById(id) {
+  return state.ottPlatforms.find(o => o.id === id);
 }
 
 // ============ UTILITIES ============
@@ -1994,6 +2269,10 @@ function cardHTML(item) {
   if (item.rating > 0) meta.push(`<span class="card-stars">${starString(item.rating)}</span>`);
   if (item.status !== 'watching') meta.push(`<span>${statusName(item.status)}</span>`);
   if (item.type === 'book' && item.bookFormat) meta.push(`<span>${bookFormatName(item.bookFormat)}</span>`);
+  if (item.ott) {
+    const ott = getOttById(item.ott);
+    if (ott) meta.push(`<span class="ott-chip"><span class="ott-chip-dot" style="background: ${escapeHTML(ott.color || '#9e9a93')}"></span>${escapeHTML(ott.name)}</span>`);
+  }
 
   let extra = '';
   if (progress !== null && item.status === 'watching') {
@@ -2059,7 +2338,10 @@ function selectType(type) {
     document.getElementById('yt-import-section').classList.add('active');
     document.getElementById('section-youtube').classList.add('active');
   }
-  if (type === 'movie' || type === 'drama') document.getElementById('section-cast').classList.add('active');
+  if (type === 'movie' || type === 'drama') {
+    document.getElementById('section-cast').classList.add('active');
+    document.getElementById('section-ott').classList.add('active');
+  }
   if (type === 'drama') document.getElementById('section-drama').classList.add('active');
   if (type === 'book') {
     document.getElementById('section-book-pub').classList.add('active');
@@ -2137,6 +2419,7 @@ function resetForm() {
   state.selectedStatus = 'watching';
   state.selectedBookFormat = 'paper';
   state.selectedBookSource = 'own';
+  state.selectedOtt = null;
   state.ytThumb = null;
   document.getElementById('ytPreview').style.display = 'none';
   document.getElementById('ytImportInput').value = '';
@@ -2145,6 +2428,7 @@ function resetForm() {
   document.querySelectorAll('#bookFormatPicker .seg-option').forEach(o => o.classList.toggle('active', o.dataset.format === 'paper'));
   document.querySelectorAll('#bookSourcePicker .seg-option').forEach(o => o.classList.toggle('active', o.dataset.source === 'own'));
   updateStars();
+  updateOttSelectButton();
   updateDateClearVisibility('fStartDate');
   updateDateClearVisibility('fEndDate');
 }
@@ -2168,12 +2452,14 @@ function fillForm(item) {
   state.selectedStatus = item.status || 'watching';
   state.selectedBookFormat = item.bookFormat || 'paper';
   state.selectedBookSource = item.bookSource || 'own';
+  state.selectedOtt = item.ott || null;
   state.ytThumb = item.thumb || null;
   selectType(state.selectedType);
   document.querySelectorAll('#statusPicker .status-option').forEach(o => o.classList.toggle('active', o.dataset.status === state.selectedStatus));
   document.querySelectorAll('#bookFormatPicker .seg-option').forEach(o => o.classList.toggle('active', o.dataset.format === state.selectedBookFormat));
   document.querySelectorAll('#bookSourcePicker .seg-option').forEach(o => o.classList.toggle('active', o.dataset.source === state.selectedBookSource));
   updateStars();
+  updateOttSelectButton();
   updateDateClearVisibility('fStartDate');
   updateDateClearVisibility('fEndDate');
   if (item.thumb && item.type === 'youtube') {
@@ -2200,6 +2486,7 @@ function saveContent(e) {
     publisher: document.getElementById('fPublisher').value.trim(),
     bookFormat: state.selectedType === 'book' ? state.selectedBookFormat : '',
     bookSource: state.selectedType === 'book' ? state.selectedBookSource : '',
+    ott: (state.selectedType === 'movie' || state.selectedType === 'drama') ? state.selectedOtt : null,
     link: document.getElementById('fLink').value.trim(),
     thumb: state.ytThumb || '',
     totalEp: parseInt(document.getElementById('fTotalEp').value) || 0,
@@ -2298,6 +2585,12 @@ function openDetail(id) {
     ${item.cast ? `<div class="detail-section"><div class="detail-label">출연</div><div class="detail-value">${escapeHTML(item.cast)}</div></div>` : ''}
     ${item.publisher ? `<div class="detail-section"><div class="detail-label">출판사</div><div class="detail-value">${escapeHTML(item.publisher)}</div></div>` : ''}
     ${item.type === 'book' && (item.bookFormat || item.bookSource) ? `<div class="detail-section"><div class="detail-label">책 정보</div><div class="detail-value">${[bookFormatName(item.bookFormat), bookSourceName(item.bookSource)].filter(Boolean).join(' · ')}</div></div>` : ''}
+    ${(() => {
+      if (!item.ott) return '';
+      const ott = getOttById(item.ott);
+      if (!ott) return '';
+      return `<div class="detail-section"><div class="detail-label">OTT 플랫폼</div><div class="detail-value"><span class="ott-chip" style="font-size: 12px; padding: 4px 10px;"><span class="ott-chip-dot" style="background: ${escapeHTML(ott.color || '#9e9a93')}"></span>${escapeHTML(ott.name)}</span></div></div>`;
+    })()}
     ${item.rating > 0 ? `<div class="detail-section"><div class="detail-label">별점</div><div class="detail-stars">${starString(item.rating)}</div></div>` : ''}
     ${(item.startDate || item.endDate) ? `<div class="detail-section"><div class="detail-label">기간</div><div class="detail-value">${item.startDate ? fmtDate(item.startDate) : '?'} → ${item.endDate ? fmtDate(item.endDate) : '진행중'}</div></div>` : ''}
 
@@ -2783,6 +3076,195 @@ function confirmDeleteTemplate(id) {
   document.getElementById('confirmModal').classList.add('active');
 }
 
+// ============ OTT MANAGER ============
+function updateOttSelectButton() {
+  const btn = document.getElementById('ottSelectBtn');
+  const text = document.getElementById('ottSelectText');
+  if (!btn || !text) return;
+  if (state.selectedOtt) {
+    const ott = getOttById(state.selectedOtt);
+    if (ott) {
+      text.innerHTML = `<span style="display: inline-flex; align-items: center; gap: 6px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: ${escapeHTML(ott.color || '#9e9a93')}; display: inline-block;"></span>${escapeHTML(ott.name)}</span>`;
+      btn.classList.add('has-value');
+      return;
+    }
+  }
+  text.textContent = '선택 안 함';
+  btn.classList.remove('has-value');
+}
+
+function openOttPicker() {
+  renderOttPicker();
+  document.getElementById('ottPickerModal').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeOttPicker() {
+  document.getElementById('ottPickerModal').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function renderOttPicker() {
+  const grid = document.getElementById('ottPickerGrid');
+  const sorted = getOttSorted();
+  if (sorted.length === 0) {
+    grid.innerHTML = `<div style="grid-column: 1/-1; padding: 24px; text-align: center; color: var(--ink-mute); font-size: 12px;">등록된 OTT가 없어요.<br>아래 관리 버튼을 눌러 추가하세요.</div>`;
+    return;
+  }
+  grid.innerHTML = sorted.map(o => `
+    <button type="button" class="ott-picker-item ${state.selectedOtt === o.id ? 'selected' : ''}" onclick="selectOtt('${o.id}')">
+      <span class="ott-picker-dot" style="background: ${escapeHTML(o.color || '#9e9a93')}"></span>
+      <span class="ott-picker-name">${escapeHTML(o.name)}</span>
+    </button>
+  `).join('');
+}
+
+function selectOtt(id) {
+  state.selectedOtt = id;
+  updateOttSelectButton();
+  closeOttPicker();
+}
+
+function openOttManager() {
+  closeOttPicker();
+  setTimeout(() => {
+    document.getElementById('ottManagerModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+    renderOttManagerList();
+  }, 200);
+}
+
+function openOttManagerFromSettings() {
+  document.getElementById('ottManagerModal').classList.add('active');
+  document.body.style.overflow = 'hidden';
+  renderOttManagerList();
+}
+
+function closeOttManager() {
+  document.getElementById('ottManagerModal').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function renderOttManagerList() {
+  const sorted = getOttSorted();
+  const container = document.getElementById('ottManagerList');
+  if (sorted.length === 0) {
+    container.innerHTML = `<div style="padding: 24px; text-align: center; color: var(--ink-mute); font-size: 12px;">+ 새 OTT 추가 버튼으로 시작하세요</div>`;
+    return;
+  }
+  container.innerHTML = sorted.map((o, idx) => `
+    <div class="ott-manage-item">
+      <span class="ott-manage-dot" style="background: ${escapeHTML(o.color || '#9e9a93')}"></span>
+      <span class="ott-manage-name">${escapeHTML(o.name)}</span>
+      <button type="button" class="ott-manage-btn" onclick="moveOtt('${o.id}', -1)" ${idx === 0 ? 'disabled' : ''} title="위로">↑</button>
+      <button type="button" class="ott-manage-btn" onclick="moveOtt('${o.id}', 1)" ${idx === sorted.length - 1 ? 'disabled' : ''} title="아래로">↓</button>
+      <button type="button" class="ott-manage-btn edit" onclick="openOttEditor('${o.id}')" title="수정">✎</button>
+      <button type="button" class="ott-manage-btn danger" onclick="confirmDeleteOtt('${o.id}')" title="삭제">×</button>
+    </div>
+  `).join('');
+}
+
+function moveOtt(id, direction) {
+  const sorted = getOttSorted();
+  const idx = sorted.findIndex(o => o.id === id);
+  if (idx < 0) return;
+  const newIdx = idx + direction;
+  if (newIdx < 0 || newIdx >= sorted.length) return;
+  // Swap orders
+  const a = sorted[idx];
+  const b = sorted[newIdx];
+  const aOrder = a.order;
+  a.order = b.order;
+  b.order = aOrder;
+  // Re-normalize to avoid drift
+  getOttSorted().forEach((o, i) => { o.order = i; });
+  save();
+  renderOttManagerList();
+}
+
+function openOttEditor(id) {
+  state.ottEditingId = id || null;
+  if (id) {
+    const o = getOttById(id);
+    if (!o) return;
+    document.getElementById('ottEditorTitle').textContent = 'OTT 수정';
+    document.getElementById('ottEditId').value = id;
+    document.getElementById('ottEditName').value = o.name;
+    state.ottEditingColor = o.color || OTT_COLORS[0];
+  } else {
+    document.getElementById('ottEditorTitle').textContent = '새 OTT';
+    document.getElementById('ottEditId').value = '';
+    document.getElementById('ottEditName').value = '';
+    state.ottEditingColor = OTT_COLORS[0];
+  }
+  renderColorPicker();
+  document.getElementById('ottEditorModal').classList.add('active');
+}
+
+function closeOttEditor() {
+  document.getElementById('ottEditorModal').classList.remove('active');
+}
+
+function renderColorPicker() {
+  document.getElementById('ottColorPicker').innerHTML = OTT_COLORS.map(c =>
+    `<button type="button" class="color-swatch ${c === state.ottEditingColor ? 'active' : ''}" style="background: ${c}" onclick="pickOttColor('${c}')"></button>`
+  ).join('');
+}
+
+function pickOttColor(c) {
+  state.ottEditingColor = c;
+  renderColorPicker();
+}
+
+function saveOtt() {
+  const name = document.getElementById('ottEditName').value.trim();
+  if (!name) { showToast('이름을 입력하세요'); return; }
+  if (state.ottEditingId) {
+    const o = getOttById(state.ottEditingId);
+    if (o) { o.name = name; o.color = state.ottEditingColor; }
+  } else {
+    const maxOrder = state.ottPlatforms.reduce((m, o) => Math.max(m, o.order || 0), -1);
+    state.ottPlatforms.push({
+      id: uid(),
+      name,
+      color: state.ottEditingColor,
+      order: maxOrder + 1,
+      createdAt: Date.now()
+    });
+  }
+  save();
+  render();
+  renderOttManagerList();
+  closeOttEditor();
+  showToast('저장되었습니다');
+}
+
+function confirmDeleteOtt(id) {
+  const o = getOttById(id);
+  if (!o) return;
+  // Count usages
+  const usageCount = state.items.filter(it => it.ott === id).length;
+  document.getElementById('confirmTitle').textContent = 'OTT를 삭제할까요?';
+  document.getElementById('confirmDesc').textContent = usageCount > 0
+    ? `"${o.name}"이(가) ${usageCount}개 기록에서 사용 중입니다. 삭제하면 해당 기록의 OTT 정보가 비워집니다.`
+    : `"${o.name}"이(가) 영구적으로 삭제됩니다.`;
+  confirmCallback = () => {
+    // Clear from items that used this OTT
+    state.items.forEach(it => { if (it.ott === id) it.ott = null; });
+    state.ottPlatforms = state.ottPlatforms.filter(o => o.id !== id);
+    if (state.selectedOtt === id) {
+      state.selectedOtt = null;
+      updateOttSelectButton();
+    }
+    save();
+    render();
+    renderOttManagerList();
+    closeConfirm();
+    showToast('삭제되었습니다');
+  };
+  document.getElementById('confirmModal').classList.add('active');
+}
+
 // ============ EXCEL EXPORT ============
 function exportExcel() {
   if (state.items.length === 0) {
@@ -2791,29 +3273,33 @@ function exportExcel() {
   }
   try {
     // 1. Items sheet
-    const itemRows = state.items.map(item => ({
-      '유형': typeName(item.type),
-      '제목': item.title || '',
-      '크리에이터/감독/저자': item.creator || '',
-      '출연': item.cast || '',
-      '출판사': item.publisher || '',
-      '책 형태': item.type === 'book' ? bookFormatName(item.bookFormat) : '',
-      '구매/대여': item.type === 'book' ? bookSourceName(item.bookSource) : '',
-      '상태': statusName(item.status),
-      '별점': item.rating || '',
-      '시작일': item.startDate || '',
-      '완료일': item.endDate || '',
-      '전체 회차': item.totalEp || '',
-      '현재 회차': item.currentEp || '',
-      '전체 페이지': item.totalPage || '',
-      '현재 페이지': item.currentPage || '',
-      '진행률(%)': getProgress(item) ?? '',
-      '한줄 메모': item.memo || '',
-      '노트 개수': (item.notes || []).length,
-      '링크': item.link || '',
-      '등록일': item.createdAt ? new Date(item.createdAt).toISOString().slice(0,10) : '',
-      '최종 수정': item.updatedAt ? new Date(item.updatedAt).toISOString().slice(0,10) : ''
-    }));
+    const itemRows = state.items.map(item => {
+      const ott = item.ott ? getOttById(item.ott) : null;
+      return {
+        '유형': typeName(item.type),
+        '제목': item.title || '',
+        '크리에이터/감독/저자': item.creator || '',
+        '출연': item.cast || '',
+        '출판사': item.publisher || '',
+        'OTT 플랫폼': ott ? ott.name : '',
+        '책 형태': item.type === 'book' ? bookFormatName(item.bookFormat) : '',
+        '구매/대여': item.type === 'book' ? bookSourceName(item.bookSource) : '',
+        '상태': statusName(item.status),
+        '별점': item.rating || '',
+        '시작일': item.startDate || '',
+        '완료일': item.endDate || '',
+        '현재 회차': item.currentEp || '',
+        '전체 회차': item.totalEp || '',
+        '현재 페이지': item.currentPage || '',
+        '전체 페이지': item.totalPage || '',
+        '진행률(%)': getProgress(item) ?? '',
+        '한줄 메모': item.memo || '',
+        '노트 개수': (item.notes || []).length,
+        '링크': item.link || '',
+        '등록일': item.createdAt ? new Date(item.createdAt).toISOString().slice(0,10) : '',
+        '최종 수정': item.updatedAt ? new Date(item.updatedAt).toISOString().slice(0,10) : ''
+      };
+    });
 
     // 2. Notes sheet
     const noteRows = [];
@@ -2856,9 +3342,10 @@ function exportExcel() {
     // Column widths
     ws1['!cols'] = [
       { wch: 8 }, { wch: 28 }, { wch: 18 }, { wch: 22 }, { wch: 14 },
-      { wch: 8 }, { wch: 10 }, { wch: 10 }, { wch: 6 }, { wch: 12 }, { wch: 12 },
-      { wch: 8 }, { wch: 8 }, { wch: 10 }, { wch: 10 }, { wch: 8 },
-      { wch: 30 }, { wch: 8 }, { wch: 36 }, { wch: 12 }, { wch: 12 }
+      { wch: 12 }, { wch: 8 }, { wch: 10 }, { wch: 10 }, { wch: 6 },
+      { wch: 12 }, { wch: 12 }, { wch: 8 }, { wch: 8 }, { wch: 10 },
+      { wch: 10 }, { wch: 8 }, { wch: 30 }, { wch: 8 }, { wch: 36 },
+      { wch: 12 }, { wch: 12 }
     ];
     XLSX.utils.book_append_sheet(wb, ws1, '기록');
 
@@ -2906,10 +3393,11 @@ function confirmDelete(id) {
 
 function confirmClearAll() {
   document.getElementById('confirmTitle').textContent = '모든 데이터를 삭제할까요?';
-  document.getElementById('confirmDesc').textContent = `${state.items.length}개의 기록이 모두 삭제됩니다. 템플릿도 함께 초기화됩니다.`;
+  document.getElementById('confirmDesc').textContent = `${state.items.length}개의 기록이 모두 삭제됩니다. 템플릿/OTT도 함께 초기화됩니다.`;
   confirmCallback = () => {
     state.items = [];
     state.templates = DEFAULT_TEMPLATES.map(t => ({ ...t, createdAt: Date.now() }));
+    state.ottPlatforms = DEFAULT_OTT.map((o, i) => ({ ...o, order: i, createdAt: Date.now() }));
     save();
     render();
     closeConfirm();
@@ -2929,7 +3417,13 @@ function closeConfirm() {
 
 // ============ JSON IMPORT/EXPORT ============
 function exportData() {
-  const data = { items: state.items, templates: state.templates, exportedAt: new Date().toISOString(), version: 2 };
+  const data = {
+    items: state.items,
+    templates: state.templates,
+    ottPlatforms: state.ottPlatforms,
+    exportedAt: new Date().toISOString(),
+    version: 3
+  };
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -2949,11 +3443,14 @@ function importData(event) {
       const data = JSON.parse(e.target.result);
       if (Array.isArray(data.items)) {
         document.getElementById('confirmTitle').textContent = '데이터를 가져올까요?';
-        document.getElementById('confirmDesc').textContent = `${data.items.length}개 항목과 ${data.templates ? data.templates.length : 0}개 템플릿이 현재 기록과 합쳐집니다.`;
+        const tCount = data.templates ? data.templates.length : 0;
+        const oCount = data.ottPlatforms ? data.ottPlatforms.length : 0;
+        document.getElementById('confirmDesc').textContent = `${data.items.length}개 항목, ${tCount}개 템플릿, ${oCount}개 OTT가 현재 기록과 합쳐집니다.`;
         confirmCallback = () => {
           const existing = new Map(state.items.map(i => [i.id, i]));
           data.items.forEach(i => {
             if (!Array.isArray(i.notes)) i.notes = [];
+            if (i.ott === undefined) i.ott = null;
             existing.set(i.id, i);
           });
           state.items = [...existing.values()];
@@ -2961,6 +3458,13 @@ function importData(event) {
             const tExisting = new Map(state.templates.map(t => [t.id, t]));
             data.templates.forEach(t => tExisting.set(t.id, t));
             state.templates = [...tExisting.values()];
+          }
+          if (Array.isArray(data.ottPlatforms)) {
+            const oExisting = new Map(state.ottPlatforms.map(o => [o.id, o]));
+            data.ottPlatforms.forEach(o => oExisting.set(o.id, o));
+            state.ottPlatforms = [...oExisting.values()];
+            // Re-normalize order
+            getOttSorted().forEach((o, i) => { o.order = i; });
           }
           save();
           render();
