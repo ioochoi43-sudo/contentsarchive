@@ -183,6 +183,14 @@
     border-color: var(--ink);
     font-weight: 600;
   }
+  .pill-count {
+    font-size: 10px;
+    color: var(--ink-mute);
+    margin-left: 2px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .pill.active .pill-count { color: var(--accent-soft); }
 
   .sort-btn {
     flex-shrink: 0;
@@ -1383,6 +1391,294 @@
     padding: 0;
     font-weight: 400;
   }
+
+  /* OTT VIEW */
+  .ott-group {
+    margin-bottom: 24px;
+  }
+  .ott-group-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--line);
+  }
+  .ott-group-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .ott-group-name {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    flex: 1;
+  }
+  .ott-group-count {
+    font-size: 12px;
+    color: var(--ink-mute);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+  .ott-group-stat {
+    font-size: 11px;
+    color: var(--ink-mute);
+    font-weight: 500;
+    margin-bottom: 10px;
+    display: flex;
+    gap: 12px;
+  }
+  .ott-group-stat b { color: var(--accent); font-weight: 700; }
+
+  /* STATS DASHBOARD */
+  .stat-card {
+    background: var(--bg-elev);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 14px;
+  }
+  .stat-card-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 16px;
+    letter-spacing: -0.01em;
+  }
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .stat-tile {
+    background: var(--bg-elev);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+  }
+  .stat-tile-num {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--ink);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .stat-tile-num span { color: var(--accent); }
+  .stat-tile-label {
+    font-size: 11px;
+    color: var(--ink-mute);
+    font-weight: 500;
+    margin-top: 6px;
+  }
+  /* horizontal bar chart */
+  .bar-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .bar-label {
+    font-size: 12px;
+    color: var(--ink-dim);
+    font-weight: 500;
+    width: 60px;
+    flex-shrink: 0;
+    text-align: right;
+  }
+  .bar-track {
+    flex: 1;
+    height: 22px;
+    background: var(--bg-soft);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 0.5s cubic-bezier(0.16,1,0.3,1);
+    min-width: 2px;
+  }
+  .bar-val {
+    font-size: 11px;
+    color: var(--ink-dim);
+    font-weight: 600;
+    width: 32px;
+    flex-shrink: 0;
+    font-variant-numeric: tabular-nums;
+  }
+  /* monthly column chart */
+  .col-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    height: 130px;
+    padding-top: 10px;
+  }
+  .col-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    height: 100%;
+    justify-content: flex-end;
+  }
+  .col-bar {
+    width: 100%;
+    max-width: 28px;
+    background: linear-gradient(180deg, var(--accent), #d99860);
+    border-radius: 5px 5px 0 0;
+    min-height: 2px;
+    transition: height 0.5s cubic-bezier(0.16,1,0.3,1);
+    position: relative;
+  }
+  .col-bar-val {
+    position: absolute;
+    top: -16px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+  }
+  .col-label {
+    font-size: 9px;
+    color: var(--ink-mute);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  /* star distribution */
+  .star-dist-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .star-dist-label {
+    font-size: 12px;
+    color: var(--accent);
+    font-weight: 600;
+    width: 48px;
+    flex-shrink: 0;
+    letter-spacing: 1px;
+  }
+
+  /* HALL OF FAME */
+  .hall-item {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    background: linear-gradient(135deg, var(--bg-elev), #fffdf9);
+    border: 1px solid #f0e4d0;
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 10px;
+    cursor: pointer;
+  }
+  .hall-rank {
+    font-size: 20px;
+    flex-shrink: 0;
+    width: 32px;
+    text-align: center;
+  }
+  .hall-thumb {
+    width: 52px;
+    height: 52px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 1px solid var(--line);
+    flex-shrink: 0;
+  }
+  .hall-body { flex: 1; min-width: 0; }
+  .hall-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    margin-bottom: 2px;
+    word-break: keep-all;
+  }
+  .hall-creator { font-size: 12px; color: var(--ink-dim); }
+  .hall-stars { color: var(--accent); font-size: 13px; letter-spacing: 1px; margin-top: 3px; font-weight: 600; }
+
+  /* CALENDAR / CHRONICLE */
+  .chron-month {
+    margin-bottom: 22px;
+  }
+  .chron-month-head {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 12px;
+    position: sticky;
+    top: 49px;
+    background: var(--bg);
+    padding: 6px 0;
+    z-index: 10;
+  }
+  .chron-month-title {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .chron-month-count {
+    font-size: 12px;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .chron-line {
+    border-left: 2px solid var(--line);
+    padding-left: 16px;
+    margin-left: 6px;
+  }
+  .chron-item {
+    position: relative;
+    margin-bottom: 12px;
+    cursor: pointer;
+  }
+  .chron-item::before {
+    content: '';
+    position: absolute;
+    left: -23px;
+    top: 4px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid var(--bg);
+  }
+  .chron-day {
+    font-size: 11px;
+    color: var(--ink-mute);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    margin-bottom: 2px;
+  }
+  .chron-card-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    word-break: keep-all;
+  }
+  .chron-meta {
+    font-size: 11px;
+    color: var(--ink-mute);
+    margin-top: 2px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
 </style>
 </head>
 <body>
@@ -1398,9 +1694,10 @@
 <nav class="tabs" id="tabs">
   <button class="tab active" data-tab="timeline">타임라인</button>
   <button class="tab" data-tab="all">전체 <span class="tab-count" id="cnt-all">0</span></button>
-  <button class="tab" data-tab="watching">진행중 <span class="tab-count" id="cnt-watching">0</span></button>
-  <button class="tab" data-tab="wishlist">위시 <span class="tab-count" id="cnt-wishlist">0</span></button>
-  <button class="tab" data-tab="done">완료 <span class="tab-count" id="cnt-done">0</span></button>
+  <button class="tab" data-tab="ott">OTT별</button>
+  <button class="tab" data-tab="stats">통계</button>
+  <button class="tab" data-tab="hall">명예의전당</button>
+  <button class="tab" data-tab="calendar">연대기</button>
   <button class="tab" data-tab="settings">설정</button>
 </nav>
 
@@ -1431,6 +1728,12 @@
   <section class="view" id="view-all">
     <h2 class="section-title">전체 <span>아카이브</span></h2>
     <div class="section-sub">모든 기록</div>
+    <div class="filter-row" id="statusFilter" style="margin-bottom: 10px;">
+      <button class="pill active" data-status="all">전체 <span class="pill-count" id="sc-all">0</span></button>
+      <button class="pill" data-status="watching">진행중 <span class="pill-count" id="sc-watching">0</span></button>
+      <button class="pill" data-status="wishlist">위시 <span class="pill-count" id="sc-wishlist">0</span></button>
+      <button class="pill" data-status="done">완료 <span class="pill-count" id="sc-done">0</span></button>
+    </div>
     <div class="controls-row">
       <div class="filter-row" id="typeFilter">
         <button class="pill active" data-type="all">전체</button>
@@ -1447,22 +1750,34 @@
     <div id="allList"></div>
   </section>
 
-  <section class="view" id="view-watching">
-    <h2 class="section-title">진행 <span>중</span></h2>
-    <div class="section-sub">보고 있는 것들</div>
-    <div id="watchingList"></div>
+  <section class="view" id="view-ott">
+    <h2 class="section-title">OTT <span>별 보기</span></h2>
+    <div class="section-sub">플랫폼마다 모아서</div>
+    <div id="ottView"></div>
   </section>
 
-  <section class="view" id="view-wishlist">
-    <h2 class="section-title"><span>위시</span>리스트</h2>
-    <div class="section-sub">언젠가 보고 싶은 것들</div>
-    <div id="wishlistList"></div>
+  <section class="view" id="view-stats">
+    <h2 class="section-title">통계 <span>대시보드</span></h2>
+    <div class="section-sub">기록을 한눈에</div>
+    <div id="statsView"></div>
   </section>
 
-  <section class="view" id="view-done">
-    <h2 class="section-title">완료 <span>기록</span></h2>
-    <div class="section-sub">완료된 기록들</div>
-    <div id="doneList"></div>
+  <section class="view" id="view-hall">
+    <h2 class="section-title">명예의 <span>전당</span></h2>
+    <div class="section-sub">별점 ★4 이상의 인생작</div>
+    <div id="hallView"></div>
+  </section>
+
+  <section class="view" id="view-calendar">
+    <h2 class="section-title"><span>연대기</span></h2>
+    <div class="section-sub">월별로 돌아보는 기록</div>
+    <div class="controls-row">
+      <div class="filter-row" id="calendarBasis">
+        <button class="pill active" data-basis="end">완료일 기준</button>
+        <button class="pill" data-basis="start">시작일 기준</button>
+      </div>
+    </div>
+    <div id="calendarView"></div>
   </section>
 
   <section class="view" id="view-settings">
@@ -1515,7 +1830,7 @@
     </div>
 
     <div style="text-align: center; margin-top: 40px; font-size: 11px; color: var(--ink-mute); letter-spacing: 0.04em; font-weight: 500;">
-      v1.6 · 데이터는 브라우저에 저장됩니다
+      v1.8 · 데이터는 브라우저에 저장됩니다
     </div>
   </section>
 </main>
@@ -2007,6 +2322,7 @@ let state = {
   ottPlatforms: [],
   currentTab: 'timeline',
   typeFilter: 'all',
+  statusFilter: 'all',
   templateFilter: 'all',
   sortBy: 'updated',
   sortDir: 'desc',
@@ -2384,10 +2700,11 @@ function render() {
   updateCounts();
   renderTimeline();
   renderAll();
-  renderWatching();
-  renderWishlist();
-  renderDone();
   renderStats();
+  renderOttView();
+  renderStatsView();
+  renderHallView();
+  renderCalendarView();
   renderBackupStatus();
   document.getElementById('dateLabel').textContent = fmtToday();
   document.getElementById('sortBtnLabel').textContent = getSortLabel();
@@ -2395,9 +2712,12 @@ function render() {
 
 function updateCounts() {
   document.getElementById('cnt-all').textContent = state.items.length;
-  document.getElementById('cnt-watching').textContent = state.items.filter(i => i.status === 'watching').length;
-  document.getElementById('cnt-wishlist').textContent = state.items.filter(i => i.status === 'wishlist').length;
-  document.getElementById('cnt-done').textContent = state.items.filter(i => i.status === 'done').length;
+  // status filter pill counts (전체 탭 내부)
+  const sc = (id, n) => { const el = document.getElementById(id); if (el) el.textContent = n; };
+  sc('sc-all', state.items.length);
+  sc('sc-watching', state.items.filter(i => i.status === 'watching').length);
+  sc('sc-wishlist', state.items.filter(i => i.status === 'wishlist').length);
+  sc('sc-done', state.items.filter(i => i.status === 'done' || i.status === 'dropped').length);
 }
 
 function renderTimeline() {
@@ -2414,30 +2734,19 @@ function renderTimeline() {
 function renderAll() {
   let items = [...state.items];
   if (state.typeFilter !== 'all') items = items.filter(i => i.type === state.typeFilter);
+  if (state.statusFilter !== 'all') {
+    if (state.statusFilter === 'done') {
+      items = items.filter(i => i.status === 'done' || i.status === 'dropped');
+    } else {
+      items = items.filter(i => i.status === state.statusFilter);
+    }
+  }
   items = sortItems(items);
+  const emptyMsg = state.statusFilter === 'all'
+    ? ['아직 기록이 없어요', '+ 버튼으로 첫 기록을 만들어보세요']
+    : ['해당하는 기록이 없어요', '다른 필터를 선택해보세요'];
   document.getElementById('allList').innerHTML = items.length === 0
-    ? emptyHTML('아직 기록이 없어요', '+ 버튼으로 첫 기록을 만들어보세요')
-    : items.map(cardHTML).join('');
-}
-
-function renderWatching() {
-  const items = sortItems(state.items.filter(i => i.status === 'watching'));
-  document.getElementById('watchingList').innerHTML = items.length === 0
-    ? emptyHTML('진행 중인 콘텐츠 없음', '보고 있는 콘텐츠가 없어요')
-    : items.map(cardHTML).join('');
-}
-
-function renderWishlist() {
-  const items = sortItems(state.items.filter(i => i.status === 'wishlist'));
-  document.getElementById('wishlistList').innerHTML = items.length === 0
-    ? emptyHTML('위시리스트 비어있음', '나중에 볼 콘텐츠를 추가해보세요')
-    : items.map(cardHTML).join('');
-}
-
-function renderDone() {
-  const items = sortItems(state.items.filter(i => i.status === 'done' || i.status === 'dropped'));
-  document.getElementById('doneList').innerHTML = items.length === 0
-    ? emptyHTML('완료한 기록 없음', '완료한 기록이 쌓이면 여기에 모입니다')
+    ? emptyHTML(emptyMsg[0], emptyMsg[1])
     : items.map(cardHTML).join('');
 }
 
@@ -2448,6 +2757,231 @@ function renderStats() {
   document.getElementById('statRating').textContent = rated.length > 0
     ? `${(rated.reduce((s,i) => s+i.rating, 0)/rated.length).toFixed(2)} / 5.00 (${rated.length}건)`
     : '-';
+}
+
+// ============ OTT VIEW ============
+function renderOttView() {
+  const container = document.getElementById('ottView');
+  if (!container) return;
+  // movie/drama items that have OTT
+  const relevant = state.items.filter(i => (i.type === 'movie' || i.type === 'drama'));
+  if (relevant.length === 0) {
+    container.innerHTML = emptyHTML('영화·드라마 기록이 없어요', 'OTT 정보를 담은 기록이 쌓이면 여기 모입니다');
+    return;
+  }
+  const sortedOtt = getOttSorted();
+  let html = '';
+  // Each OTT group
+  sortedOtt.forEach(ott => {
+    const items = sortItems(relevant.filter(i => i.ott === ott.id));
+    if (items.length === 0) return;
+    const watching = items.filter(i => i.status === 'watching').length;
+    const done = items.filter(i => i.status === 'done').length;
+    const wish = items.filter(i => i.status === 'wishlist').length;
+    const stat = [];
+    if (watching) stat.push(`진행중 <b>${watching}</b>`);
+    if (done) stat.push(`완료 <b>${done}</b>`);
+    if (wish) stat.push(`위시 <b>${wish}</b>`);
+    html += `<div class="ott-group">
+      <div class="ott-group-head">
+        <span class="ott-group-dot" style="background: ${escapeHTML(ott.color || '#9e9a93')}"></span>
+        <span class="ott-group-name">${escapeHTML(ott.name)}</span>
+        <span class="ott-group-count">${items.length}개</span>
+      </div>
+      ${stat.length ? `<div class="ott-group-stat">${stat.join('')}</div>` : ''}
+      ${items.map(cardHTML).join('')}
+    </div>`;
+  });
+  // No OTT assigned
+  const noOtt = sortItems(relevant.filter(i => !i.ott || !getOttById(i.ott)));
+  if (noOtt.length > 0) {
+    html += `<div class="ott-group">
+      <div class="ott-group-head">
+        <span class="ott-group-dot" style="background: var(--line)"></span>
+        <span class="ott-group-name" style="color: var(--ink-mute);">OTT 미지정</span>
+        <span class="ott-group-count">${noOtt.length}개</span>
+      </div>
+      ${noOtt.map(cardHTML).join('')}
+    </div>`;
+  }
+  container.innerHTML = html || emptyHTML('표시할 기록이 없어요', '');
+}
+
+// ============ STATS DASHBOARD ============
+function renderStatsView() {
+  const container = document.getElementById('statsView');
+  if (!container) return;
+  const items = state.items;
+  if (items.length === 0) {
+    container.innerHTML = emptyHTML('아직 기록이 없어요', '기록을 추가하면 통계가 표시됩니다');
+    return;
+  }
+
+  const done = items.filter(i => i.status === 'done').length;
+  const watching = items.filter(i => i.status === 'watching').length;
+  const rated = items.filter(i => i.rating > 0);
+  const avgRating = rated.length > 0 ? (rated.reduce((s,i) => s+i.rating, 0)/rated.length).toFixed(1) : '-';
+  const totalNotes = items.reduce((s,i) => s + (i.notes ? i.notes.length : 0), 0);
+
+  // tiles
+  let html = `<div class="stat-grid">
+    <div class="stat-tile"><div class="stat-tile-num">${items.length}</div><div class="stat-tile-label">전체 기록</div></div>
+    <div class="stat-tile"><div class="stat-tile-num"><span>${done}</span></div><div class="stat-tile-label">완료</div></div>
+    <div class="stat-tile"><div class="stat-tile-num">${watching}</div><div class="stat-tile-label">진행중</div></div>
+    <div class="stat-tile"><div class="stat-tile-num"><span>${avgRating}</span></div><div class="stat-tile-label">평균 별점</div></div>
+  </div>`;
+
+  // type distribution bar chart
+  const typeColors = { youtube: '#c4543a', movie: '#4a6f96', drama: '#c4923a', book: '#5a7a3c' };
+  const types = ['youtube','movie','drama','book'];
+  const typeCounts = types.map(t => items.filter(i => i.type === t).length);
+  const maxType = Math.max(...typeCounts, 1);
+  html += `<div class="stat-card">
+    <div class="stat-card-title">유형별 분포</div>
+    ${types.map((t, idx) => {
+      const c = typeCounts[idx];
+      const pct = Math.round(c / maxType * 100);
+      return `<div class="bar-row">
+        <span class="bar-label">${typeName(t)}</span>
+        <span class="bar-track"><span class="bar-fill" style="width: ${c > 0 ? pct : 0}%; background: ${typeColors[t]};"></span></span>
+        <span class="bar-val">${c}</span>
+      </div>`;
+    }).join('')}
+  </div>`;
+
+  // monthly completion (last 6 months)
+  const now = new Date();
+  const months = [];
+  for (let k = 5; k >= 0; k--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - k, 1);
+    months.push({ y: d.getFullYear(), m: d.getMonth(), label: `${d.getMonth()+1}월` });
+  }
+  const monthCounts = months.map(mo =>
+    items.filter(i => {
+      if (i.status !== 'done' || !i.endDate) return false;
+      const d = new Date(i.endDate);
+      return d.getFullYear() === mo.y && d.getMonth() === mo.m;
+    }).length
+  );
+  const maxMonth = Math.max(...monthCounts, 1);
+  html += `<div class="stat-card">
+    <div class="stat-card-title">월별 완료 추이 <span style="color: var(--ink-mute); font-weight: 500;">(최근 6개월)</span></div>
+    <div class="col-chart">
+      ${months.map((mo, idx) => {
+        const c = monthCounts[idx];
+        const h = c > 0 ? Math.round(c / maxMonth * 100) : 0;
+        return `<div class="col-item">
+          <div class="col-bar" style="height: ${h}%">${c > 0 ? `<span class="col-bar-val">${c}</span>` : ''}</div>
+          <div class="col-label">${mo.label}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+
+  // star distribution
+  if (rated.length > 0) {
+    const starCounts = [5,4,3,2,1].map(s => rated.filter(i => i.rating === s).length);
+    const maxStar = Math.max(...starCounts, 1);
+    html += `<div class="stat-card">
+      <div class="stat-card-title">별점 분포</div>
+      ${[5,4,3,2,1].map((s, idx) => {
+        const c = starCounts[idx];
+        const pct = Math.round(c / maxStar * 100);
+        return `<div class="star-dist-row">
+          <span class="star-dist-label">${'★'.repeat(s)}</span>
+          <span class="bar-track"><span class="bar-fill" style="width: ${c > 0 ? pct : 0}%; background: linear-gradient(90deg, var(--accent), #d99860);"></span></span>
+          <span class="bar-val">${c}</span>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }
+
+  // notes count
+  html += `<div class="stat-card" style="display: flex; justify-content: space-between; align-items: center;">
+    <div class="stat-card-title" style="margin-bottom: 0;">작성한 노트</div>
+    <div style="font-size: 22px; font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums;">${totalNotes}<span style="font-size: 13px; color: var(--ink-mute); font-weight: 500;"> 개</span></div>
+  </div>`;
+
+  container.innerHTML = html;
+}
+
+// ============ HALL OF FAME ============
+function renderHallView() {
+  const container = document.getElementById('hallView');
+  if (!container) return;
+  const items = state.items.filter(i => i.rating >= 4)
+    .sort((a,b) => (b.rating - a.rating) || ((b.updatedAt||0) - (a.updatedAt||0)));
+  if (items.length === 0) {
+    container.innerHTML = emptyHTML('아직 인생작이 없어요', '별점 ★4 이상을 준 기록이 여기 모입니다');
+    return;
+  }
+  const medals = ['🥇','🥈','🥉'];
+  container.innerHTML = items.map((item, idx) => {
+    const rank = idx < 3 ? medals[idx] : `<span style="font-size: 13px; color: var(--ink-mute); font-weight: 700;">${idx+1}</span>`;
+    const thumb = item.thumb
+      ? `<img class="hall-thumb" src="${escapeHTML(item.thumb)}" alt="" loading="lazy">`
+      : `<div class="hall-thumb" style="display:flex;align-items:center;justify-content:center;background:var(--bg-soft);color:var(--ink-mute);font-size:18px;">${{youtube:'▶',movie:'★',drama:'●',book:'▤'}[item.type]||''}</div>`;
+    return `<div class="hall-item" onclick="openDetail('${item.id}')">
+      <div class="hall-rank">${rank}</div>
+      ${thumb}
+      <div class="hall-body">
+        <div class="hall-title">${escapeHTML(item.title)}</div>
+        ${item.creator ? `<div class="hall-creator">${escapeHTML(item.creator)}</div>` : ''}
+        <div class="hall-stars">${starString(item.rating)}</div>
+      </div>
+      <div class="card-type ${item.type}">${typeName(item.type)}</div>
+    </div>`;
+  }).join('');
+}
+
+// ============ CALENDAR / CHRONICLE ============
+let calendarBasis = 'end';
+
+function renderCalendarView() {
+  const container = document.getElementById('calendarView');
+  if (!container) return;
+  const dateField = calendarBasis === 'start' ? 'startDate' : 'endDate';
+  const withDate = state.items.filter(i => i[dateField]);
+  if (withDate.length === 0) {
+    container.innerHTML = emptyHTML('표시할 기록이 없어요', calendarBasis === 'start' ? '시작일이 있는 기록이 없어요' : '완료일이 있는 기록이 없어요');
+    return;
+  }
+  // group by YYYY-MM
+  const groups = {};
+  withDate.forEach(i => {
+    const d = new Date(i[dateField]);
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(i);
+  });
+  // sort months descending
+  const keys = Object.keys(groups).sort((a,b) => b.localeCompare(a));
+  let html = '';
+  keys.forEach(key => {
+    const [y, m] = key.split('-');
+    const monthItems = groups[key].sort((a,b) => new Date(b[dateField]) - new Date(a[dateField]));
+    html += `<div class="chron-month">
+      <div class="chron-month-head">
+        <span class="chron-month-title">${y}.${m}</span>
+        <span class="chron-month-count">${monthItems.length}개</span>
+      </div>
+      <div class="chron-line">
+        ${monthItems.map(i => {
+          const d = new Date(i[dateField]);
+          const meta = [];
+          meta.push(`<span class="card-type ${i.type}" style="padding: 1px 7px; font-size: 9px;">${typeName(i.type)}</span>`);
+          if (i.rating > 0) meta.push(`<span class="card-stars" style="font-size: 11px;">${starString(i.rating)}</span>`);
+          if (i.ott) { const o = getOttById(i.ott); if (o) meta.push(`<span class="ott-chip"><span class="ott-chip-dot" style="background:${escapeHTML(o.color||'#9e9a93')}"></span>${escapeHTML(o.name)}</span>`); }
+          return `<div class="chron-item" onclick="openDetail('${i.id}')">
+            <div class="chron-day">${d.getMonth()+1}.${String(d.getDate()).padStart(2,'0')} ${calendarBasis === 'start' ? '시작' : '완료'}</div>
+            <div class="chron-card-title">${escapeHTML(i.title)}</div>
+            <div class="chron-meta">${meta.join('')}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  });
+  container.innerHTML = html;
 }
 
 function emptyHTML(big, small) {
@@ -2516,6 +3050,24 @@ document.getElementById('typeFilter').addEventListener('click', (e) => {
   pill.classList.add('active');
   state.typeFilter = pill.dataset.type;
   renderAll();
+});
+
+document.getElementById('statusFilter').addEventListener('click', (e) => {
+  const pill = e.target.closest('.pill');
+  if (!pill) return;
+  document.querySelectorAll('#statusFilter .pill').forEach(p => p.classList.remove('active'));
+  pill.classList.add('active');
+  state.statusFilter = pill.dataset.status;
+  renderAll();
+});
+
+document.getElementById('calendarBasis').addEventListener('click', (e) => {
+  const pill = e.target.closest('.pill');
+  if (!pill) return;
+  document.querySelectorAll('#calendarBasis .pill').forEach(p => p.classList.remove('active'));
+  pill.classList.add('active');
+  calendarBasis = pill.dataset.basis;
+  renderCalendarView();
 });
 
 // ============ FORM ============
