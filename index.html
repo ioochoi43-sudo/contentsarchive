@@ -1270,10 +1270,117 @@
     cursor: pointer;
     border: 2px solid transparent;
     transition: transform 0.1s;
+    padding: 0;
   }
   .color-swatch.active {
     border-color: var(--ink);
     transform: scale(1.1);
+  }
+  /* custom color picker row */
+  .color-custom-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+    padding: 10px 12px;
+    background: var(--bg-soft);
+    border-radius: 10px;
+  }
+  .color-custom-label {
+    font-size: 12px;
+    color: var(--ink-dim);
+    font-weight: 500;
+    flex: 1;
+  }
+  .color-custom-preview {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    flex-shrink: 0;
+  }
+  .color-custom-input {
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    opacity: 0;
+    cursor: pointer;
+    border: none;
+    padding: 0;
+  }
+  .color-custom-wrap {
+    position: relative;
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+  }
+  .color-custom-hex {
+    font-size: 12px;
+    color: var(--ink-mute);
+    font-family: 'SF Mono', Monaco, monospace;
+    text-transform: uppercase;
+    width: 70px;
+    text-align: right;
+  }
+
+  /* BACKUP BANNER */
+  .backup-banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--accent-soft);
+    border: 1px solid #ecd9bf;
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 18px;
+    position: relative;
+    animation: fadeIn 0.4s ease;
+  }
+  .backup-banner-icon {
+    font-size: 22px;
+    flex-shrink: 0;
+    line-height: 1;
+  }
+  .backup-banner-text { flex: 1; min-width: 0; }
+  .backup-banner-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #9a5a1e;
+    margin-bottom: 2px;
+    letter-spacing: -0.01em;
+  }
+  .backup-banner-desc {
+    font-size: 11px;
+    color: #b07636;
+    line-height: 1.4;
+  }
+  .backup-banner-btn {
+    flex-shrink: 0;
+    padding: 8px 16px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 100px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: var(--sans);
+  }
+  .backup-banner-btn:active { transform: scale(0.96); }
+  .backup-banner-close {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    width: 22px;
+    height: 22px;
+    background: none;
+    border: none;
+    color: #c09b6a;
+    font-size: 18px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    font-weight: 400;
   }
 </style>
 </head>
@@ -1297,6 +1404,16 @@
 </nav>
 
 <main>
+  <div id="backupBanner" class="backup-banner" style="display: none;">
+    <div class="backup-banner-icon">💾</div>
+    <div class="backup-banner-text">
+      <div class="backup-banner-title" id="backupBannerTitle">백업할 때가 됐어요</div>
+      <div class="backup-banner-desc" id="backupBannerDesc">데이터는 이 기기에만 저장돼요. 가끔 백업해두세요.</div>
+    </div>
+    <button class="backup-banner-btn" onclick="exportData()">백업</button>
+    <button class="backup-banner-close" onclick="dismissBackupBanner()" aria-label="닫기">×</button>
+  </div>
+
   <section class="view active" id="view-timeline">
     <h2 class="section-title">지금 <span>보는 중</span></h2>
     <div class="section-sub">진행 중인 콘텐츠를 한눈에</div>
@@ -1369,6 +1486,12 @@
         <div class="settings-desc" id="statRating">-</div>
       </div>
     </div>
+    <div class="settings-row">
+      <div>
+        <div class="settings-label">마지막 백업</div>
+        <div class="settings-desc" id="backupStatus">아직 백업 안 함</div>
+      </div>
+    </div>
 
     <div style="margin-top: 24px;">
       <h3 style="font-size: 13px; font-weight: 600; color: var(--ink-mute); letter-spacing: 0.04em; margin-bottom: 10px;">템플릿 관리</h3>
@@ -1378,8 +1501,11 @@
 
     <div style="margin-top: 24px;">
       <h3 style="font-size: 13px; font-weight: 600; color: var(--ink-mute); letter-spacing: 0.04em; margin-bottom: 10px;">내보내기 / 백업</h3>
+      <div style="font-size: 12px; color: var(--ink-dim); line-height: 1.6; background: var(--bg-soft); border-radius: 10px; padding: 12px 14px; margin-bottom: 12px;">
+        💡 데이터는 <strong>이 기기에만</strong> 저장돼요. 다른 기기와는 자동으로 합쳐지지 않고, 오래 안 쓰면 사라질 수 있어요. 가끔 <strong>JSON 백업</strong>을 받아두면 안전하게 보관·복원할 수 있어요.
+      </div>
       <button class="btn" onclick="exportExcel()" style="width: 100%; margin-bottom: 8px;">📊 엑셀 파일로 내보내기 (.xlsx)</button>
-      <button class="btn" onclick="exportData()" style="width: 100%; margin-bottom: 8px;">JSON 백업 다운로드</button>
+      <button class="btn btn-primary" onclick="exportData()" style="width: 100%; margin-bottom: 8px;">💾 JSON 백업 다운로드</button>
       <label class="btn" style="width: 100%; margin-bottom: 8px; display: block; text-align: center;">
         JSON 백업 가져오기
         <input type="file" accept=".json" onchange="importData(event)" style="display: none;">
@@ -1388,7 +1514,7 @@
     </div>
 
     <div style="text-align: center; margin-top: 40px; font-size: 11px; color: var(--ink-mute); letter-spacing: 0.04em; font-weight: 500;">
-      v1.4 · 데이터는 브라우저에 저장됩니다
+      v1.5 · 데이터는 브라우저에 저장됩니다
     </div>
   </section>
 </main>
@@ -1766,6 +1892,14 @@
       <div class="form-group">
         <label class="form-label">색상</label>
         <div class="color-picker" id="ottColorPicker"></div>
+        <div class="color-custom-row">
+          <span class="color-custom-label">직접 색상 고르기</span>
+          <span class="color-custom-hex" id="ottColorHex">#000000</span>
+          <span class="color-custom-wrap">
+            <span class="color-custom-preview" id="ottColorPreview"></span>
+            <input type="color" class="color-custom-input" id="ottColorInput" oninput="pickCustomColor(this.value)">
+          </span>
+        </div>
       </div>
 
       <div class="btn-row">
@@ -1846,7 +1980,10 @@ let state = {
   selectedBookFormat: 'paper',
   selectedBookSource: 'own',
   selectedOtt: null,
-  ytThumb: null
+  ytThumb: null,
+  lastBackupAt: null,
+  changesSinceBackup: 0,
+  bannerDismissedAt: null
 };
 
 // ============ STORAGE ============
@@ -1891,6 +2028,9 @@ function load() {
       if (data.settings) {
         state.sortBy = data.settings.sortBy || 'updated';
         state.sortDir = data.settings.sortDir || 'desc';
+        state.lastBackupAt = data.settings.lastBackupAt || null;
+        state.changesSinceBackup = data.settings.changesSinceBackup || 0;
+        state.bannerDismissedAt = data.settings.bannerDismissedAt || null;
       }
     } else {
       state.templates = DEFAULT_TEMPLATES.map(t => ({ ...t, createdAt: Date.now() }));
@@ -1904,19 +2044,29 @@ function load() {
   }
 }
 
-function save() {
+function save(isDataChange) {
+  if (isDataChange) {
+    state.changesSinceBackup = (state.changesSinceBackup || 0) + 1;
+  }
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
       items: state.items,
       templates: state.templates,
       ottPlatforms: state.ottPlatforms,
-      settings: { sortBy: state.sortBy, sortDir: state.sortDir },
+      settings: {
+        sortBy: state.sortBy,
+        sortDir: state.sortDir,
+        lastBackupAt: state.lastBackupAt,
+        changesSinceBackup: state.changesSinceBackup,
+        bannerDismissedAt: state.bannerDismissedAt
+      },
       savedAt: Date.now()
     }));
   } catch(e) {
     console.error(e);
     showToast('저장 실패 (저장공간 가득)');
   }
+  if (isDataChange) updateBackupBanner();
 }
 
 // Helper: get sorted OTT list
@@ -2195,6 +2345,7 @@ function render() {
   renderWishlist();
   renderDone();
   renderStats();
+  renderBackupStatus();
   document.getElementById('dateLabel').textContent = fmtToday();
   document.getElementById('sortBtnLabel').textContent = getSortLabel();
 }
@@ -2507,7 +2658,7 @@ function saveContent(e) {
     item.createdAt = Date.now();
     state.items.unshift(item);
   }
-  save();
+  save(true);
   render();
   closeAddModal();
   showToast(isEdit ? '수정되었습니다' : '추가되었습니다');
@@ -2630,7 +2781,7 @@ function markDone(id) {
   if (item.type === 'drama' && item.totalEp > 0) item.currentEp = item.totalEp;
   if (item.type === 'book' && item.totalPage > 0) item.currentPage = item.totalPage;
   item.updatedAt = Date.now();
-  save();
+  save(true);
   render();
   closeDetailModal();
   showToast('완료로 변경되었습니다');
@@ -2645,7 +2796,7 @@ function toggleEpisode(id, ep) {
     item.status = 'done';
     if (!item.endDate) item.endDate = today();
   }
-  save();
+  save(true);
   render();
   openDetail(id);
 }
@@ -2660,7 +2811,7 @@ function updateBookPage(id) {
     item.status = 'done';
     if (!item.endDate) item.endDate = today();
   }
-  save();
+  save(true);
   render();
   openDetail(id);
   showToast('업데이트됨');
@@ -2794,7 +2945,7 @@ function saveNote() {
     });
   }
   item.updatedAt = now;
-  save();
+  save(true);
   render();
   closeNoteModal();
   showToast('노트가 저장되었습니다');
@@ -2815,7 +2966,7 @@ function confirmDeleteNote() {
   confirmCallback = () => {
     item.notes = item.notes.filter(n => n.id !== state.noteEditingNoteId);
     item.updatedAt = Date.now();
-    save();
+    save(true);
     render();
     closeConfirm();
     closeNoteModal();
@@ -3206,12 +3357,29 @@ function closeOttEditor() {
 }
 
 function renderColorPicker() {
+  const cur = (state.ottEditingColor || '').toLowerCase();
   document.getElementById('ottColorPicker').innerHTML = OTT_COLORS.map(c =>
-    `<button type="button" class="color-swatch ${c === state.ottEditingColor ? 'active' : ''}" style="background: ${c}" onclick="pickOttColor('${c}')"></button>`
+    `<button type="button" class="color-swatch ${c.toLowerCase() === cur ? 'active' : ''}" style="background: ${c}" onclick="pickOttColor('${c}')"></button>`
   ).join('');
+  // Update custom color preview + hex
+  const preview = document.getElementById('ottColorPreview');
+  const hex = document.getElementById('ottColorHex');
+  const input = document.getElementById('ottColorInput');
+  if (preview) preview.style.background = state.ottEditingColor;
+  if (hex) hex.textContent = (state.ottEditingColor || '').toUpperCase();
+  if (input) {
+    // input type=color only accepts #rrggbb
+    const valid = /^#[0-9a-fA-F]{6}$/.test(state.ottEditingColor || '');
+    input.value = valid ? state.ottEditingColor : '#888888';
+  }
 }
 
 function pickOttColor(c) {
+  state.ottEditingColor = c;
+  renderColorPicker();
+}
+
+function pickCustomColor(c) {
   state.ottEditingColor = c;
   renderColorPicker();
 }
@@ -3382,7 +3550,7 @@ function confirmDelete(id) {
   document.getElementById('confirmDesc').textContent = `"${item.title}"이(가) 영구적으로 삭제됩니다.`;
   confirmCallback = () => {
     state.items = state.items.filter(i => i.id !== id);
-    save();
+    save(true);
     render();
     closeDetailModal();
     closeConfirm();
@@ -3431,7 +3599,82 @@ function exportData() {
   a.download = `contents-archive-${new Date().toISOString().slice(0, 10)}.json`;
   a.click();
   URL.revokeObjectURL(url);
+  // Reset backup tracking
+  state.lastBackupAt = Date.now();
+  state.changesSinceBackup = 0;
+  state.bannerDismissedAt = null;
+  save();
+  updateBackupBanner();
+  renderBackupStatus();
   showToast('백업 파일이 다운로드됩니다');
+}
+
+// ============ BACKUP REMINDER ============
+const BACKUP_CHANGE_THRESHOLD = 10;       // 변경 10회 이상이면 알림
+const BACKUP_DAYS_THRESHOLD = 7;          // 마지막 백업 7일 경과면 알림
+const BANNER_SNOOZE_DAYS = 3;             // 배너 닫으면 3일간 숨김
+
+function shouldShowBackupBanner() {
+  if (state.items.length === 0) return false; // 기록 없으면 굳이 안 띄움
+
+  // 스누즈 중이면 숨김
+  if (state.bannerDismissedAt) {
+    const daysSinceDismiss = (Date.now() - state.bannerDismissedAt) / 86400000;
+    if (daysSinceDismiss < BANNER_SNOOZE_DAYS) return false;
+  }
+
+  // 변경 횟수 조건
+  if ((state.changesSinceBackup || 0) >= BACKUP_CHANGE_THRESHOLD) return true;
+
+  // 시간 경과 조건 (한 번이라도 백업했고, 그 이후 변경이 있을 때만)
+  if (state.lastBackupAt && (state.changesSinceBackup || 0) > 0) {
+    const daysSince = (Date.now() - state.lastBackupAt) / 86400000;
+    if (daysSince >= BACKUP_DAYS_THRESHOLD) return true;
+  }
+
+  // 한 번도 백업 안 했는데 기록이 어느 정도 쌓였을 때
+  if (!state.lastBackupAt && state.items.length >= 5) return true;
+
+  return false;
+}
+
+function updateBackupBanner() {
+  const banner = document.getElementById('backupBanner');
+  if (!banner) return;
+  if (shouldShowBackupBanner()) {
+    const title = document.getElementById('backupBannerTitle');
+    const desc = document.getElementById('backupBannerDesc');
+    if (!state.lastBackupAt) {
+      title.textContent = '아직 백업한 적이 없어요';
+      desc.textContent = '데이터는 이 기기에만 저장돼요. 지금 한 번 백업해두세요.';
+    } else {
+      const days = Math.floor((Date.now() - state.lastBackupAt) / 86400000);
+      title.textContent = '백업할 때가 됐어요';
+      desc.textContent = `마지막 백업 후 ${days}일 · ${state.changesSinceBackup}번 변경됨. 백업을 권해요.`;
+    }
+    banner.style.display = 'flex';
+  } else {
+    banner.style.display = 'none';
+  }
+}
+
+function dismissBackupBanner() {
+  state.bannerDismissedAt = Date.now();
+  save();
+  updateBackupBanner();
+}
+
+function renderBackupStatus() {
+  const el = document.getElementById('backupStatus');
+  if (!el) return;
+  if (!state.lastBackupAt) {
+    el.textContent = '아직 백업 안 함';
+  } else {
+    const days = Math.floor((Date.now() - state.lastBackupAt) / 86400000);
+    const dateStr = fmtDate(new Date(state.lastBackupAt).toISOString().slice(0,10));
+    if (days === 0) el.textContent = `오늘 (${dateStr})`;
+    else el.textContent = `${days}일 전 (${dateStr})`;
+  }
 }
 
 function importData(event) {
@@ -3467,7 +3710,14 @@ function importData(event) {
             getOttSorted().forEach((o, i) => { o.order = i; });
           }
           save();
+          // 가져오기는 백업본이 존재한다는 의미 → 백업 추적 리셋
+          state.lastBackupAt = Date.now();
+          state.changesSinceBackup = 0;
+          state.bannerDismissedAt = null;
+          save();
           render();
+          updateBackupBanner();
+          renderBackupStatus();
           closeConfirm();
           showToast(`${data.items.length}개를 가져왔습니다`);
         };
@@ -3492,6 +3742,8 @@ document.querySelectorAll('.modal').forEach(modal => {
 // ============ INIT ============
 load();
 render();
+updateBackupBanner();
+renderBackupStatus();
 </script>
 </body>
 </html>
