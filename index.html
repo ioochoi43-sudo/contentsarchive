@@ -933,6 +933,7 @@
     gap: 8px;
     margin-top: 12px;
   }
+  .export-options-3 { grid-template-columns: 1fr 1fr 1fr; }
 
   /* TEMPLATE MANAGEMENT */
   .template-list-item {
@@ -1514,7 +1515,7 @@
     </div>
 
     <div style="text-align: center; margin-top: 40px; font-size: 11px; color: var(--ink-mute); letter-spacing: 0.04em; font-weight: 500;">
-      v1.5 · 데이터는 브라우저에 저장됩니다
+      v1.6 · 데이터는 브라우저에 저장됩니다
     </div>
   </section>
 </main>
@@ -1760,10 +1761,11 @@
       </div>
 
       <div class="form-group" style="margin-top: 16px;">
-        <label class="form-label">노트 내보내기</label>
-        <div class="export-options">
-          <button type="button" class="btn" onclick="exportNote('image')">이미지로 저장</button>
-          <button type="button" class="btn" onclick="exportNote('pdf')">PDF로 저장</button>
+        <label class="form-label">이 노트 내보내기</label>
+        <div class="export-options export-options-3">
+          <button type="button" class="btn" onclick="exportNote('image')">이미지</button>
+          <button type="button" class="btn" onclick="exportNote('pdf')">PDF</button>
+          <button type="button" class="btn" onclick="exportNote('word')">Word</button>
         </div>
       </div>
 
@@ -1905,6 +1907,47 @@
       <div class="btn-row">
         <button type="button" class="btn" onclick="closeOttEditor()">취소</button>
         <button type="button" class="btn btn-primary" onclick="saveOtt()">저장</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BULK EXPORT MODAL -->
+<div class="modal" id="bulkExportModal">
+  <div class="modal-content">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title">전체 노트 내보내기</div>
+      <button class="modal-close" onclick="closeBulkExport()">×</button>
+    </div>
+    <div class="modal-body">
+      <div id="bulkExportInfo" style="margin-bottom: 16px; padding: 12px; background: var(--bg-soft); border-radius: 8px;">
+        <div style="font-size: 11px; color: var(--ink-mute); font-weight: 600; margin-bottom: 2px;">콘텐츠</div>
+        <div id="bulkExportTitle" style="font-size: 14px; font-weight: 600;"></div>
+        <div id="bulkExportCount" style="font-size: 12px; color: var(--ink-dim); margin-top: 2px;"></div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">파일 형식</label>
+        <div class="status-picker" id="bulkFormatPicker" style="grid-template-columns: repeat(3, 1fr);">
+          <div class="status-option active" data-format="pdf">PDF</div>
+          <div class="status-option" data-format="word">Word</div>
+          <div class="status-option" data-format="image">이미지</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">묶는 방식</label>
+        <div class="seg-picker" id="bulkModePicker">
+          <button type="button" class="seg-option active" data-mode="merged">하나로 합치기</button>
+          <button type="button" class="seg-option" data-mode="separate">노트별 따로</button>
+        </div>
+        <div id="bulkModeHint" style="font-size: 11px; color: var(--ink-mute); margin-top: 8px; line-height: 1.5;">모든 노트를 한 파일에 순서대로 담아요.</div>
+      </div>
+
+      <div class="btn-row">
+        <button type="button" class="btn" onclick="closeBulkExport()">취소</button>
+        <button type="button" class="btn btn-primary" id="bulkExportRunBtn" onclick="runBulkExport()">내보내기</button>
       </div>
     </div>
   </div>
@@ -2702,6 +2745,12 @@ function openDetail(id) {
 
   // Notes list
   const notes = (item.notes || []).sort((a,b) => (b.updatedAt||0) - (a.updatedAt||0));
+  const bulkExportHTML = notes.length >= 2 ? `
+    <div style="margin-top: 12px; padding: 12px 14px; background: var(--bg-soft); border-radius: 10px;">
+      <div style="font-size: 12px; font-weight: 600; color: var(--ink-dim); margin-bottom: 4px;">전체 노트 내보내기 <span style="color: var(--ink-mute); font-weight: 500;">(${notes.length}개)</span></div>
+      <div style="font-size: 11px; color: var(--ink-mute); margin-bottom: 10px;">이 콘텐츠의 노트를 한꺼번에 저장해요</div>
+      <button type="button" class="btn btn-primary" onclick="openBulkExport('${item.id}')" style="width: 100%;">📦 전체 노트 내보내기</button>
+    </div>` : '';
   const notesHTML = `<div class="notes-section">
     <div class="notes-header">
       <div class="notes-header-title">📝 노트 <span style="color: var(--ink-mute); font-weight: 500;">(${notes.length})</span></div>
@@ -2720,6 +2769,7 @@ function openDetail(id) {
           </div>`;
         }).join('')
     }
+    ${bulkExportHTML}
   </div>`;
 
   document.getElementById('detailBody').innerHTML = `
@@ -2977,6 +3027,82 @@ function confirmDeleteNote() {
 }
 
 // ============ NOTE EXPORT ============
+// 노트 하나의 표시용 HTML (헤더+본문). header=true면 콘텐츠 제목 헤더 포함
+function buildNoteCardHTML(item, note, includeContentHeader) {
+  const ratingStr = item.rating > 0 ? starString(item.rating) : '';
+  const period = (item.startDate || item.endDate)
+    ? `${item.startDate ? fmtDate(item.startDate) : '?'} → ${item.endDate ? fmtDate(item.endDate) : '진행중'}`
+    : '';
+  const renderedMD = renderMarkdownForExport(note.content || '');
+  const contentHeader = includeContentHeader ? `
+      <div style="border-bottom: 2px solid #1c1b1a; padding-bottom: 16px; margin-bottom: 20px;">
+        <div style="font-size: 11px; letter-spacing: 0.12em; color: #9e9a93; font-weight: 600; margin-bottom: 4px;">${typeName(item.type).toUpperCase()} NOTE</div>
+        <div style="font-size: 24px; font-weight: 700; letter-spacing: -0.02em; color: #1c1b1a; margin-bottom: 4px;">${escapeHTML(item.title)}</div>
+        ${item.creator ? `<div style="font-size: 13px; color: #5e5b56;">${escapeHTML(item.creator)}</div>` : ''}
+      </div>` : '';
+  const metaRow = (ratingStr || period || item.publisher || item.bookFormat) ? `<div style="display: flex; flex-wrap: wrap; gap: 16px; font-size: 12px; color: #5e5b56; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px dashed #e8e6e1;">
+        ${ratingStr ? `<div><span style="color: #9e9a93; font-weight: 600;">평점</span> <span style="color: #c87f3f; letter-spacing: 1px; font-weight: 600;">${ratingStr}</span></div>` : ''}
+        ${period ? `<div><span style="color: #9e9a93; font-weight: 600;">기간</span> ${period}</div>` : ''}
+        ${item.type === 'book' && item.bookFormat ? `<div><span style="color: #9e9a93; font-weight: 600;">형태</span> ${bookFormatName(item.bookFormat)}${item.bookSource ? ' · ' + bookSourceName(item.bookSource) : ''}</div>` : ''}
+        ${item.publisher ? `<div><span style="color: #9e9a93; font-weight: 600;">출판사</span> ${escapeHTML(item.publisher)}</div>` : ''}
+      </div>` : '';
+  return `
+    <div style="background: white; padding: 0; color: #1c1b1a; line-height: 1.7; font-family: 'Pretendard Variable', Pretendard, sans-serif;">
+      ${contentHeader}
+      <div style="font-size: 16px; font-weight: 700; color: #c87f3f; margin-bottom: 12px;">📝 ${escapeHTML(note.title || '제목 없음')}</div>
+      ${metaRow}
+      <div style="font-size: 14px; line-height: 1.8; color: #1c1b1a;">${renderedMD}</div>
+      <div style="margin-top: 32px; padding-top: 14px; border-top: 1px solid #e8e6e1; font-size: 10px; color: #9e9a93; letter-spacing: 0.06em; text-align: right;">
+        CONTENTS ARCHIVE · ${fmtToday()}
+      </div>
+    </div>`;
+}
+
+// MS Word(.doc) HTML 포맷 다운로드 — 외부 라이브러리 불필요
+function downloadWordDoc(bodyHTML, filename) {
+  const html = `<!DOCTYPE html><html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>Note</title><!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]--><style>
+    body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; font-size: 11pt; color: #1c1b1a; line-height: 1.7; }
+    h1 { font-size: 18pt; font-weight: 700; }
+    h2 { font-size: 14pt; font-weight: 700; }
+    h3 { font-size: 12pt; font-weight: 700; }
+  </style></head><body>${bodyHTML}</body></html>`;
+  const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename.endsWith('.doc') ? filename : filename + '.doc';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// 이미지/PDF 렌더 (html2canvas)용 공통: 주어진 HTML을 캔버스로
+async function htmlToCanvas(innerHTML) {
+  const renderEl = document.getElementById('exportRender');
+  renderEl.innerHTML = innerHTML;
+  await new Promise(r => setTimeout(r, 150));
+  const canvas = await html2canvas(renderEl, { scale: 2, backgroundColor: '#ffffff', logging: false, useCORS: true });
+  renderEl.innerHTML = '';
+  return canvas;
+}
+
+function canvasToPdf(canvas, pdf) {
+  const imgData = canvas.toDataURL('image/png');
+  const pdfWidth = 210;
+  const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+  const pageHeight = 297;
+  if (pdfHeight <= pageHeight) {
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+  } else {
+    let position = 0;
+    let remaining = pdfHeight;
+    while (remaining > 0) {
+      pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+      remaining -= pageHeight;
+      if (remaining > 0) { pdf.addPage(); position -= pageHeight; }
+    }
+  }
+}
+
 async function exportNote(format) {
   const item = state.items.find(i => i.id === state.noteEditingItemId);
   if (!item) return;
@@ -2986,44 +3112,19 @@ async function exportNote(format) {
     showToast('노트 내용을 먼저 입력해주세요');
     return;
   }
+  const note = { title: noteTitle, content };
+  const safeName = (noteTitle || 'note').replace(/[\\/:*?"<>|]/g, '_').slice(0, 40);
+  const cardHTML = buildNoteCardHTML(item, note, true);
 
-  const renderEl = document.getElementById('exportRender');
-  const ratingStr = item.rating > 0 ? starString(item.rating) : '';
-  const period = (item.startDate || item.endDate)
-    ? `${item.startDate ? fmtDate(item.startDate) : '?'} → ${item.endDate ? fmtDate(item.endDate) : '진행중'}`
-    : '';
-
-  // Render markdown to HTML, with inline styles for html2canvas
-  const renderedMD = renderMarkdownForExport(content);
-
-  renderEl.innerHTML = `
-    <div style="background: white; padding: 0; color: #1c1b1a; line-height: 1.7; font-family: 'Pretendard Variable', Pretendard, sans-serif;">
-      <div style="border-bottom: 2px solid #1c1b1a; padding-bottom: 16px; margin-bottom: 20px;">
-        <div style="font-size: 11px; letter-spacing: 0.12em; color: #9e9a93; font-weight: 600; margin-bottom: 4px;">${typeName(item.type).toUpperCase()} NOTE</div>
-        <div style="font-size: 24px; font-weight: 700; letter-spacing: -0.02em; color: #1c1b1a; margin-bottom: 4px;">${escapeHTML(item.title)}</div>
-        ${item.creator ? `<div style="font-size: 13px; color: #5e5b56;">${escapeHTML(item.creator)}</div>` : ''}
-      </div>
-      <div style="font-size: 16px; font-weight: 700; color: #c87f3f; margin-bottom: 12px;">📝 ${escapeHTML(noteTitle)}</div>
-      ${(ratingStr || period || item.publisher || item.bookFormat) ? `<div style="display: flex; flex-wrap: wrap; gap: 16px; font-size: 12px; color: #5e5b56; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px dashed #e8e6e1;">
-        ${ratingStr ? `<div><span style="color: #9e9a93; font-weight: 600;">평점</span> <span style="color: #c87f3f; letter-spacing: 1px; font-weight: 600;">${ratingStr}</span></div>` : ''}
-        ${period ? `<div><span style="color: #9e9a93; font-weight: 600;">기간</span> ${period}</div>` : ''}
-        ${item.type === 'book' && item.bookFormat ? `<div><span style="color: #9e9a93; font-weight: 600;">형태</span> ${bookFormatName(item.bookFormat)}${item.bookSource ? ' · ' + bookSourceName(item.bookSource) : ''}</div>` : ''}
-        ${item.publisher ? `<div><span style="color: #9e9a93; font-weight: 600;">출판사</span> ${escapeHTML(item.publisher)}</div>` : ''}
-      </div>` : ''}
-      <div style="font-size: 14px; line-height: 1.8; color: #1c1b1a;">${renderedMD}</div>
-      <div style="margin-top: 32px; padding-top: 14px; border-top: 1px solid #e8e6e1; font-size: 10px; color: #9e9a93; letter-spacing: 0.06em; text-align: right;">
-        CONTENTS ARCHIVE · ${fmtToday()}
-      </div>
-    </div>
-  `;
-
-  await new Promise(r => setTimeout(r, 150));
-  showToast(format === 'pdf' ? 'PDF 생성 중...' : '이미지 생성 중...');
+  showToast(format === 'pdf' ? 'PDF 생성 중...' : format === 'word' ? 'Word 생성 중...' : '이미지 생성 중...');
 
   try {
-    const canvas = await html2canvas(renderEl, { scale: 2, backgroundColor: '#ffffff', logging: false, useCORS: true });
-    const safeName = (noteTitle || 'note').replace(/[\\/:*?"<>|]/g, '_').slice(0, 40);
-
+    if (format === 'word') {
+      downloadWordDoc(cardHTML, `${safeName}_노트`);
+      showToast('Word 파일이 저장되었습니다');
+      return;
+    }
+    const canvas = await htmlToCanvas(cardHTML);
     if (format === 'image') {
       const link = document.createElement('a');
       link.download = `${safeName}_노트.png`;
@@ -3032,30 +3133,218 @@ async function exportNote(format) {
       showToast('이미지가 저장되었습니다');
     } else if (format === 'pdf') {
       const { jsPDF } = window.jspdf;
-      const imgData = canvas.toDataURL('image/png');
-      const pdfWidth = 210;
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-      const pageHeight = 297;
-      if (pdfHeight <= pageHeight) {
-        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      } else {
-        let position = 0;
-        let remaining = pdfHeight;
-        while (remaining > 0) {
-          pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
-          remaining -= pageHeight;
-          if (remaining > 0) { pdf.addPage(); position -= pageHeight; }
-        }
-      }
+      canvasToPdf(canvas, pdf);
       pdf.save(`${safeName}_노트.pdf`);
       showToast('PDF가 저장되었습니다');
     }
   } catch(e) {
     console.error(e);
     showToast('내보내기 실패');
+  }
+}
+
+// ============ BULK NOTE EXPORT ============
+let bulkExportItemId = null;
+let bulkExportFormat = 'pdf';
+let bulkExportMode = 'merged';
+
+function openBulkExport(itemId) {
+  const item = state.items.find(i => i.id === itemId);
+  if (!item) return;
+  const notes = (item.notes || []);
+  if (notes.length === 0) { showToast('내보낼 노트가 없어요'); return; }
+  bulkExportItemId = itemId;
+  bulkExportFormat = 'pdf';
+  bulkExportMode = 'merged';
+  document.getElementById('bulkExportTitle').textContent = item.title;
+  document.getElementById('bulkExportCount').textContent = `노트 ${notes.length}개`;
+  // reset pickers
+  document.querySelectorAll('#bulkFormatPicker .status-option').forEach(o => o.classList.toggle('active', o.dataset.format === 'pdf'));
+  document.querySelectorAll('#bulkModePicker .seg-option').forEach(o => o.classList.toggle('active', o.dataset.mode === 'merged'));
+  updateBulkModeHint();
+  closeDetailModal();
+  setTimeout(() => {
+    document.getElementById('bulkExportModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }, 200);
+}
+
+function closeBulkExport() {
+  document.getElementById('bulkExportModal').classList.remove('active');
+  document.body.style.overflow = '';
+  // 상세로 복귀
+  if (bulkExportItemId) {
+    const id = bulkExportItemId;
+    setTimeout(() => openDetail(id), 100);
+  }
+}
+
+document.getElementById('bulkFormatPicker').addEventListener('click', (e) => {
+  const opt = e.target.closest('.status-option');
+  if (!opt) return;
+  bulkExportFormat = opt.dataset.format;
+  document.querySelectorAll('#bulkFormatPicker .status-option').forEach(o => o.classList.toggle('active', o === opt));
+  updateBulkModeHint();
+});
+
+document.getElementById('bulkModePicker').addEventListener('click', (e) => {
+  const opt = e.target.closest('.seg-option');
+  if (!opt) return;
+  bulkExportMode = opt.dataset.mode;
+  document.querySelectorAll('#bulkModePicker .seg-option').forEach(o => o.classList.toggle('active', o === opt));
+  updateBulkModeHint();
+});
+
+function updateBulkModeHint() {
+  const hint = document.getElementById('bulkModeHint');
+  if (bulkExportMode === 'merged') {
+    if (bulkExportFormat === 'image') {
+      hint.textContent = '모든 노트를 세로로 이어붙인 긴 이미지 1장으로 저장해요.';
+    } else if (bulkExportFormat === 'word') {
+      hint.textContent = '모든 노트를 한 Word 문서에 페이지로 나눠 담아요.';
+    } else {
+      hint.textContent = '모든 노트를 한 PDF에 페이지로 나눠 담아요.';
+    }
+  } else {
+    hint.textContent = '노트마다 파일을 따로 만들어 여러 개로 저장해요.';
+  }
+}
+
+async function runBulkExport() {
+  const item = state.items.find(i => i.id === bulkExportItemId);
+  if (!item) return;
+  const notes = (item.notes || []).sort((a,b) => (a.createdAt||0) - (b.createdAt||0));
+  if (notes.length === 0) { showToast('내보낼 노트가 없어요'); return; }
+
+  const btn = document.getElementById('bulkExportRunBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>';
+  const safeBase = (item.title || 'notes').replace(/[\\/:*?"<>|]/g, '_').slice(0, 40);
+
+  try {
+    if (bulkExportMode === 'separate') {
+      await bulkExportSeparate(item, notes, safeBase);
+    } else {
+      await bulkExportMerged(item, notes, safeBase);
+    }
+  } catch(e) {
+    console.error(e);
+    showToast('내보내기 실패');
   } finally {
-    renderEl.innerHTML = '';
+    btn.disabled = false;
+    btn.innerHTML = '내보내기';
+    document.getElementById('bulkExportModal').classList.remove('active');
+    document.body.style.overflow = '';
+    const id = bulkExportItemId;
+    setTimeout(() => openDetail(id), 150);
+  }
+}
+
+// 합치기 모드
+async function bulkExportMerged(item, notes, safeBase) {
+  if (bulkExportFormat === 'word') {
+    // 노트들을 page-break로 구분해 한 문서에
+    const body = notes.map((n, i) =>
+      buildNoteCardHTML(item, n, i === 0) +
+      (i < notes.length - 1 ? '<br clear="all" style="page-break-before:always">' : '')
+    ).join('');
+    downloadWordDoc(body, `${safeBase}_노트모음`);
+    showToast(`Word 파일로 ${notes.length}개 노트를 저장했어요`);
+    return;
+  }
+
+  if (bulkExportFormat === 'pdf') {
+    showToast('PDF 생성 중...');
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    for (let i = 0; i < notes.length; i++) {
+      const canvas = await htmlToCanvas(buildNoteCardHTML(item, notes[i], true));
+      if (i > 0) pdf.addPage();
+      // 각 노트를 새 페이지부터: canvasToPdf는 현재 페이지에 그림
+      canvasToPdfFresh(canvas, pdf);
+    }
+    pdf.save(`${safeBase}_노트모음.pdf`);
+    showToast(`PDF로 ${notes.length}개 노트를 저장했어요`);
+    return;
+  }
+
+  if (bulkExportFormat === 'image') {
+    showToast('이미지 생성 중...');
+    // 모든 노트를 하나의 컨테이너에 세로로 쌓아서 한 장으로
+    const combined = notes.map((n, i) =>
+      `<div style="${i > 0 ? 'margin-top: 32px; padding-top: 32px; border-top: 2px dashed #e8e6e1;' : ''}">${buildNoteCardHTML(item, n, i === 0)}</div>`
+    ).join('');
+    const canvas = await htmlToCanvas(combined);
+    const link = document.createElement('a');
+    link.download = `${safeBase}_노트모음.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    showToast(`이미지로 ${notes.length}개 노트를 저장했어요`);
+    return;
+  }
+}
+
+// PDF: 현재 페이지 맨 위부터 이미지 배치 (여러 페이지 분할)
+function canvasToPdfFresh(canvas, pdf) {
+  const imgData = canvas.toDataURL('image/png');
+  const pdfWidth = 210;
+  const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+  const pageHeight = 297;
+  if (pdfHeight <= pageHeight) {
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+  } else {
+    let position = 0;
+    let remaining = pdfHeight;
+    let first = true;
+    while (remaining > 0) {
+      if (!first) pdf.addPage();
+      pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+      remaining -= pageHeight;
+      position -= pageHeight;
+      first = false;
+    }
+  }
+}
+
+// 따로 모드
+async function bulkExportSeparate(item, notes, safeBase) {
+  if (bulkExportFormat === 'word') {
+    for (let i = 0; i < notes.length; i++) {
+      const nm = (notes[i].title || `노트${i+1}`).replace(/[\\/:*?"<>|]/g, '_').slice(0, 30);
+      downloadWordDoc(buildNoteCardHTML(item, notes[i], true), `${safeBase}_${i+1}_${nm}`);
+      await new Promise(r => setTimeout(r, 400)); // 브라우저 다운로드 차단 방지
+    }
+    showToast(`Word 파일 ${notes.length}개를 저장했어요`);
+    return;
+  }
+  if (bulkExportFormat === 'pdf') {
+    showToast('PDF 생성 중...');
+    const { jsPDF } = window.jspdf;
+    for (let i = 0; i < notes.length; i++) {
+      const canvas = await htmlToCanvas(buildNoteCardHTML(item, notes[i], true));
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+      canvasToPdfFresh(canvas, pdf);
+      const nm = (notes[i].title || `노트${i+1}`).replace(/[\\/:*?"<>|]/g, '_').slice(0, 30);
+      pdf.save(`${safeBase}_${i+1}_${nm}.pdf`);
+      await new Promise(r => setTimeout(r, 400));
+    }
+    showToast(`PDF ${notes.length}개를 저장했어요`);
+    return;
+  }
+  if (bulkExportFormat === 'image') {
+    showToast('이미지 생성 중...');
+    for (let i = 0; i < notes.length; i++) {
+      const canvas = await htmlToCanvas(buildNoteCardHTML(item, notes[i], true));
+      const link = document.createElement('a');
+      const nm = (notes[i].title || `노트${i+1}`).replace(/[\\/:*?"<>|]/g, '_').slice(0, 30);
+      link.download = `${safeBase}_${i+1}_${nm}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      await new Promise(r => setTimeout(r, 400));
+    }
+    showToast(`이미지 ${notes.length}개를 저장했어요`);
+    return;
   }
 }
 
