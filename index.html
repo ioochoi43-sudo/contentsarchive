@@ -72,7 +72,27 @@
     font-variant-numeric: tabular-nums;
   }
 
-  .header-sub { margin-top: 8px; font-size: 12px; color: var(--ink-mute); }
+  .header-sub { margin-top: 8px; font-size: 12px; color: var(--ink-mute); display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .save-indicator {
+    font-size: 11px;
+    color: var(--ink-mute);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+    transition: color 0.3s;
+  }
+  .save-indicator.flash { color: var(--green); }
+  .save-indicator::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+  }
 
   .tabs {
     display: flex;
@@ -255,6 +275,57 @@
   .card-type.movie { color: var(--blue); border-color: var(--blue-soft); background: var(--blue-soft); }
   .card-type.drama { color: var(--yellow); border-color: var(--yellow-soft); background: var(--yellow-soft); }
   .card-type.book { color: var(--green); border-color: var(--green-soft); background: var(--green-soft); }
+
+  .card-copy-btn {
+    font-size: 10px;
+    color: var(--ink-dim);
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    border-radius: 100px;
+    padding: 4px 9px;
+    cursor: pointer;
+    font-family: var(--sans);
+    font-weight: 500;
+    white-space: nowrap;
+    line-height: 1;
+  }
+  .card-copy-btn:active { background: var(--line); transform: scale(0.95); }
+
+  .copy-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .copy-opt-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px;
+    background: var(--bg-elev);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: var(--sans);
+    text-align: left;
+    width: 100%;
+  }
+  .copy-opt-btn:active { background: var(--bg-soft); transform: scale(0.99); }
+  .copy-opt-label {
+    font-size: 12px;
+    color: var(--ink-mute);
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .copy-opt-preview {
+    font-size: 14px;
+    color: var(--ink);
+    font-weight: 500;
+    text-align: right;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 
   .card-title {
     font-size: 16px;
@@ -1688,7 +1759,10 @@
     <h1 class="brand-title">Contents <span>Archive</span></h1>
     <div class="brand-meta" id="dateLabel"></div>
   </div>
-  <div class="header-sub">보고 읽은 모든 것의 기록</div>
+  <div class="header-sub">
+    <span>보고 읽은 모든 것의 기록</span>
+    <span class="save-indicator" id="saveIndicator"></span>
+  </div>
 </header>
 
 <nav class="tabs" id="tabs">
@@ -1810,6 +1884,16 @@
     </div>
 
     <div style="margin-top: 24px;">
+      <h3 style="font-size: 13px; font-weight: 600; color: var(--ink-mute); letter-spacing: 0.04em; margin-bottom: 10px;">복사 설정</h3>
+      <div style="font-size: 12px; color: var(--ink-dim); line-height: 1.6; margin-bottom: 10px;">카드의 <strong>복사</strong> 버튼을 눌렀을 때 기본으로 복사할 형식이에요. (상세 화면에서는 매번 골라서 복사할 수 있어요)</div>
+      <div class="seg-picker" id="copyDefaultPicker">
+        <button type="button" class="seg-option active" data-mode="progress">진행 상황 포함</button>
+        <button type="button" class="seg-option" data-mode="title">제목만</button>
+      </div>
+      <div style="font-size: 11px; color: var(--ink-mute); margin-top: 8px;">예시 — 진행 상황: <span id="copyExampleProgress">〈드라마〉 9화~</span> · 제목만: 〈드라마〉</div>
+    </div>
+
+    <div style="margin-top: 24px;">
       <h3 style="font-size: 13px; font-weight: 600; color: var(--ink-mute); letter-spacing: 0.04em; margin-bottom: 10px;">템플릿 관리</h3>
       <button class="btn" onclick="openTemplateManager()" style="width: 100%; margin-bottom: 8px;">노트 템플릿 관리</button>
       <button class="btn" onclick="openOttManagerFromSettings()" style="width: 100%; margin-bottom: 8px;">OTT 플랫폼 관리</button>
@@ -1830,7 +1914,7 @@
     </div>
 
     <div style="text-align: center; margin-top: 40px; font-size: 11px; color: var(--ink-mute); letter-spacing: 0.04em; font-weight: 500;">
-      v1.8 · 데이터는 브라우저에 저장됩니다
+      v1.9 · 데이터는 브라우저에 저장됩니다
     </div>
   </section>
 </main>
@@ -2323,6 +2407,8 @@ let state = {
   currentTab: 'timeline',
   typeFilter: 'all',
   statusFilter: 'all',
+  copyDefaultProgress: true,
+  lastSavedAt: null,
   templateFilter: 'all',
   sortBy: 'updated',
   sortDir: 'desc',
@@ -2351,6 +2437,7 @@ function load() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const data = JSON.parse(raw);
+      if (data.savedAt) state.lastSavedAt = data.savedAt;
       state.items = Array.isArray(data.items) ? data.items : [];
       // Migrate old single-note items
       state.items.forEach(item => {
@@ -2390,6 +2477,7 @@ function load() {
         state.lastBackupAt = data.settings.lastBackupAt || null;
         state.changesSinceBackup = data.settings.changesSinceBackup || 0;
         state.bannerDismissedAt = data.settings.bannerDismissedAt || null;
+        if (data.settings.copyDefaultProgress !== undefined) state.copyDefaultProgress = data.settings.copyDefaultProgress;
       }
     } else {
       state.templates = DEFAULT_TEMPLATES.map(t => ({ ...t, createdAt: Date.now() }));
@@ -2407,6 +2495,7 @@ function save(isDataChange) {
   if (isDataChange) {
     state.changesSinceBackup = (state.changesSinceBackup || 0) + 1;
   }
+  const now = Date.now();
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
       items: state.items,
@@ -2417,15 +2506,37 @@ function save(isDataChange) {
         sortDir: state.sortDir,
         lastBackupAt: state.lastBackupAt,
         changesSinceBackup: state.changesSinceBackup,
-        bannerDismissedAt: state.bannerDismissedAt
+        bannerDismissedAt: state.bannerDismissedAt,
+        copyDefaultProgress: state.copyDefaultProgress
       },
-      savedAt: Date.now()
+      savedAt: now
     }));
+    state.lastSavedAt = now;
+    updateSaveIndicator(true);
   } catch(e) {
     console.error(e);
     showToast('저장 실패 (저장공간 가득)');
   }
   if (isDataChange) updateBackupBanner();
+}
+
+// 저장 시각 표시 갱신. flash=true면 잠깐 초록색
+function updateSaveIndicator(flash) {
+  const el = document.getElementById('saveIndicator');
+  if (!el) return;
+  const ts = state.lastSavedAt;
+  if (!ts) { el.textContent = ''; return; }
+  const d = new Date(ts);
+  const hh = String(d.getHours()).padStart(2, '0');
+  const mm = String(d.getMinutes()).padStart(2, '0');
+  const ss = String(d.getSeconds()).padStart(2, '0');
+  const sameDay = (new Date()).toDateString() === d.toDateString();
+  const datePart = sameDay ? '' : `${d.getMonth()+1}.${String(d.getDate()).padStart(2,'0')} `;
+  el.textContent = `저장됨 ${datePart}${hh}:${mm}:${ss}`;
+  if (flash) {
+    el.classList.add('flash');
+    setTimeout(() => el.classList.remove('flash'), 1000);
+  }
 }
 
 // Helper: get sorted OTT list
@@ -2484,6 +2595,76 @@ function progressText(item) {
 }
 
 function starString(n) { return n ? '★'.repeat(n) + '☆'.repeat(5 - n) : ''; }
+
+// ============ COPY TEXT ============
+// 제목을 유형에 맞는 괄호로 감싸기 (영상물 〈 〉, 책 《 》)
+function bracketTitle(item) {
+  if (item.type === 'book') return `《${item.title}》`;
+  return `〈${item.title}〉`;
+}
+
+// 복사용 텍스트 생성. withProgress=true면 진행 상황(다음 회차/페이지) 포함
+function buildCopyText(item, withProgress) {
+  const t = bracketTitle(item);
+  if (!withProgress) return t;
+  // 진행 상황 포함
+  if (item.type === 'drama' && item.totalEp > 0) {
+    const next = Math.min((item.currentEp || 0) + 1, item.totalEp);
+    return `${t} ${next}화~`;
+  }
+  if (item.type === 'book' && item.totalPage > 0) {
+    const next = Math.min((item.currentPage || 0) + 1, item.totalPage);
+    return `${t} ${next}p~`;
+  }
+  // 영화·유튜브 등은 진행 개념이 없으니 제목만
+  return t;
+}
+
+// 클립보드 복사 (실패 시 fallback)
+function copyToClipboard(text) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(
+      () => showToast(`복사됨: ${text}`),
+      () => fallbackCopy(text)
+    );
+  } else {
+    fallbackCopy(text);
+  }
+}
+
+function fallbackCopy(text) {
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast(`복사됨: ${text}`);
+  } catch(e) {
+    showToast('복사 실패');
+  }
+}
+
+// 카드/상세에서 호출. ev로 카드 클릭 전파 방지
+function copyItem(id, withProgress, ev) {
+  if (ev) ev.stopPropagation();
+  const item = state.items.find(i => i.id === id);
+  if (!item) return;
+  copyToClipboard(buildCopyText(item, withProgress));
+}
+
+// 카드용: 기본 형식(설정값)으로 복사
+function copyItemDefault(id, ev) {
+  if (ev) ev.stopPropagation();
+  const item = state.items.find(i => i.id === id);
+  if (!item) return;
+  const withProgress = state.copyDefaultProgress !== false; // 기본 true
+  copyToClipboard(buildCopyText(item, withProgress));
+}
 
 function escapeHTML(s) {
   if (s == null) return '';
@@ -3024,7 +3205,10 @@ function cardHTML(item) {
         <div class="card-title">${escapeHTML(item.title)}${titleExtra}</div>
         ${item.creator ? `<div class="card-creator">${escapeHTML(item.creator)}</div>` : ''}
       </div>
-      <div class="card-type ${item.type}">${typeName(item.type)}</div>
+      <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0;">
+        <div class="card-type ${item.type}">${typeName(item.type)}</div>
+        <button class="card-copy-btn" onclick="copyItemDefault('${item.id}', event)" title="복사">⧉ 복사</button>
+      </div>
     </div>
     ${extra}
     ${meta.length ? `<div class="card-meta">${meta.join('')}</div>` : ''}
@@ -3060,6 +3244,21 @@ document.getElementById('statusFilter').addEventListener('click', (e) => {
   state.statusFilter = pill.dataset.status;
   renderAll();
 });
+
+document.getElementById('copyDefaultPicker').addEventListener('click', (e) => {
+  const opt = e.target.closest('.seg-option');
+  if (!opt) return;
+  state.copyDefaultProgress = (opt.dataset.mode === 'progress');
+  document.querySelectorAll('#copyDefaultPicker .seg-option').forEach(o => o.classList.toggle('active', o === opt));
+  save();
+});
+
+function syncCopyDefaultPicker() {
+  const picker = document.getElementById('copyDefaultPicker');
+  if (!picker) return;
+  const mode = state.copyDefaultProgress !== false ? 'progress' : 'title';
+  picker.querySelectorAll('.seg-option').forEach(o => o.classList.toggle('active', o.dataset.mode === mode));
+}
 
 document.getElementById('calendarBasis').addEventListener('click', (e) => {
   const pill = e.target.closest('.pill');
@@ -3352,6 +3551,25 @@ function openDetail(id) {
 
     ${item.type === 'youtube' && item.link ? `<div class="detail-section"><div class="detail-label">링크</div><a href="${escapeHTML(item.link)}" target="_blank" rel="noopener" class="card-link" style="margin-top: 4px;">▶ 영상 열기</a></div>` : ''}
     ${item.memo ? `<div class="detail-section"><div class="detail-label">한줄 메모</div><div class="detail-value" style="white-space: pre-wrap;">${escapeHTML(item.memo)}</div></div>` : ''}
+
+    ${(() => {
+      const hasProgress = (item.type === 'drama' && item.totalEp > 0) || (item.type === 'book' && item.totalPage > 0);
+      const titleOnly = buildCopyText(item, false);
+      const withProg = buildCopyText(item, true);
+      return `<div class="detail-section">
+        <div class="detail-label">복사하기</div>
+        <div class="copy-options">
+          ${hasProgress ? `<button class="copy-opt-btn" onclick="copyItem('${item.id}', true, event)">
+            <span class="copy-opt-label">진행 상황 포함</span>
+            <span class="copy-opt-preview">${escapeHTML(withProg)}</span>
+          </button>` : ''}
+          <button class="copy-opt-btn" onclick="copyItem('${item.id}', false, event)">
+            <span class="copy-opt-label">제목만</span>
+            <span class="copy-opt-preview">${escapeHTML(titleOnly)}</span>
+          </button>
+        </div>
+      </div>`;
+    })()}
 
     ${notesHTML}
 
@@ -4585,6 +4803,8 @@ load();
 render();
 updateBackupBanner();
 renderBackupStatus();
+updateSaveIndicator(false);
+syncCopyDefaultPicker();
 </script>
 </body>
 </html>
