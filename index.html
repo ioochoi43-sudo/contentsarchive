@@ -274,7 +274,7 @@
   .card-type.youtube { color: var(--red); border-color: var(--red-soft); background: var(--red-soft); }
   .card-type.movie { color: var(--blue); border-color: var(--blue-soft); background: var(--blue-soft); }
   .card-type.drama { color: var(--yellow); border-color: var(--yellow-soft); background: var(--yellow-soft); }
-  .card-type.book { color: var(--green); border-color: var(--green-soft); background: var(--green-soft); }
+  .card-type.podcast { color: #7a5cc8; border-color: #e6def6; background: #ede7f8; }
 
   .card-copy-btn {
     font-size: 10px;
@@ -1814,7 +1814,7 @@
         <button class="pill" data-type="youtube">유튜브</button>
         <button class="pill" data-type="movie">영화</button>
         <button class="pill" data-type="drama">드라마</button>
-        <button class="pill" data-type="book">책</button>
+        <button class="pill" data-type="podcast">팟캐스트</button>
       </div>
       <button class="sort-btn" onclick="toggleSortMenu(event)">
         <span id="sortBtnLabel">최근순</span>
@@ -1914,7 +1914,7 @@
     </div>
 
     <div style="text-align: center; margin-top: 40px; font-size: 11px; color: var(--ink-mute); letter-spacing: 0.04em; font-weight: 500;">
-      v1.9 · 데이터는 브라우저에 저장됩니다
+      v2.0 · 데이터는 브라우저에 저장됩니다
     </div>
   </section>
 </main>
@@ -1954,7 +1954,7 @@
             <div class="type-option active" data-type="youtube"><span class="type-option-icon">▶</span>유튜브</div>
             <div class="type-option" data-type="movie"><span class="type-option-icon">★</span>영화</div>
             <div class="type-option" data-type="drama"><span class="type-option-icon">●</span>드라마</div>
-            <div class="type-option" data-type="book"><span class="type-option-icon">▤</span>책</div>
+            <div class="type-option" data-type="podcast"><span class="type-option-icon">🎙</span>팟캐스트</div>
           </div>
         </div>
 
@@ -2021,33 +2021,16 @@
           </div>
         </div>
 
-        <div class="form-group form-section" id="section-book-pub">
-          <label class="form-label">출판사</label>
-          <input type="text" class="form-input" id="fPublisher" placeholder="선택 사항">
+        <div class="form-group form-section" id="section-podcast-platform">
+          <label class="form-label">채널 / 플랫폼</label>
+          <input type="text" class="form-input" id="fPlatform" placeholder="예: 애플 팟캐스트, 스포티파이, 유튜브">
         </div>
 
-        <div class="form-group form-section" id="section-book-format">
-          <label class="form-label">책 형태</label>
-          <div class="seg-picker" id="bookFormatPicker">
-            <button type="button" class="seg-option active" data-format="paper">종이책</button>
-            <button type="button" class="seg-option" data-format="ebook">e-book</button>
-          </div>
-        </div>
-
-        <div class="form-group form-section" id="section-book-source">
-          <label class="form-label">구매 / 대여</label>
-          <div class="seg-picker" id="bookSourcePicker">
-            <button type="button" class="seg-option active" data-source="own">구매</button>
-            <button type="button" class="seg-option" data-source="borrowed">대여</button>
-            <button type="button" class="seg-option" data-source="library">도서관</button>
-          </div>
-        </div>
-
-        <div class="form-group form-section" id="section-book">
-          <label class="form-label">페이지 (종이책 기준)</label>
+        <div class="form-group form-section" id="section-podcast">
+          <label class="form-label">에피소드</label>
           <div class="form-row">
-            <input type="number" class="form-input" id="fCurrentPage" placeholder="현재 페이지" min="0">
-            <input type="number" class="form-input" id="fTotalPage" placeholder="전체 페이지" min="1">
+            <input type="number" class="form-input" id="fCurrentPodEp" placeholder="현재 EP" min="0">
+            <input type="number" class="form-input" id="fTotalPodEp" placeholder="전체 EP (선택)" min="1">
           </div>
         </div>
 
@@ -2192,7 +2175,7 @@
           <button class="pill" data-type="youtube">유튜브</button>
           <button class="pill" data-type="movie">영화</button>
           <button class="pill" data-type="drama">드라마</button>
-          <button class="pill" data-type="book">책</button>
+          <button class="pill" data-type="podcast">팟캐스트</button>
         </div>
       </div>
 
@@ -2225,7 +2208,7 @@
           <div class="type-option active" data-type="youtube"><span class="type-option-icon">▶</span>유튜브</div>
           <div class="type-option" data-type="movie"><span class="type-option-icon">★</span>영화</div>
           <div class="type-option" data-type="drama"><span class="type-option-icon">●</span>드라마</div>
-          <div class="type-option" data-type="book"><span class="type-option-icon">▤</span>책</div>
+          <div class="type-option" data-type="podcast"><span class="type-option-icon">🎙</span>팟캐스트</div>
         </div>
       </div>
 
@@ -2374,9 +2357,9 @@
 
 // ============ DEFAULT TEMPLATES ============
 const DEFAULT_TEMPLATES = [
-  { id: 'def-book-1', type: 'book', name: '기본 독서노트', content: `## 한 줄 요약\n\n\n## 인상 깊었던 구절\n- \n- \n\n## 떠오른 생각\n\n\n## 총평\n` },
-  { id: 'def-book-2', type: 'book', name: '챕터별 정리', content: `## 1장\n**핵심**: \n메모: \n\n## 2장\n**핵심**: \n메모: \n\n## 3장\n**핵심**: \n메모: \n` },
-  { id: 'def-book-3', type: 'book', name: '인용 모음', content: `> "인용문 1"\n— p. \n메모: \n\n-----\n\n> "인용문 2"\n— p. \n메모: \n` },
+  { id: 'def-podcast-1', type: 'podcast', name: '기본 청취 메모', content: `## 한 줄 요약\n\n\n## 핵심 내용\n- \n- \n\n## 인상 깊었던 말\n\n\n## 떠오른 생각\n` },
+  { id: 'def-podcast-2', type: 'podcast', name: '에피소드별 정리', content: `## EP 1\n핵심: \n메모: \n\n## EP 2\n핵심: \n메모: \n` },
+  { id: 'def-podcast-3', type: 'podcast', name: '인용 모음', content: `> "인용 1"\n— 타임스탬프: \n메모: \n\n-----\n\n> "인용 2"\n— 타임스탬프: \n메모: \n` },
   { id: 'def-drama-1', type: 'drama', name: '기본 감상문', content: `## 한 줄 평\n\n\n## 인상적인 장면\n\n\n## 인물에 대해\n\n\n## 전체적인 감상\n` },
   { id: 'def-drama-2', type: 'drama', name: '회차별 기록', content: `## 1화\n\n## 2화\n\n## 3화\n` },
   { id: 'def-movie-1', type: 'movie', name: '기본 감상문', content: `## 한 줄 평\n\n\n## 명장면\n\n\n## 기억에 남는 대사\n\n\n## 전체적인 감상\n` },
@@ -2422,8 +2405,6 @@ let state = {
   selectedType: 'youtube',
   selectedStatus: 'watching',
   selectedRating: 0,
-  selectedBookFormat: 'paper',
-  selectedBookSource: 'own',
   selectedOtt: null,
   ytThumb: null,
   lastBackupAt: null,
@@ -2570,10 +2551,8 @@ function fmtDateTime(ts) {
   return `${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
 }
 
-function typeName(t) { return {youtube:'유튜브', movie:'영화', drama:'드라마', book:'책'}[t] || t; }
+function typeName(t) { return {youtube:'유튜브', movie:'영화', drama:'드라마', podcast:'팟캐스트'}[t] || t; }
 function statusName(s) { return {wishlist:'위시리스트', watching:'진행 중', done:'완료', dropped:'중단'}[s] || s; }
-function bookFormatName(f) { return {paper:'종이책', ebook:'e-book'}[f] || ''; }
-function bookSourceName(s) { return {own:'구매', borrowed:'대여', library:'도서관'}[s] || ''; }
 
 function showToast(msg) {
   const t = document.getElementById('toast');
@@ -2584,26 +2563,25 @@ function showToast(msg) {
 
 function getProgress(item) {
   if (item.type === 'drama' && item.totalEp > 0) return Math.min(100, Math.round((item.currentEp || 0) / item.totalEp * 100));
-  if (item.type === 'book' && item.totalPage > 0) return Math.min(100, Math.round((item.currentPage || 0) / item.totalPage * 100));
+  if (item.type === 'podcast' && item.totalPodEp > 0) return Math.min(100, Math.round((item.currentPodEp || 0) / item.totalPodEp * 100));
   return null;
 }
 
 function progressText(item) {
   if (item.type === 'drama' && item.totalEp > 0) return `${item.currentEp || 0} / ${item.totalEp} 회`;
-  if (item.type === 'book' && item.totalPage > 0) return `${item.currentPage || 0} / ${item.totalPage} p`;
+  if (item.type === 'podcast' && item.totalPodEp > 0) return `EP ${item.currentPodEp || 0} / ${item.totalPodEp}`;
   return null;
 }
 
 function starString(n) { return n ? '★'.repeat(n) + '☆'.repeat(5 - n) : ''; }
 
 // ============ COPY TEXT ============
-// 제목을 유형에 맞는 괄호로 감싸기 (영상물 〈 〉, 책 《 》)
+// 제목을 유형에 맞는 괄호로 감싸기 (모두 영상물 〈 〉)
 function bracketTitle(item) {
-  if (item.type === 'book') return `《${item.title}》`;
   return `〈${item.title}〉`;
 }
 
-// 복사용 텍스트 생성. withProgress=true면 진행 상황(다음 회차/페이지) 포함
+// 복사용 텍스트 생성. withProgress=true면 진행 상황(다음 회차/에피소드) 포함
 function buildCopyText(item, withProgress) {
   const t = bracketTitle(item);
   if (!withProgress) return t;
@@ -2612,9 +2590,10 @@ function buildCopyText(item, withProgress) {
     const next = Math.min((item.currentEp || 0) + 1, item.totalEp);
     return `${t} ${next}화~`;
   }
-  if (item.type === 'book' && item.totalPage > 0) {
-    const next = Math.min((item.currentPage || 0) + 1, item.totalPage);
-    return `${t} ${next}p~`;
+  if (item.type === 'podcast') {
+    const cur = item.currentPodEp || 0;
+    const next = item.totalPodEp > 0 ? Math.min(cur + 1, item.totalPodEp) : cur + 1;
+    return `${t} EP${next}~`;
   }
   // 영화·유튜브 등은 진행 개념이 없으니 제목만
   return t;
@@ -3013,8 +2992,8 @@ function renderStatsView() {
   </div>`;
 
   // type distribution bar chart
-  const typeColors = { youtube: '#c4543a', movie: '#4a6f96', drama: '#c4923a', book: '#5a7a3c' };
-  const types = ['youtube','movie','drama','book'];
+  const typeColors = { youtube: '#c4543a', movie: '#4a6f96', drama: '#c4923a', podcast: '#7a5cc8' };
+  const types = ['youtube','movie','drama','podcast'];
   const typeCounts = types.map(t => items.filter(i => i.type === t).length);
   const maxType = Math.max(...typeCounts, 1);
   html += `<div class="stat-card">
@@ -3101,7 +3080,7 @@ function renderHallView() {
     const rank = idx < 3 ? medals[idx] : `<span style="font-size: 13px; color: var(--ink-mute); font-weight: 700;">${idx+1}</span>`;
     const thumb = item.thumb
       ? `<img class="hall-thumb" src="${escapeHTML(item.thumb)}" alt="" loading="lazy">`
-      : `<div class="hall-thumb" style="display:flex;align-items:center;justify-content:center;background:var(--bg-soft);color:var(--ink-mute);font-size:18px;">${{youtube:'▶',movie:'★',drama:'●',book:'▤'}[item.type]||''}</div>`;
+      : `<div class="hall-thumb" style="display:flex;align-items:center;justify-content:center;background:var(--bg-soft);color:var(--ink-mute);font-size:18px;">${{youtube:'▶',movie:'★',drama:'●',podcast:'🎙'}[item.type]||''}</div>`;
     return `<div class="hall-item" onclick="openDetail('${item.id}')">
       <div class="hall-rank">${rank}</div>
       ${thumb}
@@ -3177,7 +3156,7 @@ function cardHTML(item) {
   if (item.endDate && item.status === 'done') meta.push(`<span>${fmtDate(item.endDate)} 완료</span>`);
   if (item.rating > 0) meta.push(`<span class="card-stars">${starString(item.rating)}</span>`);
   if (item.status !== 'watching') meta.push(`<span>${statusName(item.status)}</span>`);
-  if (item.type === 'book' && item.bookFormat) meta.push(`<span>${bookFormatName(item.bookFormat)}</span>`);
+  if (item.type === 'podcast' && item.platform) meta.push(`<span>${escapeHTML(item.platform)}</span>`);
   if (item.ott) {
     const ott = getOttById(item.ott);
     if (ott) meta.push(`<span class="ott-chip"><span class="ott-chip-dot" style="background: ${escapeHTML(ott.color || '#9e9a93')}"></span>${escapeHTML(ott.name)}</span>`);
@@ -3288,13 +3267,11 @@ function selectType(type) {
     document.getElementById('section-ott').classList.add('active');
   }
   if (type === 'drama') document.getElementById('section-drama').classList.add('active');
-  if (type === 'book') {
-    document.getElementById('section-book-pub').classList.add('active');
-    document.getElementById('section-book-format').classList.add('active');
-    document.getElementById('section-book-source').classList.add('active');
-    document.getElementById('section-book').classList.add('active');
+  if (type === 'podcast') {
+    document.getElementById('section-podcast-platform').classList.add('active');
+    document.getElementById('section-podcast').classList.add('active');
   }
-  document.getElementById('creatorLabel').textContent = {youtube:'채널', movie:'감독', drama:'연출 / 작가', book:'저자'}[type] || '';
+  document.getElementById('creatorLabel').textContent = {youtube:'채널', movie:'감독', drama:'연출 / 작가', podcast:'진행자 / 제작'}[type] || '';
 }
 
 document.getElementById('statusPicker').addEventListener('click', (e) => {
@@ -3302,20 +3279,6 @@ document.getElementById('statusPicker').addEventListener('click', (e) => {
   if (!opt) return;
   state.selectedStatus = opt.dataset.status;
   document.querySelectorAll('#statusPicker .status-option').forEach(o => o.classList.toggle('active', o.dataset.status === state.selectedStatus));
-});
-
-document.getElementById('bookFormatPicker').addEventListener('click', (e) => {
-  const opt = e.target.closest('.seg-option');
-  if (!opt) return;
-  state.selectedBookFormat = opt.dataset.format;
-  document.querySelectorAll('#bookFormatPicker .seg-option').forEach(o => o.classList.toggle('active', o.dataset.format === state.selectedBookFormat));
-});
-
-document.getElementById('bookSourcePicker').addEventListener('click', (e) => {
-  const opt = e.target.closest('.seg-option');
-  if (!opt) return;
-  state.selectedBookSource = opt.dataset.source;
-  document.querySelectorAll('#bookSourcePicker .seg-option').forEach(o => o.classList.toggle('active', o.dataset.source === state.selectedBookSource));
 });
 
 document.getElementById('starRating').addEventListener('click', (e) => {
@@ -3362,16 +3325,12 @@ function resetForm() {
   state.selectedRating = 0;
   state.selectedType = 'youtube';
   state.selectedStatus = 'watching';
-  state.selectedBookFormat = 'paper';
-  state.selectedBookSource = 'own';
   state.selectedOtt = null;
   state.ytThumb = null;
   document.getElementById('ytPreview').style.display = 'none';
   document.getElementById('ytImportInput').value = '';
   selectType('youtube');
   document.querySelectorAll('#statusPicker .status-option').forEach(o => o.classList.toggle('active', o.dataset.status === 'watching'));
-  document.querySelectorAll('#bookFormatPicker .seg-option').forEach(o => o.classList.toggle('active', o.dataset.format === 'paper'));
-  document.querySelectorAll('#bookSourcePicker .seg-option').forEach(o => o.classList.toggle('active', o.dataset.source === 'own'));
   updateStars();
   updateOttSelectButton();
   updateDateClearVisibility('fStartDate');
@@ -3383,26 +3342,22 @@ function fillForm(item) {
   document.getElementById('fTitle').value = item.title || '';
   document.getElementById('fCreator').value = item.creator || '';
   document.getElementById('fCast').value = item.cast || '';
-  document.getElementById('fPublisher').value = item.publisher || '';
+  document.getElementById('fPlatform').value = item.platform || '';
   document.getElementById('fLink').value = item.link || '';
   document.getElementById('fTotalEp').value = item.totalEp || '';
   document.getElementById('fCurrentEp').value = item.currentEp || '';
-  document.getElementById('fTotalPage').value = item.totalPage || '';
-  document.getElementById('fCurrentPage').value = item.currentPage || '';
+  document.getElementById('fTotalPodEp').value = item.totalPodEp || '';
+  document.getElementById('fCurrentPodEp').value = item.currentPodEp || '';
   document.getElementById('fStartDate').value = item.startDate || '';
   document.getElementById('fEndDate').value = item.endDate || '';
   document.getElementById('fMemo').value = item.memo || '';
   state.selectedRating = item.rating || 0;
   state.selectedType = item.type || 'youtube';
   state.selectedStatus = item.status || 'watching';
-  state.selectedBookFormat = item.bookFormat || 'paper';
-  state.selectedBookSource = item.bookSource || 'own';
   state.selectedOtt = item.ott || null;
   state.ytThumb = item.thumb || null;
   selectType(state.selectedType);
   document.querySelectorAll('#statusPicker .status-option').forEach(o => o.classList.toggle('active', o.dataset.status === state.selectedStatus));
-  document.querySelectorAll('#bookFormatPicker .seg-option').forEach(o => o.classList.toggle('active', o.dataset.format === state.selectedBookFormat));
-  document.querySelectorAll('#bookSourcePicker .seg-option').forEach(o => o.classList.toggle('active', o.dataset.source === state.selectedBookSource));
   updateStars();
   updateOttSelectButton();
   updateDateClearVisibility('fStartDate');
@@ -3428,16 +3383,14 @@ function saveContent(e) {
     title: document.getElementById('fTitle').value.trim(),
     creator: document.getElementById('fCreator').value.trim(),
     cast: document.getElementById('fCast').value.trim(),
-    publisher: document.getElementById('fPublisher').value.trim(),
-    bookFormat: state.selectedType === 'book' ? state.selectedBookFormat : '',
-    bookSource: state.selectedType === 'book' ? state.selectedBookSource : '',
+    platform: state.selectedType === 'podcast' ? document.getElementById('fPlatform').value.trim() : '',
     ott: (state.selectedType === 'movie' || state.selectedType === 'drama') ? state.selectedOtt : null,
     link: document.getElementById('fLink').value.trim(),
     thumb: state.ytThumb || '',
     totalEp: parseInt(document.getElementById('fTotalEp').value) || 0,
     currentEp: parseInt(document.getElementById('fCurrentEp').value) || 0,
-    totalPage: parseInt(document.getElementById('fTotalPage').value) || 0,
-    currentPage: parseInt(document.getElementById('fCurrentPage').value) || 0,
+    totalPodEp: parseInt(document.getElementById('fTotalPodEp').value) || 0,
+    currentPodEp: parseInt(document.getElementById('fCurrentPodEp').value) || 0,
     startDate: document.getElementById('fStartDate').value,
     endDate: document.getElementById('fEndDate').value,
     rating: state.selectedRating,
@@ -3480,14 +3433,17 @@ function openDetail(id) {
   }
 
   let progressHTML = '';
-  if (item.type === 'book' && item.totalPage > 0) {
+  if (item.type === 'podcast') {
+    const cur = item.currentPodEp || 0;
+    const totalTxt = item.totalPodEp > 0 ? ` / ${item.totalPodEp}` : '';
+    const pctTxt = (item.totalPodEp > 0 && progress !== null) ? ` (${progress}%)` : '';
     progressHTML = `<div class="detail-section">
-      <div class="detail-label">독서 진행</div>
-      <div class="detail-value">${ptext} (${progress}%)</div>
-      <div class="progress-bar" style="margin-top: 8px;"><div class="progress-fill" style="width: ${progress}%"></div></div>
+      <div class="detail-label">청취 진행</div>
+      <div class="detail-value">EP ${cur}${totalTxt}${pctTxt}</div>
+      ${item.totalPodEp > 0 ? `<div class="progress-bar" style="margin-top: 8px;"><div class="progress-fill" style="width: ${progress}%"></div></div>` : ''}
       <div style="margin-top: 10px; display: flex; gap: 8px;">
-        <input type="number" id="quickPage" placeholder="현재 페이지" value="${item.currentPage || 0}" max="${item.totalPage}" min="0" class="form-input" style="flex: 1;">
-        <button class="btn btn-primary" onclick="updateBookPage('${item.id}')" style="flex: 1; padding: 12px;">업데이트</button>
+        <input type="number" id="quickPodEp" placeholder="현재 EP" value="${cur}" min="0" class="form-input" style="flex: 1;">
+        <button class="btn btn-primary" onclick="updatePodEp('${item.id}')" style="flex: 1; padding: 12px;">업데이트</button>
       </div>
     </div>`;
   }
@@ -3535,8 +3491,7 @@ function openDetail(id) {
 
     <div class="detail-section"><div class="detail-label">상태</div><div class="detail-value">${statusName(item.status)}</div></div>
     ${item.cast ? `<div class="detail-section"><div class="detail-label">출연</div><div class="detail-value">${escapeHTML(item.cast)}</div></div>` : ''}
-    ${item.publisher ? `<div class="detail-section"><div class="detail-label">출판사</div><div class="detail-value">${escapeHTML(item.publisher)}</div></div>` : ''}
-    ${item.type === 'book' && (item.bookFormat || item.bookSource) ? `<div class="detail-section"><div class="detail-label">책 정보</div><div class="detail-value">${[bookFormatName(item.bookFormat), bookSourceName(item.bookSource)].filter(Boolean).join(' · ')}</div></div>` : ''}
+    ${item.platform ? `<div class="detail-section"><div class="detail-label">채널 / 플랫폼</div><div class="detail-value">${escapeHTML(item.platform)}</div></div>` : ''}
     ${(() => {
       if (!item.ott) return '';
       const ott = getOttById(item.ott);
@@ -3553,7 +3508,7 @@ function openDetail(id) {
     ${item.memo ? `<div class="detail-section"><div class="detail-label">한줄 메모</div><div class="detail-value" style="white-space: pre-wrap;">${escapeHTML(item.memo)}</div></div>` : ''}
 
     ${(() => {
-      const hasProgress = (item.type === 'drama' && item.totalEp > 0) || (item.type === 'book' && item.totalPage > 0);
+      const hasProgress = (item.type === 'drama' && item.totalEp > 0) || (item.type === 'podcast');
       const titleOnly = buildCopyText(item, false);
       const withProg = buildCopyText(item, true);
       return `<div class="detail-section">
@@ -3599,7 +3554,7 @@ function markDone(id) {
   item.status = 'done';
   if (!item.endDate) item.endDate = today();
   if (item.type === 'drama' && item.totalEp > 0) item.currentEp = item.totalEp;
-  if (item.type === 'book' && item.totalPage > 0) item.currentPage = item.totalPage;
+  if (item.type === 'podcast' && item.totalPodEp > 0) item.currentPodEp = item.totalPodEp;
   item.updatedAt = Date.now();
   save(true);
   render();
@@ -3621,13 +3576,13 @@ function toggleEpisode(id, ep) {
   openDetail(id);
 }
 
-function updateBookPage(id) {
+function updatePodEp(id) {
   const item = state.items.find(i => i.id === id);
   if (!item) return;
-  const newPage = parseInt(document.getElementById('quickPage').value) || 0;
-  item.currentPage = Math.min(newPage, item.totalPage);
+  const newEp = parseInt(document.getElementById('quickPodEp').value) || 0;
+  item.currentPodEp = item.totalPodEp > 0 ? Math.min(newEp, item.totalPodEp) : newEp;
   item.updatedAt = Date.now();
-  if (item.totalPage > 0 && item.currentPage >= item.totalPage) {
+  if (item.totalPodEp > 0 && item.currentPodEp >= item.totalPodEp) {
     item.status = 'done';
     if (!item.endDate) item.endDate = today();
   }
@@ -3810,11 +3765,10 @@ function buildNoteCardHTML(item, note, includeContentHeader) {
         <div style="font-size: 24px; font-weight: 700; letter-spacing: -0.02em; color: #1c1b1a; margin-bottom: 4px;">${escapeHTML(item.title)}</div>
         ${item.creator ? `<div style="font-size: 13px; color: #5e5b56;">${escapeHTML(item.creator)}</div>` : ''}
       </div>` : '';
-  const metaRow = (ratingStr || period || item.publisher || item.bookFormat) ? `<div style="display: flex; flex-wrap: wrap; gap: 16px; font-size: 12px; color: #5e5b56; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px dashed #e8e6e1;">
+  const metaRow = (ratingStr || period || item.platform) ? `<div style="display: flex; flex-wrap: wrap; gap: 16px; font-size: 12px; color: #5e5b56; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px dashed #e8e6e1;">
         ${ratingStr ? `<div><span style="color: #9e9a93; font-weight: 600;">평점</span> <span style="color: #c87f3f; letter-spacing: 1px; font-weight: 600;">${ratingStr}</span></div>` : ''}
         ${period ? `<div><span style="color: #9e9a93; font-weight: 600;">기간</span> ${period}</div>` : ''}
-        ${item.type === 'book' && item.bookFormat ? `<div><span style="color: #9e9a93; font-weight: 600;">형태</span> ${bookFormatName(item.bookFormat)}${item.bookSource ? ' · ' + bookSourceName(item.bookSource) : ''}</div>` : ''}
-        ${item.publisher ? `<div><span style="color: #9e9a93; font-weight: 600;">출판사</span> ${escapeHTML(item.publisher)}</div>` : ''}
+        ${item.platform ? `<div><span style="color: #9e9a93; font-weight: 600;">플랫폼</span> ${escapeHTML(item.platform)}</div>` : ''}
       </div>` : '';
   return `
     <div style="background: white; padding: 0; color: #1c1b1a; line-height: 1.7; font-family: 'Pretendard Variable', Pretendard, sans-serif;">
@@ -4505,20 +4459,18 @@ function exportExcel() {
       return {
         '유형': typeName(item.type),
         '제목': item.title || '',
-        '크리에이터/감독/저자': item.creator || '',
+        '크리에이터/감독/진행자': item.creator || '',
         '출연': item.cast || '',
-        '출판사': item.publisher || '',
         'OTT 플랫폼': ott ? ott.name : '',
-        '책 형태': item.type === 'book' ? bookFormatName(item.bookFormat) : '',
-        '구매/대여': item.type === 'book' ? bookSourceName(item.bookSource) : '',
+        '채널/플랫폼': item.platform || '',
         '상태': statusName(item.status),
         '별점': item.rating || '',
         '시작일': item.startDate || '',
         '완료일': item.endDate || '',
         '현재 회차': item.currentEp || '',
         '전체 회차': item.totalEp || '',
-        '현재 페이지': item.currentPage || '',
-        '전체 페이지': item.totalPage || '',
+        '현재 EP': item.currentPodEp || '',
+        '전체 EP': item.totalPodEp || '',
         '진행률(%)': getProgress(item) ?? '',
         '한줄 메모': item.memo || '',
         '노트 개수': (item.notes || []).length,
@@ -4544,7 +4496,7 @@ function exportExcel() {
     });
 
     // 3. Stats sheet
-    const byType = ['youtube','movie','drama','book'].map(t => ({
+    const byType = ['youtube','movie','drama','podcast'].map(t => ({
       '유형': typeName(t),
       '전체': state.items.filter(i => i.type === t).length,
       '진행중': state.items.filter(i => i.type === t && i.status === 'watching').length,
@@ -4568,11 +4520,10 @@ function exportExcel() {
     const ws1 = XLSX.utils.json_to_sheet(itemRows);
     // Column widths
     ws1['!cols'] = [
-      { wch: 8 }, { wch: 28 }, { wch: 18 }, { wch: 22 }, { wch: 14 },
-      { wch: 12 }, { wch: 8 }, { wch: 10 }, { wch: 10 }, { wch: 6 },
-      { wch: 12 }, { wch: 12 }, { wch: 8 }, { wch: 8 }, { wch: 10 },
-      { wch: 10 }, { wch: 8 }, { wch: 30 }, { wch: 8 }, { wch: 36 },
-      { wch: 12 }, { wch: 12 }
+      { wch: 8 }, { wch: 28 }, { wch: 18 }, { wch: 22 }, { wch: 12 },
+      { wch: 16 }, { wch: 10 }, { wch: 6 }, { wch: 12 }, { wch: 12 },
+      { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 8 },
+      { wch: 30 }, { wch: 8 }, { wch: 36 }, { wch: 12 }, { wch: 12 }
     ];
     XLSX.utils.book_append_sheet(wb, ws1, '기록');
 
