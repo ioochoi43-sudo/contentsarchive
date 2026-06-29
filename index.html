@@ -275,6 +275,7 @@
   .card-type.movie { color: var(--blue); border-color: var(--blue-soft); background: var(--blue-soft); }
   .card-type.drama { color: var(--yellow); border-color: var(--yellow-soft); background: var(--yellow-soft); }
   .card-type.podcast { color: #7a5cc8; border-color: #e6def6; background: #ede7f8; }
+  .card-type.anime { color: #c2477f; border-color: #f6dde9; background: #fae7f0; }
 
   .card-copy-btn {
     font-size: 10px;
@@ -631,20 +632,20 @@
   .yt-preview-title { font-size: 12px; font-weight: 600; color: var(--ink); margin-bottom: 2px; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   .yt-preview-channel { font-size: 11px; color: var(--ink-dim); }
 
-  .type-picker { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .type-picker { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
+  .type-option-icon { display: block; font-size: 16px; margin-bottom: 3px; font-weight: 700; }
   .type-option {
-    padding: 12px 4px;
+    padding: 11px 2px;
     background: var(--bg-elev);
     border: 1px solid var(--line);
     border-radius: 8px;
     text-align: center;
     cursor: pointer;
-    font-size: 12px;
+    font-size: 11px;
     color: var(--ink-dim);
     font-weight: 500;
   }
   .type-option.active { background: var(--ink); color: var(--bg-elev); border-color: var(--ink); font-weight: 600; }
-  .type-option-icon { display: block; font-size: 18px; margin-bottom: 3px; font-weight: 700; }
 
   .status-picker { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
   .status-option {
@@ -752,6 +753,31 @@
   }
   .ep-btn.watched { background: var(--accent); color: white; border-color: var(--accent); }
   .ep-btn:active { transform: scale(0.92); }
+
+  .ep-mode-toggle {
+    display: inline-flex;
+    background: var(--bg-soft);
+    border-radius: 100px;
+    padding: 2px;
+    gap: 2px;
+    flex-shrink: 0;
+  }
+  .ep-mode-btn {
+    border: none;
+    background: transparent;
+    color: var(--ink-dim);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 100px;
+    cursor: pointer;
+    font-family: var(--sans);
+  }
+  .ep-mode-btn.active {
+    background: var(--bg-elev);
+    color: var(--accent);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
 
   .detail-section { margin-bottom: 18px; }
   .detail-label {
@@ -1814,6 +1840,7 @@
         <button class="pill" data-type="youtube">유튜브</button>
         <button class="pill" data-type="movie">영화</button>
         <button class="pill" data-type="drama">드라마</button>
+        <button class="pill" data-type="anime">애니</button>
         <button class="pill" data-type="podcast">팟캐스트</button>
       </div>
       <button class="sort-btn" onclick="toggleSortMenu(event)">
@@ -1914,7 +1941,7 @@
     </div>
 
     <div style="text-align: center; margin-top: 40px; font-size: 11px; color: var(--ink-mute); letter-spacing: 0.04em; font-weight: 500;">
-      v2.0 · 데이터는 브라우저에 저장됩니다
+      v2.1 · 데이터는 브라우저에 저장됩니다
     </div>
   </section>
 </main>
@@ -1954,6 +1981,7 @@
             <div class="type-option active" data-type="youtube"><span class="type-option-icon">▶</span>유튜브</div>
             <div class="type-option" data-type="movie"><span class="type-option-icon">★</span>영화</div>
             <div class="type-option" data-type="drama"><span class="type-option-icon">●</span>드라마</div>
+            <div class="type-option" data-type="anime"><span class="type-option-icon">◆</span>애니</div>
             <div class="type-option" data-type="podcast"><span class="type-option-icon">🎙</span>팟캐스트</div>
           </div>
         </div>
@@ -2175,6 +2203,7 @@
           <button class="pill" data-type="youtube">유튜브</button>
           <button class="pill" data-type="movie">영화</button>
           <button class="pill" data-type="drama">드라마</button>
+        <button class="pill" data-type="anime">애니</button>
           <button class="pill" data-type="podcast">팟캐스트</button>
         </div>
       </div>
@@ -2208,6 +2237,7 @@
           <div class="type-option active" data-type="youtube"><span class="type-option-icon">▶</span>유튜브</div>
           <div class="type-option" data-type="movie"><span class="type-option-icon">★</span>영화</div>
           <div class="type-option" data-type="drama"><span class="type-option-icon">●</span>드라마</div>
+          <div class="type-option" data-type="anime"><span class="type-option-icon">◆</span>애니</div>
           <div class="type-option" data-type="podcast"><span class="type-option-icon">🎙</span>팟캐스트</div>
         </div>
       </div>
@@ -2440,6 +2470,10 @@ function load() {
         }
         // Ensure ott field exists (null = no OTT)
         if (item.ott === undefined) item.ott = null;
+        if (item.type === 'podcast') {
+          if (!Array.isArray(item.podWatched)) item.podWatched = [];
+          if (typeof item.podSeqMode !== 'boolean') item.podSeqMode = false;
+        }
       });
       state.templates = Array.isArray(data.templates) ? data.templates : [];
       if (state.templates.length === 0) {
@@ -2551,7 +2585,7 @@ function fmtDateTime(ts) {
   return `${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
 }
 
-function typeName(t) { return {youtube:'유튜브', movie:'영화', drama:'드라마', podcast:'팟캐스트'}[t] || t; }
+function typeName(t) { return {youtube:'유튜브', movie:'영화', drama:'드라마', anime:'애니', podcast:'팟캐스트'}[t] || t; }
 function statusName(s) { return {wishlist:'위시리스트', watching:'진행 중', done:'완료', dropped:'중단'}[s] || s; }
 
 function showToast(msg) {
@@ -2562,13 +2596,13 @@ function showToast(msg) {
 }
 
 function getProgress(item) {
-  if (item.type === 'drama' && item.totalEp > 0) return Math.min(100, Math.round((item.currentEp || 0) / item.totalEp * 100));
+  if ((item.type === 'drama' || item.type === 'anime') && item.totalEp > 0) return Math.min(100, Math.round((item.currentEp || 0) / item.totalEp * 100));
   if (item.type === 'podcast' && item.totalPodEp > 0) return Math.min(100, Math.round((item.currentPodEp || 0) / item.totalPodEp * 100));
   return null;
 }
 
 function progressText(item) {
-  if (item.type === 'drama' && item.totalEp > 0) return `${item.currentEp || 0} / ${item.totalEp} 회`;
+  if ((item.type === 'drama' || item.type === 'anime') && item.totalEp > 0) return `${item.currentEp || 0} / ${item.totalEp} 회`;
   if (item.type === 'podcast' && item.totalPodEp > 0) return `EP ${item.currentPodEp || 0} / ${item.totalPodEp}`;
   return null;
 }
@@ -2586,7 +2620,7 @@ function buildCopyText(item, withProgress) {
   const t = bracketTitle(item);
   if (!withProgress) return t;
   // 진행 상황 포함
-  if (item.type === 'drama' && item.totalEp > 0) {
+  if ((item.type === 'drama' || item.type === 'anime') && item.totalEp > 0) {
     const next = Math.min((item.currentEp || 0) + 1, item.totalEp);
     return `${t} ${next}화~`;
   }
@@ -2923,10 +2957,10 @@ function renderStats() {
 function renderOttView() {
   const container = document.getElementById('ottView');
   if (!container) return;
-  // movie/drama items that have OTT
-  const relevant = state.items.filter(i => (i.type === 'movie' || i.type === 'drama'));
+  // movie/drama/anime items that have OTT
+  const relevant = state.items.filter(i => (i.type === 'movie' || i.type === 'drama' || i.type === 'anime'));
   if (relevant.length === 0) {
-    container.innerHTML = emptyHTML('영화·드라마 기록이 없어요', 'OTT 정보를 담은 기록이 쌓이면 여기 모입니다');
+    container.innerHTML = emptyHTML('영화·드라마·애니 기록이 없어요', 'OTT 정보를 담은 기록이 쌓이면 여기 모입니다');
     return;
   }
   const sortedOtt = getOttSorted();
@@ -2992,8 +3026,8 @@ function renderStatsView() {
   </div>`;
 
   // type distribution bar chart
-  const typeColors = { youtube: '#c4543a', movie: '#4a6f96', drama: '#c4923a', podcast: '#7a5cc8' };
-  const types = ['youtube','movie','drama','podcast'];
+  const typeColors = { youtube: '#c4543a', movie: '#4a6f96', drama: '#c4923a', anime: '#c2477f', podcast: '#7a5cc8' };
+  const types = ['youtube','movie','drama','anime','podcast'];
   const typeCounts = types.map(t => items.filter(i => i.type === t).length);
   const maxType = Math.max(...typeCounts, 1);
   html += `<div class="stat-card">
@@ -3080,7 +3114,7 @@ function renderHallView() {
     const rank = idx < 3 ? medals[idx] : `<span style="font-size: 13px; color: var(--ink-mute); font-weight: 700;">${idx+1}</span>`;
     const thumb = item.thumb
       ? `<img class="hall-thumb" src="${escapeHTML(item.thumb)}" alt="" loading="lazy">`
-      : `<div class="hall-thumb" style="display:flex;align-items:center;justify-content:center;background:var(--bg-soft);color:var(--ink-mute);font-size:18px;">${{youtube:'▶',movie:'★',drama:'●',podcast:'🎙'}[item.type]||''}</div>`;
+      : `<div class="hall-thumb" style="display:flex;align-items:center;justify-content:center;background:var(--bg-soft);color:var(--ink-mute);font-size:18px;">${{youtube:'▶',movie:'★',drama:'●',anime:'◆',podcast:'🎙'}[item.type]||''}</div>`;
     return `<div class="hall-item" onclick="openDetail('${item.id}')">
       <div class="hall-rank">${rank}</div>
       ${thumb}
@@ -3262,16 +3296,16 @@ function selectType(type) {
     document.getElementById('yt-import-section').classList.add('active');
     document.getElementById('section-youtube').classList.add('active');
   }
-  if (type === 'movie' || type === 'drama') {
+  if (type === 'movie' || type === 'drama' || type === 'anime') {
     document.getElementById('section-cast').classList.add('active');
     document.getElementById('section-ott').classList.add('active');
   }
-  if (type === 'drama') document.getElementById('section-drama').classList.add('active');
+  if (type === 'drama' || type === 'anime') document.getElementById('section-drama').classList.add('active');
   if (type === 'podcast') {
     document.getElementById('section-podcast-platform').classList.add('active');
     document.getElementById('section-podcast').classList.add('active');
   }
-  document.getElementById('creatorLabel').textContent = {youtube:'채널', movie:'감독', drama:'연출 / 작가', podcast:'진행자 / 제작'}[type] || '';
+  document.getElementById('creatorLabel').textContent = {youtube:'채널', movie:'감독', drama:'연출 / 작가', anime:'감독 / 제작사', podcast:'진행자 / 제작'}[type] || '';
 }
 
 document.getElementById('statusPicker').addEventListener('click', (e) => {
@@ -3384,7 +3418,7 @@ function saveContent(e) {
     creator: document.getElementById('fCreator').value.trim(),
     cast: document.getElementById('fCast').value.trim(),
     platform: state.selectedType === 'podcast' ? document.getElementById('fPlatform').value.trim() : '',
-    ott: (state.selectedType === 'movie' || state.selectedType === 'drama') ? state.selectedOtt : null,
+    ott: (state.selectedType === 'movie' || state.selectedType === 'drama' || state.selectedType === 'anime') ? state.selectedOtt : null,
     link: document.getElementById('fLink').value.trim(),
     thumb: state.ytThumb || '',
     totalEp: parseInt(document.getElementById('fTotalEp').value) || 0,
@@ -3419,7 +3453,7 @@ function openDetail(id) {
   const ptext = progressText(item);
 
   let episodesHTML = '';
-  if (item.type === 'drama' && item.totalEp > 0) {
+  if ((item.type === 'drama' || item.type === 'anime') && item.totalEp > 0) {
     let grid = '';
     for (let i = 1; i <= item.totalEp; i++) {
       const watched = i <= (item.currentEp || 0);
@@ -3431,16 +3465,38 @@ function openDetail(id) {
       <div class="episodes-grid">${grid}</div>
     </div>`;
   }
+  // 팟캐스트: 전체 EP가 있으면 그리드(개별/순차 모드 토글)
+  if (item.type === 'podcast' && item.totalPodEp > 0) {
+    const watchedSet = new Set(item.podWatched || []);
+    const seqMode = item.podSeqMode === true; // 기본은 개별 모드
+    const watchedCount = seqMode ? (item.currentPodEp || 0) : watchedSet.size;
+    let grid = '';
+    for (let i = 1; i <= item.totalPodEp; i++) {
+      const on = seqMode ? (i <= (item.currentPodEp || 0)) : watchedSet.has(i);
+      grid += `<button class="ep-btn ${on ? 'watched' : ''}" onclick="togglePodEpisode('${item.id}', ${i})">${i}</button>`;
+    }
+    const pct = Math.min(100, Math.round(watchedCount / item.totalPodEp * 100));
+    episodesHTML = `<div class="episodes-section">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px;">
+        <div class="detail-label" style="margin-bottom:0;">에피소드 (${watchedCount} / ${item.totalPodEp})</div>
+        <div class="ep-mode-toggle">
+          <button class="ep-mode-btn ${!seqMode ? 'active' : ''}" onclick="setPodMode('${item.id}', false)">개별</button>
+          <button class="ep-mode-btn ${seqMode ? 'active' : ''}" onclick="setPodMode('${item.id}', true)">순차</button>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--ink-mute);margin-bottom:8px;">${seqMode ? '탭하면 거기까지 한꺼번에 체크돼요' : '들은 에피소드만 하나씩 탭해서 체크해요'}</div>
+      <div class="progress-bar"><div class="progress-fill" style="width: ${pct}%"></div></div>
+      <div class="episodes-grid">${grid}</div>
+    </div>`;
+  }
 
   let progressHTML = '';
-  if (item.type === 'podcast') {
+  if (item.type === 'podcast' && !(item.totalPodEp > 0)) {
     const cur = item.currentPodEp || 0;
-    const totalTxt = item.totalPodEp > 0 ? ` / ${item.totalPodEp}` : '';
-    const pctTxt = (item.totalPodEp > 0 && progress !== null) ? ` (${progress}%)` : '';
     progressHTML = `<div class="detail-section">
       <div class="detail-label">청취 진행</div>
-      <div class="detail-value">EP ${cur}${totalTxt}${pctTxt}</div>
-      ${item.totalPodEp > 0 ? `<div class="progress-bar" style="margin-top: 8px;"><div class="progress-fill" style="width: ${progress}%"></div></div>` : ''}
+      <div class="detail-value">EP ${cur}까지</div>
+      <div style="font-size:11px;color:var(--ink-mute);margin-top:4px;">전체 회차를 입력하면 그리드로 하나씩 체크할 수 있어요</div>
       <div style="margin-top: 10px; display: flex; gap: 8px;">
         <input type="number" id="quickPodEp" placeholder="현재 EP" value="${cur}" min="0" class="form-input" style="flex: 1;">
         <button class="btn btn-primary" onclick="updatePodEp('${item.id}')" style="flex: 1; padding: 12px;">업데이트</button>
@@ -3553,8 +3609,12 @@ function markDone(id) {
   if (!item) return;
   item.status = 'done';
   if (!item.endDate) item.endDate = today();
-  if (item.type === 'drama' && item.totalEp > 0) item.currentEp = item.totalEp;
-  if (item.type === 'podcast' && item.totalPodEp > 0) item.currentPodEp = item.totalPodEp;
+  if ((item.type === 'drama' || item.type === 'anime') && item.totalEp > 0) item.currentEp = item.totalEp;
+  if (item.type === 'podcast' && item.totalPodEp > 0) {
+    item.currentPodEp = item.totalPodEp;
+    // 개별 모드면 전체 EP를 들은 것으로
+    item.podWatched = Array.from({length: item.totalPodEp}, (_, i) => i + 1);
+  }
   item.updatedAt = Date.now();
   save(true);
   render();
@@ -3568,6 +3628,57 @@ function toggleEpisode(id, ep) {
   item.currentEp = ep <= (item.currentEp || 0) ? ep - 1 : ep;
   item.updatedAt = Date.now();
   if (item.totalEp > 0 && item.currentEp >= item.totalEp) {
+    item.status = 'done';
+    if (!item.endDate) item.endDate = today();
+  }
+  save(true);
+  render();
+  openDetail(id);
+}
+
+// 팟캐스트 모드 전환 (개별/순차)
+function setPodMode(id, seq) {
+  const item = state.items.find(i => i.id === id);
+  if (!item) return;
+  item.podSeqMode = seq;
+  // 모드 전환 시 데이터 동기화
+  if (seq) {
+    // 개별 → 순차: 연속으로 들은 데까지를 현재 EP로 (1부터 끊김 없이)
+    const set = new Set(item.podWatched || []);
+    let cur = 0;
+    while (set.has(cur + 1)) cur++;
+    item.currentPodEp = cur;
+  } else {
+    // 순차 → 개별: 현재 EP까지를 들은 집합으로
+    item.podWatched = Array.from({length: item.currentPodEp || 0}, (_, i) => i + 1);
+  }
+  item.updatedAt = Date.now();
+  save(true);
+  render();
+  openDetail(id);
+}
+
+// 팟캐스트 에피소드 토글
+function togglePodEpisode(id, ep) {
+  const item = state.items.find(i => i.id === id);
+  if (!item) return;
+  if (item.podSeqMode === true) {
+    // 순차 모드: 드라마식
+    item.currentPodEp = ep <= (item.currentPodEp || 0) ? ep - 1 : ep;
+  } else {
+    // 개별 모드: 집합 토글
+    const set = new Set(item.podWatched || []);
+    if (set.has(ep)) set.delete(ep); else set.add(ep);
+    item.podWatched = Array.from(set).sort((a,b) => a - b);
+    // 개별 모드에서도 currentPodEp는 "최대 연속"으로 갱신(복사 텍스트용)
+    let cur = 0;
+    while (set.has(cur + 1)) cur++;
+    item.currentPodEp = cur;
+  }
+  item.updatedAt = Date.now();
+  // 전부 들었으면 완료
+  const watchedCount = item.podSeqMode ? (item.currentPodEp||0) : (item.podWatched||[]).length;
+  if (item.totalPodEp > 0 && watchedCount >= item.totalPodEp) {
     item.status = 'done';
     if (!item.endDate) item.endDate = today();
   }
@@ -4496,7 +4607,7 @@ function exportExcel() {
     });
 
     // 3. Stats sheet
-    const byType = ['youtube','movie','drama','podcast'].map(t => ({
+    const byType = ['youtube','movie','drama','anime','podcast'].map(t => ({
       '유형': typeName(t),
       '전체': state.items.filter(i => i.type === t).length,
       '진행중': state.items.filter(i => i.type === t && i.status === 'watching').length,
