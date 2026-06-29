@@ -1941,7 +1941,7 @@
     </div>
 
     <div style="text-align: center; margin-top: 40px; font-size: 11px; color: var(--ink-mute); letter-spacing: 0.04em; font-weight: 500;">
-      v2.1 · 데이터는 브라우저에 저장됩니다
+      v2.2 · 데이터는 브라우저에 저장됩니다
     </div>
   </section>
 </main>
@@ -2470,6 +2470,10 @@ function load() {
         }
         // Ensure ott field exists (null = no OTT)
         if (item.ott === undefined) item.ott = null;
+        if (item.type === 'drama' || item.type === 'anime') {
+          if (!Array.isArray(item.epWatched)) item.epWatched = [];
+          if (typeof item.epSeqMode !== 'boolean') item.epSeqMode = true; // 기존 동작(순차) 유지
+        }
         if (item.type === 'podcast') {
           if (!Array.isArray(item.podWatched)) item.podWatched = [];
           if (typeof item.podSeqMode !== 'boolean') item.podSeqMode = false;
@@ -3454,14 +3458,25 @@ function openDetail(id) {
 
   let episodesHTML = '';
   if ((item.type === 'drama' || item.type === 'anime') && item.totalEp > 0) {
+    const watchedSet = new Set(item.epWatched || []);
+    const seqMode = item.epSeqMode !== false; // 기본은 순차 모드(기존 동작 유지)
+    const watchedCount = seqMode ? (item.currentEp || 0) : watchedSet.size;
     let grid = '';
     for (let i = 1; i <= item.totalEp; i++) {
-      const watched = i <= (item.currentEp || 0);
-      grid += `<button class="ep-btn ${watched ? 'watched' : ''}" onclick="toggleEpisode('${item.id}', ${i})">${i}</button>`;
+      const on = seqMode ? (i <= (item.currentEp || 0)) : watchedSet.has(i);
+      grid += `<button class="ep-btn ${on ? 'watched' : ''}" onclick="toggleEpisode('${item.id}', ${i})">${i}</button>`;
     }
+    const pct = Math.min(100, Math.round(watchedCount / item.totalEp * 100));
     episodesHTML = `<div class="episodes-section">
-      <div class="detail-label">회차 진행 (${item.currentEp || 0} / ${item.totalEp})</div>
-      <div class="progress-bar" style="margin-top: 8px;"><div class="progress-fill" style="width: ${progress}%"></div></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px;">
+        <div class="detail-label" style="margin-bottom:0;">회차 진행 (${watchedCount} / ${item.totalEp})</div>
+        <div class="ep-mode-toggle">
+          <button class="ep-mode-btn ${!seqMode ? 'active' : ''}" onclick="setEpMode('${item.id}', false)">개별</button>
+          <button class="ep-mode-btn ${seqMode ? 'active' : ''}" onclick="setEpMode('${item.id}', true)">순차</button>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--ink-mute);margin-bottom:8px;">${seqMode ? '탭하면 거기까지 한꺼번에 체크돼요' : '본 회차만 하나씩 탭해서 체크해요'}</div>
+      <div class="progress-bar"><div class="progress-fill" style="width: ${pct}%"></div></div>
       <div class="episodes-grid">${grid}</div>
     </div>`;
   }
@@ -3609,7 +3624,10 @@ function markDone(id) {
   if (!item) return;
   item.status = 'done';
   if (!item.endDate) item.endDate = today();
-  if ((item.type === 'drama' || item.type === 'anime') && item.totalEp > 0) item.currentEp = item.totalEp;
+  if ((item.type === 'drama' || item.type === 'anime') && item.totalEp > 0) {
+    item.currentEp = item.totalEp;
+    item.epWatched = Array.from({length: item.totalEp}, (_, i) => i + 1);
+  }
   if (item.type === 'podcast' && item.totalPodEp > 0) {
     item.currentPodEp = item.totalPodEp;
     // 개별 모드면 전체 EP를 들은 것으로
@@ -3625,12 +3643,47 @@ function markDone(id) {
 function toggleEpisode(id, ep) {
   const item = state.items.find(i => i.id === id);
   if (!item) return;
-  item.currentEp = ep <= (item.currentEp || 0) ? ep - 1 : ep;
+  const seqMode = item.epSeqMode !== false; // 기본 순차
+  if (seqMode) {
+    // 순차 모드: 탭하면 거기까지
+    item.currentEp = ep <= (item.currentEp || 0) ? ep - 1 : ep;
+  } else {
+    // 개별 모드: 집합 토글
+    const set = new Set(item.epWatched || []);
+    if (set.has(ep)) set.delete(ep); else set.add(ep);
+    item.epWatched = Array.from(set).sort((a,b) => a - b);
+    // currentEp는 1부터 연속 최대로 (복사 텍스트/진행률용)
+    let cur = 0;
+    while (set.has(cur + 1)) cur++;
+    item.currentEp = cur;
+  }
   item.updatedAt = Date.now();
-  if (item.totalEp > 0 && item.currentEp >= item.totalEp) {
+  const watchedCount = seqMode ? (item.currentEp || 0) : (item.epWatched || []).length;
+  if (item.totalEp > 0 && watchedCount >= item.totalEp) {
     item.status = 'done';
     if (!item.endDate) item.endDate = today();
   }
+  save(true);
+  render();
+  openDetail(id);
+}
+
+// 드라마/애니 모드 전환 (개별/순차)
+function setEpMode(id, seq) {
+  const item = state.items.find(i => i.id === id);
+  if (!item) return;
+  item.epSeqMode = seq;
+  if (seq) {
+    // 개별 → 순차: 1부터 연속으로 본 데까지를 현재 회차로
+    const set = new Set(item.epWatched || []);
+    let cur = 0;
+    while (set.has(cur + 1)) cur++;
+    item.currentEp = cur;
+  } else {
+    // 순차 → 개별: 현재 회차까지를 본 집합으로
+    item.epWatched = Array.from({length: item.currentEp || 0}, (_, i) => i + 1);
+  }
+  item.updatedAt = Date.now();
   save(true);
   render();
   openDetail(id);
