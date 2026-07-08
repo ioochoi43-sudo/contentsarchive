@@ -1889,6 +1889,11 @@
       <div class="timeline-hero-desc" id="watchingDesc">아직 보고 있는 게 없어요</div>
     </div>
 
+    <div class="filter-row" id="timelineSort" style="margin-bottom: 14px;">
+      <button class="pill active" data-tsort="updated">최근순</button>
+      <button class="pill" data-tsort="started">시작일순</button>
+      <button class="pill" data-tsort="title">제목순</button>
+    </div>
     <div id="timelineList"></div>
   </section>
 
@@ -1904,6 +1909,7 @@
       <button class="pill" data-status="watching">진행중 <span class="pill-count" id="sc-watching">0</span></button>
       <button class="pill" data-status="wishlist">위시 <span class="pill-count" id="sc-wishlist">0</span></button>
       <button class="pill" data-status="done">완료 <span class="pill-count" id="sc-done">0</span></button>
+      <button class="pill" data-status="dropped">중단 <span class="pill-count" id="sc-dropped">0</span></button>
     </div>
     <div class="controls-row">
       <div class="filter-row" id="typeFilter">
@@ -2015,7 +2021,7 @@
     </div>
 
     <div style="text-align: center; margin-top: 40px; font-size: 11px; color: var(--ink-mute); letter-spacing: 0.04em; font-weight: 500;">
-      v2.6 · 데이터는 브라우저에 저장됩니다
+      v2.8 · 데이터는 브라우저에 저장됩니다
     </div>
   </section>
 </main>
@@ -2621,6 +2627,7 @@ let state = {
   selectedRating: 0,
   selectedOtts: [],
   searchQuery: '',
+  timelineSort: 'updated',
   ytThumb: null,
   lastBackupAt: null,
   changesSinceBackup: 0,
@@ -2690,6 +2697,7 @@ function load() {
         state.changesSinceBackup = data.settings.changesSinceBackup || 0;
         state.bannerDismissedAt = data.settings.bannerDismissedAt || null;
         if (data.settings.copyDefaultProgress !== undefined) state.copyDefaultProgress = data.settings.copyDefaultProgress;
+        if (data.settings.timelineSort) state.timelineSort = data.settings.timelineSort;
       }
     } else {
       state.templates = DEFAULT_TEMPLATES.map(t => ({ ...t, createdAt: Date.now() }));
@@ -2721,7 +2729,8 @@ function save(isDataChange) {
         lastBackupAt: state.lastBackupAt,
         changesSinceBackup: state.changesSinceBackup,
         bannerDismissedAt: state.bannerDismissedAt,
-        copyDefaultProgress: state.copyDefaultProgress
+        copyDefaultProgress: state.copyDefaultProgress,
+        timelineSort: state.timelineSort
       },
       savedAt: now
     }));
@@ -3111,11 +3120,19 @@ function updateCounts() {
   sc('sc-all', state.items.length);
   sc('sc-watching', state.items.filter(i => i.status === 'watching').length);
   sc('sc-wishlist', state.items.filter(i => i.status === 'wishlist').length);
-  sc('sc-done', state.items.filter(i => i.status === 'done' || i.status === 'dropped').length);
+  sc('sc-done', state.items.filter(i => i.status === 'done').length);
+  sc('sc-dropped', state.items.filter(i => i.status === 'dropped').length);
 }
 
 function renderTimeline() {
-  const watching = state.items.filter(i => i.status === 'watching').sort((a,b) => (b.updatedAt||0)-(a.updatedAt||0));
+  let watching = state.items.filter(i => i.status === 'watching');
+  if (state.timelineSort === 'started') {
+    watching.sort((a,b) => (b.startDate||'').localeCompare(a.startDate||''));
+  } else if (state.timelineSort === 'title') {
+    watching.sort((a,b) => (a.title||'').localeCompare(b.title||'', 'ko'));
+  } else {
+    watching.sort((a,b) => (b.updatedAt||0)-(a.updatedAt||0));
+  }
   document.getElementById('watchingCount').textContent = watching.length;
   const desc = document.getElementById('watchingDesc');
   desc.textContent = watching.length === 0 ? '아직 보고 있는 게 없어요' : [...new Set(watching.map(w => typeName(w.type)))].join(' · ');
@@ -3141,11 +3158,7 @@ function renderAll() {
     });
   }
   if (state.statusFilter !== 'all') {
-    if (state.statusFilter === 'done') {
-      items = items.filter(i => i.status === 'done' || i.status === 'dropped');
-    } else {
-      items = items.filter(i => i.status === state.statusFilter);
-    }
+    items = items.filter(i => i.status === state.statusFilter);
   }
   items = sortItems(items);
   const emptyMsg = q
@@ -3462,6 +3475,16 @@ document.getElementById('typeFilter').addEventListener('click', (e) => {
   pill.classList.add('active');
   state.typeFilter = pill.dataset.type;
   renderAll();
+});
+
+document.getElementById('timelineSort').addEventListener('click', (e) => {
+  const pill = e.target.closest('.pill');
+  if (!pill) return;
+  document.querySelectorAll('#timelineSort .pill').forEach(p => p.classList.remove('active'));
+  pill.classList.add('active');
+  state.timelineSort = pill.dataset.tsort;
+  save();
+  renderTimeline();
 });
 
 document.getElementById('statusFilter').addEventListener('click', (e) => {
@@ -3819,6 +3842,7 @@ function openDetail(id) {
 
     <div class="menu-items" style="margin-top: 24px;">
       <button class="menu-item" onclick="editFromDetail('${item.id}')"><span class="menu-item-icon">✎</span>기록 수정</button>
+      ${item.status === 'wishlist' ? `<button class="menu-item" onclick="markWatching('${item.id}')"><span class="menu-item-icon">▶</span>진행하기</button>` : ''}
       ${item.status === 'watching' ? `<button class="menu-item" onclick="markDone('${item.id}')"><span class="menu-item-icon">✓</span>완료로 표시</button>` : ''}
       <button class="menu-item danger" onclick="confirmDelete('${item.id}')"><span class="menu-item-icon">×</span>삭제하기</button>
     </div>
@@ -3835,6 +3859,18 @@ function closeDetailModal() {
 function editFromDetail(id) {
   closeDetailModal();
   setTimeout(() => openAddModal(id), 200);
+}
+
+function markWatching(id) {
+  const item = state.items.find(i => i.id === id);
+  if (!item) return;
+  item.status = 'watching';
+  item.startDate = today();
+  item.updatedAt = Date.now();
+  save(true);
+  render();
+  openDetail(id);
+  showToast('진행중으로 변경! 시작일: ' + fmtDate(today()));
 }
 
 function markDone(id) {
@@ -5498,6 +5534,7 @@ updateBackupBanner();
 renderBackupStatus();
 updateSaveIndicator(false);
 syncCopyDefaultPicker();
+document.querySelectorAll('#timelineSort .pill').forEach(p => p.classList.toggle('active', p.dataset.tsort === state.timelineSort));
 </script>
 </body>
 </html>
