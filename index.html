@@ -779,6 +779,73 @@
     box-shadow: 0 1px 3px rgba(0,0,0,0.06);
   }
 
+  .search-box { position: relative; margin-bottom: 12px; }
+  .search-box .form-input { padding-right: 38px; }
+  .search-clear {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--bg-soft);
+    border: none;
+    color: var(--ink-mute);
+    font-size: 15px;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    padding: 0;
+  }
+  .search-clear.show { display: flex; }
+
+  .note-photo-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  .note-photo-grid:empty { display: none; }
+  .note-photo-item {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+  }
+  .note-photo-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .note-photo-del {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(28,27,26,0.65);
+    color: white;
+    border: none;
+    font-size: 13px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
+  .md-preview img.note-inline-photo, .note-photos-view img {
+    max-width: 100%;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    margin: 6px 0;
+  }
+
   .detail-section { margin-bottom: 18px; }
   .detail-label {
     font-size: 11px;
@@ -1828,6 +1895,10 @@
   <section class="view" id="view-all">
     <h2 class="section-title">전체 <span>아카이브</span></h2>
     <div class="section-sub">모든 기록</div>
+    <div class="search-box">
+      <input type="search" class="form-input" id="searchInput" placeholder="🔍 제목, 크리에이터, 메모 검색" oninput="onSearchInput(this.value)">
+      <button type="button" class="search-clear" id="searchClear" onclick="clearSearch()">×</button>
+    </div>
     <div class="filter-row" id="statusFilter" style="margin-bottom: 10px;">
       <button class="pill active" data-status="all">전체 <span class="pill-count" id="sc-all">0</span></button>
       <button class="pill" data-status="watching">진행중 <span class="pill-count" id="sc-watching">0</span></button>
@@ -1943,7 +2014,7 @@
     </div>
 
     <div style="text-align: center; margin-top: 40px; font-size: 11px; color: var(--ink-mute); letter-spacing: 0.04em; font-weight: 500;">
-      v2.3 · 데이터는 브라우저에 저장됩니다
+      v2.5 · 데이터는 브라우저에 저장됩니다
     </div>
   </section>
 </main>
@@ -2174,6 +2245,14 @@
           <button class="md-btn" type="button" onclick="insertText('\n-----\n')" title="구분선">―</button>
         </div>
         <textarea class="note-textarea" id="noteContent" placeholder="자유롭게 기록해보세요..."></textarea>
+        <div class="form-group" style="margin-top: 12px;">
+          <label class="form-label">사진 첨부 <span style="font-weight:400;color:var(--ink-mute);">— 자동으로 압축돼요</span></label>
+          <div class="note-photo-grid" id="notePhotoGrid"></div>
+          <label class="btn" style="width:100%;display:block;text-align:center;margin-top:8px;">
+            📷 사진 추가
+            <input type="file" accept="image/*" multiple onchange="addNotePhotos(event)" style="display:none;">
+          </label>
+        </div>
       </div>
 
       <div id="previewPane" style="display: none;">
@@ -2354,9 +2433,11 @@
       <button class="modal-close" onclick="closeOttPicker()">×</button>
     </div>
     <div class="modal-body">
-      <button type="button" class="ott-picker-clear" onclick="selectOtt(null)">선택 안 함</button>
+      <div style="font-size:12px;color:var(--ink-mute);margin-bottom:10px;">여러 개 선택할 수 있어요</div>
+      <button type="button" class="ott-picker-clear" onclick="clearOttSelect()">선택 안 함 (모두 해제)</button>
       <div class="ott-picker-grid" id="ottPickerGrid"></div>
-      <button type="button" class="btn" onclick="openOttManager()" style="width: 100%; margin-top: 16px;">⚙ OTT 목록 관리</button>
+      <button type="button" class="btn btn-primary" onclick="closeOttPicker()" style="width: 100%; margin-top: 12px;">완료</button>
+      <button type="button" class="btn" onclick="openOttManager()" style="width: 100%; margin-top: 8px;">⚙ OTT 목록 관리</button>
     </div>
   </div>
 </div>
@@ -2537,7 +2618,8 @@ let state = {
   selectedType: 'youtube',
   selectedStatus: 'watching',
   selectedRating: 0,
-  selectedOtt: null,
+  selectedOtts: [],
+  searchQuery: '',
   ytThumb: null,
   lastBackupAt: null,
   changesSinceBackup: 0,
@@ -2570,8 +2652,12 @@ function load() {
         } else if (!Array.isArray(item.notes)) {
           item.notes = [];
         }
+        (item.notes || []).forEach(n => { if (!Array.isArray(n.images)) n.images = []; });
         // Ensure ott field exists (null = no OTT)
-        if (item.ott === undefined) item.ott = null;
+        if (!Array.isArray(item.otts)) {
+          item.otts = item.ott ? [item.ott] : [];
+          delete item.ott;
+        }
         if (item.country === undefined) item.country = null;
         if (item.type === 'drama' || item.type === 'anime') {
           if (!Array.isArray(item.epWatched)) item.epWatched = [];
@@ -3042,6 +3128,17 @@ function renderAll() {
   let items = [...state.items];
   if (state.typeFilter !== 'all') items = items.filter(i => i.type === state.typeFilter);
   if (state.countryFilter !== 'all') items = items.filter(i => i.country === state.countryFilter);
+  const q = (state.searchQuery || '').trim().toLowerCase();
+  if (q) {
+    items = items.filter(i => {
+      const hay = [i.title, i.creator, i.cast, i.memo, i.platform,
+        ...(i.otts || []).map(id => { const o = getOttById(id); return o ? o.name : ''; }),
+        (() => { const c = i.country ? getCountryById(i.country) : null; return c ? c.name : ''; })(),
+        ...(i.notes || []).map(n => (n.title || '') + ' ' + (n.content || ''))
+      ].join(' ').toLowerCase();
+      return hay.includes(q);
+    });
+  }
   if (state.statusFilter !== 'all') {
     if (state.statusFilter === 'done') {
       items = items.filter(i => i.status === 'done' || i.status === 'dropped');
@@ -3050,9 +3147,11 @@ function renderAll() {
     }
   }
   items = sortItems(items);
-  const emptyMsg = state.statusFilter === 'all'
-    ? ['아직 기록이 없어요', '+ 버튼으로 첫 기록을 만들어보세요']
-    : ['해당하는 기록이 없어요', '다른 필터를 선택해보세요'];
+  const emptyMsg = q
+    ? ['검색 결과가 없어요', `"${state.searchQuery}" 에 해당하는 기록이 없어요`]
+    : (state.statusFilter === 'all'
+      ? ['아직 기록이 없어요', '+ 버튼으로 첫 기록을 만들어보세요']
+      : ['해당하는 기록이 없어요', '다른 필터를 선택해보세요']);
   document.getElementById('allList').innerHTML = items.length === 0
     ? emptyHTML(emptyMsg[0], emptyMsg[1])
     : items.map(cardHTML).join('');
@@ -3081,7 +3180,7 @@ function renderOttView() {
   let html = '';
   // Each OTT group
   sortedOtt.forEach(ott => {
-    const items = sortItems(relevant.filter(i => i.ott === ott.id));
+    const items = sortItems(relevant.filter(i => (i.otts || []).includes(ott.id)));
     if (items.length === 0) return;
     const watching = items.filter(i => i.status === 'watching').length;
     const done = items.filter(i => i.status === 'done').length;
@@ -3101,7 +3200,7 @@ function renderOttView() {
     </div>`;
   });
   // No OTT assigned
-  const noOtt = sortItems(relevant.filter(i => !i.ott || !getOttById(i.ott)));
+  const noOtt = sortItems(relevant.filter(i => (i.otts || []).filter(id => getOttById(id)).length === 0));
   if (noOtt.length > 0) {
     html += `<div class="ott-group">
       <div class="ott-group-head">
@@ -3279,7 +3378,7 @@ function renderCalendarView() {
           const meta = [];
           meta.push(`<span class="card-type ${i.type}" style="padding: 1px 7px; font-size: 9px;">${typeName(i.type)}</span>`);
           if (i.rating > 0) meta.push(`<span class="card-stars" style="font-size: 11px;">${starString(i.rating)}</span>`);
-          if (i.ott) { const o = getOttById(i.ott); if (o) meta.push(`<span class="ott-chip"><span class="ott-chip-dot" style="background:${escapeHTML(o.color||'#9e9a93')}"></span>${escapeHTML(o.name)}</span>`); }
+          (i.otts || []).forEach(oid => { const o = getOttById(oid); if (o) meta.push(`<span class="ott-chip"><span class="ott-chip-dot" style="background:${escapeHTML(o.color||'#9e9a93')}"></span>${escapeHTML(o.name)}</span>`); });
           return `<div class="chron-item" onclick="openDetail('${i.id}')">
             <div class="chron-day">${d.getMonth()+1}.${String(d.getDate()).padStart(2,'0')} ${calendarBasis === 'start' ? '시작' : '완료'}</div>
             <div class="chron-card-title">${escapeHTML(i.title)}</div>
@@ -3306,10 +3405,10 @@ function cardHTML(item) {
   if (item.status !== 'watching') meta.push(`<span>${statusName(item.status)}</span>`);
   if (item.type === 'podcast' && item.platform) meta.push(`<span>${escapeHTML(item.platform)}</span>`);
   if (item.country) { const c = getCountryById(item.country); if (c) meta.push(`<span>${escapeHTML(c.name)}</span>`); }
-  if (item.ott) {
-    const ott = getOttById(item.ott);
+  (item.otts || []).forEach(oid => {
+    const ott = getOttById(oid);
     if (ott) meta.push(`<span class="ott-chip"><span class="ott-chip-dot" style="background: ${escapeHTML(ott.color || '#9e9a93')}"></span>${escapeHTML(ott.name)}</span>`);
-  }
+  });
 
   let extra = '';
   if (progress !== null && item.status === 'watching') {
@@ -3475,7 +3574,7 @@ function resetForm() {
   state.selectedRating = 0;
   state.selectedType = 'youtube';
   state.selectedStatus = 'watching';
-  state.selectedOtt = null;
+  state.selectedOtts = [];
   state.selectedCountry = null;
   state.ytThumb = null;
   document.getElementById('ytPreview').style.display = 'none';
@@ -3506,7 +3605,7 @@ function fillForm(item) {
   state.selectedRating = item.rating || 0;
   state.selectedType = item.type || 'youtube';
   state.selectedStatus = item.status || 'watching';
-  state.selectedOtt = item.ott || null;
+  state.selectedOtts = Array.isArray(item.otts) ? [...item.otts] : [];
   state.selectedCountry = item.country || null;
   state.ytThumb = item.thumb || null;
   selectType(state.selectedType);
@@ -3538,7 +3637,7 @@ function saveContent(e) {
     creator: document.getElementById('fCreator').value.trim(),
     cast: document.getElementById('fCast').value.trim(),
     platform: state.selectedType === 'podcast' ? document.getElementById('fPlatform').value.trim() : '',
-    ott: (state.selectedType === 'movie' || state.selectedType === 'drama' || state.selectedType === 'anime') ? state.selectedOtt : null,
+    otts: (state.selectedType === 'movie' || state.selectedType === 'drama' || state.selectedType === 'anime') ? [...state.selectedOtts] : [],
     country: (state.selectedType === 'movie' || state.selectedType === 'drama' || state.selectedType === 'anime') ? state.selectedCountry : null,
     link: document.getElementById('fLink').value.trim(),
     thumb: state.ytThumb || '',
@@ -3655,9 +3754,10 @@ function openDetail(id) {
       ? `<div style="color: var(--ink-mute); font-size: 12px; padding: 16px; text-align: center; background: var(--bg-soft); border-radius: 8px;">아직 노트가 없어요. 새 노트를 만들어보세요.</div>`
       : notes.map(n => {
           const preview = (n.content || '').replace(/[#*_~=/`-]/g, '').trim().slice(0, 80);
+          const photoBadge = (Array.isArray(n.images) && n.images.length > 0) ? ` <span style="color: var(--accent); font-size: 11px;">📷${n.images.length}</span>` : '';
           return `<div class="note-item" onclick="openNoteModal('${item.id}', '${n.id}')">
             <div class="note-item-title">
-              <span style="flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHTML(n.title || '제목 없음')}</span>
+              <span style="flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHTML(n.title || '제목 없음')}${photoBadge}</span>
               <span class="note-item-date">${fmtDateTime(n.updatedAt)}</span>
             </div>
             ${preview ? `<div class="note-item-preview">${escapeHTML(preview)}</div>` : '<div class="note-item-preview" style="color: var(--ink-mute);">내용 없음</div>'}
@@ -3681,10 +3781,9 @@ function openDetail(id) {
     ${item.cast ? `<div class="detail-section"><div class="detail-label">출연</div><div class="detail-value">${escapeHTML(item.cast)}</div></div>` : ''}
     ${item.platform ? `<div class="detail-section"><div class="detail-label">채널 / 플랫폼</div><div class="detail-value">${escapeHTML(item.platform)}</div></div>` : ''}
     ${(() => {
-      if (!item.ott) return '';
-      const ott = getOttById(item.ott);
-      if (!ott) return '';
-      return `<div class="detail-section"><div class="detail-label">OTT 플랫폼</div><div class="detail-value"><span class="ott-chip" style="font-size: 12px; padding: 4px 10px;"><span class="ott-chip-dot" style="background: ${escapeHTML(ott.color || '#9e9a93')}"></span>${escapeHTML(ott.name)}</span></div></div>`;
+      const sel = (item.otts || []).map(id => getOttById(id)).filter(Boolean);
+      if (sel.length === 0) return '';
+      return `<div class="detail-section"><div class="detail-label">OTT 플랫폼</div><div class="detail-value" style="display:flex;flex-wrap:wrap;gap:6px;">${sel.map(ott => `<span class="ott-chip" style="font-size: 12px; padding: 4px 10px;"><span class="ott-chip-dot" style="background: ${escapeHTML(ott.color || '#9e9a93')}"></span>${escapeHTML(ott.name)}</span>`).join('')}</div></div>`;
     })()}
     ${(() => { if (!item.country) return ''; const c = getCountryById(item.country); if (!c) return ''; return `<div class="detail-section"><div class="detail-label">국가</div><div class="detail-value">${escapeHTML(c.name)}</div></div>`; })()}
     ${item.rating > 0 ? `<div class="detail-section"><div class="detail-label">별점</div><div class="detail-stars">${starString(item.rating)}</div></div>` : ''}
@@ -3884,6 +3983,68 @@ function updatePodEp(id) {
 }
 
 // ============ NOTE EDITOR ============
+let noteEditingImages = [];
+
+// 이미지 리사이즈+압축 (최대 1000px, JPEG 0.72)
+function compressImage(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 1000;
+        let w = img.width, ht = img.height;
+        if (w > MAX || ht > MAX) {
+          if (w >= ht) { ht = Math.round(ht * MAX / w); w = MAX; }
+          else { w = Math.round(w * MAX / ht); ht = MAX; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = ht;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, ht);
+        resolve(canvas.toDataURL('image/jpeg', 0.72));
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function addNotePhotos(event) {
+  const files = Array.from(event.target.files || []);
+  event.target.value = '';
+  if (files.length === 0) return;
+  if (noteEditingImages.length + files.length > 6) {
+    showToast('사진은 노트당 최대 6장까지예요');
+    return;
+  }
+  showToast('사진 처리 중...');
+  try {
+    for (const f of files) {
+      const dataUrl = await compressImage(f);
+      noteEditingImages.push(dataUrl);
+    }
+    renderNotePhotoGrid();
+    showToast(`${files.length}장 추가됨`);
+  } catch(e) {
+    console.error(e);
+    showToast('사진 추가 실패');
+  }
+}
+
+function removeNotePhoto(idx) {
+  noteEditingImages.splice(idx, 1);
+  renderNotePhotoGrid();
+}
+
+function renderNotePhotoGrid() {
+  const grid = document.getElementById('notePhotoGrid');
+  grid.innerHTML = noteEditingImages.map((src, i) =>
+    `<div class="note-photo-item"><img src="${src}" alt=""><button type="button" class="note-photo-del" onclick="removeNotePhoto(${i})">×</button></div>`
+  ).join('');
+}
+
 function openNoteModal(itemId, noteId) {
   const item = state.items.find(i => i.id === itemId);
   if (!item) return;
@@ -3903,6 +4064,8 @@ function openNoteModal(itemId, noteId) {
   document.getElementById('noteItemCreator').textContent = item.creator || '';
   document.getElementById('noteTitleInput').value = note.title || '';
   document.getElementById('noteContent').value = note.content || '';
+  noteEditingImages = Array.isArray(note.images) ? [...note.images] : [];
+  renderNotePhotoGrid();
 
   // Populate templates for this type
   const pills = document.getElementById('templatePills');
@@ -3936,7 +4099,11 @@ document.getElementById('previewToggle').addEventListener('click', (e) => {
   if (btn.dataset.mode === 'preview') {
     document.getElementById('editorPane').style.display = 'none';
     document.getElementById('previewPane').style.display = 'block';
-    document.getElementById('mdPreview').innerHTML = renderMarkdown(document.getElementById('noteContent').value);
+    let pv = renderMarkdown(document.getElementById('noteContent').value);
+    if (noteEditingImages.length > 0) {
+      pv += '<div class="note-photos-view">' + noteEditingImages.map(s => `<img class="note-inline-photo" src="${s}" alt="">`).join('') + '</div>';
+    }
+    document.getElementById('mdPreview').innerHTML = pv;
   } else {
     document.getElementById('editorPane').style.display = 'block';
     document.getElementById('previewPane').style.display = 'none';
@@ -3999,6 +4166,7 @@ function saveNote() {
     if (note) {
       note.title = title;
       note.content = content;
+      note.images = [...noteEditingImages];
       note.updatedAt = now;
     }
   } else {
@@ -4006,6 +4174,7 @@ function saveNote() {
       id: uid(),
       title,
       content,
+      images: [...noteEditingImages],
       createdAt: now,
       updatedAt: now
     });
@@ -4067,6 +4236,7 @@ function buildNoteCardHTML(item, note, includeContentHeader) {
       <div style="font-size: 16px; font-weight: 700; color: #c87f3f; margin-bottom: 12px;">📝 ${escapeHTML(note.title || '제목 없음')}</div>
       ${metaRow}
       <div style="font-size: 14px; line-height: 1.8; color: #1c1b1a;">${renderedMD}</div>
+      ${Array.isArray(note.images) && note.images.length > 0 ? `<div style="margin-top: 16px;">${note.images.map(s => `<img src="${s}" style="max-width: 100%; border-radius: 8px; border: 1px solid #e8e6e1; margin: 6px 0; display: block;" alt="">`).join('')}</div>` : ''}
       <div style="margin-top: 32px; padding-top: 14px; border-top: 1px solid #e8e6e1; font-size: 10px; color: #9e9a93; letter-spacing: 0.06em; text-align: right;">
         CONTENTS ARCHIVE · ${fmtToday()}
       </div>
@@ -4127,7 +4297,7 @@ async function exportNote(format) {
     showToast('노트 내용을 먼저 입력해주세요');
     return;
   }
-  const note = { title: noteTitle, content };
+  const note = { title: noteTitle, content, images: [...noteEditingImages] };
   const safeName = (noteTitle || 'note').replace(/[\\/:*?"<>|]/g, '_').slice(0, 40);
   const cardHTML = buildNoteCardHTML(item, note, true);
 
@@ -4536,16 +4706,14 @@ function updateOttSelectButton() {
   const btn = document.getElementById('ottSelectBtn');
   const text = document.getElementById('ottSelectText');
   if (!btn || !text) return;
-  if (state.selectedOtt) {
-    const ott = getOttById(state.selectedOtt);
-    if (ott) {
-      text.innerHTML = `<span style="display: inline-flex; align-items: center; gap: 6px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: ${escapeHTML(ott.color || '#9e9a93')}; display: inline-block;"></span>${escapeHTML(ott.name)}</span>`;
-      btn.classList.add('has-value');
-      return;
-    }
+  const sel = (state.selectedOtts || []).map(id => getOttById(id)).filter(Boolean);
+  if (sel.length > 0) {
+    text.innerHTML = sel.map(o => `<span style="display:inline-flex;align-items:center;gap:5px;margin-right:8px;"><span style="width:8px;height:8px;border-radius:50%;background:${escapeHTML(o.color||'#9e9a93')};display:inline-block;"></span>${escapeHTML(o.name)}</span>`).join('');
+    btn.classList.add('has-value');
+  } else {
+    text.textContent = '선택 안 함';
+    btn.classList.remove('has-value');
   }
-  text.textContent = '선택 안 함';
-  btn.classList.remove('has-value');
 }
 
 function openOttPicker() {
@@ -4567,15 +4735,24 @@ function renderOttPicker() {
     return;
   }
   grid.innerHTML = sorted.map(o => `
-    <button type="button" class="ott-picker-item ${state.selectedOtt === o.id ? 'selected' : ''}" onclick="selectOtt('${o.id}')">
+    <button type="button" class="ott-picker-item ${(state.selectedOtts||[]).includes(o.id) ? 'selected' : ''}" onclick="toggleOttSelect('${o.id}')">
       <span class="ott-picker-dot" style="background: ${escapeHTML(o.color || '#9e9a93')}"></span>
       <span class="ott-picker-name">${escapeHTML(o.name)}</span>
     </button>
   `).join('');
 }
 
-function selectOtt(id) {
-  state.selectedOtt = id;
+function toggleOttSelect(id) {
+  const arr = state.selectedOtts || [];
+  const idx = arr.indexOf(id);
+  if (idx >= 0) arr.splice(idx, 1); else arr.push(id);
+  state.selectedOtts = arr;
+  renderOttPicker();
+  updateOttSelectButton();
+}
+
+function clearOttSelect() {
+  state.selectedOtts = [];
   updateOttSelectButton();
   closeOttPicker();
 }
@@ -4715,17 +4892,17 @@ function confirmDeleteOtt(id) {
   const o = getOttById(id);
   if (!o) return;
   // Count usages
-  const usageCount = state.items.filter(it => it.ott === id).length;
+  const usageCount = state.items.filter(it => (it.otts || []).includes(id)).length;
   document.getElementById('confirmTitle').textContent = 'OTT를 삭제할까요?';
   document.getElementById('confirmDesc').textContent = usageCount > 0
     ? `"${o.name}"이(가) ${usageCount}개 기록에서 사용 중입니다. 삭제하면 해당 기록의 OTT 정보가 비워집니다.`
     : `"${o.name}"이(가) 영구적으로 삭제됩니다.`;
   confirmCallback = () => {
     // Clear from items that used this OTT
-    state.items.forEach(it => { if (it.ott === id) it.ott = null; });
+    state.items.forEach(it => { if (Array.isArray(it.otts)) it.otts = it.otts.filter(x => x !== id); });
     state.ottPlatforms = state.ottPlatforms.filter(o => o.id !== id);
-    if (state.selectedOtt === id) {
-      state.selectedOtt = null;
+    if ((state.selectedOtts || []).includes(id)) {
+      state.selectedOtts = state.selectedOtts.filter(x => x !== id);
       updateOttSelectButton();
     }
     save();
@@ -4870,6 +5047,23 @@ function renderCountryFilter() {
     + sorted.map(c => `<button class="pill ${state.countryFilter===c.id?'active':''}" data-country="${c.id}">${escapeHTML(c.name)}</button>`).join('');
 }
 
+let searchDebounce = null;
+function onSearchInput(val) {
+  document.getElementById('searchClear').classList.toggle('show', !!val);
+  clearTimeout(searchDebounce);
+  searchDebounce = setTimeout(() => {
+    state.searchQuery = val;
+    renderAll();
+  }, 200);
+}
+
+function clearSearch() {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('searchClear').classList.remove('show');
+  state.searchQuery = '';
+  renderAll();
+}
+
 document.getElementById('countryFilter').addEventListener('click', (e) => {
   const pill = e.target.closest('.pill');
   if (!pill) return;
@@ -4934,13 +5128,13 @@ function exportExcel() {
   try {
     // 1. Items sheet
     const itemRows = state.items.map(item => {
-      const ott = item.ott ? getOttById(item.ott) : null;
+      const ottNames = (item.otts || []).map(id => getOttById(id)).filter(Boolean).map(o => o.name).join(', ');
       return {
         '유형': typeName(item.type),
         '제목': item.title || '',
         '크리에이터/감독/진행자': item.creator || '',
         '출연': item.cast || '',
-        'OTT 플랫폼': ott ? ott.name : '',
+        'OTT 플랫폼': ottNames,
         '국가': (() => { const c = item.country ? getCountryById(item.country) : null; return c ? c.name : ''; })(),
         '채널/플랫폼': item.platform || '',
         '상태': statusName(item.status),
@@ -5184,7 +5378,7 @@ function importData(event) {
           const existing = new Map(state.items.map(i => [i.id, i]));
           data.items.forEach(i => {
             if (!Array.isArray(i.notes)) i.notes = [];
-            if (i.ott === undefined) i.ott = null;
+            if (!Array.isArray(i.otts)) { i.otts = i.ott ? [i.ott] : []; delete i.ott; }
             existing.set(i.id, i);
           });
           state.items = [...existing.values()];
