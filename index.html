@@ -14,16 +14,16 @@
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
   :root {
-    --bg: #fafaf9;
+    --bg: #ffffff;
     --bg-elev: #ffffff;
-    --bg-soft: #f4f3f1;
-    --line: #e8e6e1;
-    --line-soft: #efeeea;
-    --ink: #1c1b1a;
-    --ink-dim: #5e5b56;
-    --ink-mute: #9e9a93;
-    --accent: #c87f3f;
-    --accent-soft: #f5e9da;
+    --bg-soft: #f4f5f8;
+    --line: #e9eaef;
+    --line-soft: #f1f2f6;
+    --ink: #17181c;
+    --ink-dim: #5b5e6b;
+    --ink-mute: #9a9daa;
+    --accent: #3d4cc8;
+    --accent-soft: #e7e9fa;
     --red: #c4543a;
     --red-soft: #fae6df;
     --green: #5a7a3c;
@@ -36,6 +36,7 @@
     --sans: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   }
 
+  body { padding-bottom: calc(74px + env(safe-area-inset-bottom, 0px)); }
   html, body {
     background: var(--bg);
     color: var(--ink);
@@ -96,41 +97,43 @@
 
   .tabs {
     display: flex;
-    padding: 0 12px;
-    border-bottom: 1px solid var(--line);
-    overflow-x: auto;
-    scrollbar-width: none;
-    position: sticky;
-    top: 0;
-    background: rgba(250, 250, 249, 0.94);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid var(--line-soft);
+    padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px));
     z-index: 50;
+    justify-content: space-around;
   }
-  .tabs::-webkit-scrollbar { display: none; }
 
   .tab {
-    flex-shrink: 0;
-    padding: 14px 12px;
+    flex: 1;
+    padding: 6px 2px;
     background: none;
     border: none;
     color: var(--ink-mute);
     font-family: var(--sans);
-    font-size: 13px;
+    font-size: 10px;
     font-weight: 500;
     cursor: pointer;
-    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
     letter-spacing: -0.01em;
+    border-radius: 12px;
   }
-  .tab.active { color: var(--ink); font-weight: 600; }
-  .tab.active::after {
-    content: '';
-    position: absolute;
-    bottom: -1px; left: 12px; right: 12px;
-    height: 2px;
-    background: var(--ink);
-    border-radius: 2px;
+  .tab-icon {
+    font-size: 20px;
+    line-height: 1;
+    filter: grayscale(1) opacity(0.55);
   }
+  .tab.active { color: var(--accent); font-weight: 700; }
+  .tab.active .tab-icon { filter: none; }
 
   .tab-count {
     font-size: 11px;
@@ -152,21 +155,118 @@
   }
 
   .section-title {
-    font-size: 22px;
-    font-weight: 700;
-    letter-spacing: -0.025em;
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
     margin-bottom: 4px;
     color: var(--ink);
   }
-  .section-title span { color: var(--accent); }
+  .section-title span { color: var(--ink); }
 
   .section-sub {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--ink-mute);
-    margin-bottom: 16px;
-    padding-bottom: 14px;
-    border-bottom: 1px dashed var(--line);
+    margin-bottom: 18px;
   }
+
+  /* 스크린샷 스타일 진입 카드 */
+  .entry-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--bg-elev);
+    border: 1px solid var(--line-soft);
+    box-shadow: 0 2px 14px rgba(23,24,28,0.05);
+    border-radius: 20px;
+    padding: 20px 18px;
+    margin-bottom: 14px;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    font-family: var(--sans);
+  }
+  .entry-card:active { transform: scale(0.99); }
+  .entry-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: var(--accent-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+  .entry-body { flex: 1; min-width: 0; }
+  .entry-title { font-size: 17px; font-weight: 700; color: var(--ink); letter-spacing: -0.02em; }
+  .entry-desc { font-size: 13px; color: var(--ink-mute); margin-top: 3px; line-height: 1.5; }
+  .entry-arrow { color: var(--ink-mute); font-size: 18px; flex-shrink: 0; }
+
+  /* 홈 가로 포스터 스크롤 */
+  .home-scroll {
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    margin: 0 -20px 8px;
+    padding: 4px 20px 8px;
+  }
+  .home-scroll::-webkit-scrollbar { display: none; }
+  .home-poster {
+    flex-shrink: 0;
+    width: 138px;
+    cursor: pointer;
+  }
+  .home-poster-thumb {
+    position: relative;
+    width: 138px;
+    height: 180px;
+    border-radius: 16px;
+    overflow: hidden;
+    background: var(--bg-soft);
+    border: 1px solid var(--line-soft);
+    margin-bottom: 10px;
+  }
+  .home-poster-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .home-poster-fallback {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 40px;
+  }
+  .home-day-badge {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255,255,255,0.94);
+    border-radius: 100px;
+    padding: 5px 12px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(23,24,28,0.12);
+    letter-spacing: -0.02em;
+  }
+  .home-poster-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 8px;
+  }
+  .home-poster-bar {
+    height: 5px;
+    background: var(--bg-soft);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 5px;
+  }
+  .home-poster-fill { height: 100%; background: var(--accent); border-radius: 3px; }
+  .home-poster-pct { font-size: 12px; color: var(--ink-mute); font-weight: 500; font-variant-numeric: tabular-nums; }
 
   .controls-row {
     display: flex;
@@ -441,18 +541,18 @@
 
   .fab {
     position: fixed;
-    bottom: 24px;
+    bottom: calc(88px + env(safe-area-inset-bottom, 0px));
     right: 20px;
     width: 56px;
     height: 56px;
     border-radius: 50%;
-    background: var(--ink);
-    color: var(--bg);
+    background: var(--accent);
+    color: #fff;
     border: none;
     font-size: 28px;
     font-weight: 300;
     cursor: pointer;
-    box-shadow: 0 10px 28px rgba(28, 27, 26, 0.2), 0 4px 10px rgba(28, 27, 26, 0.1);
+    box-shadow: 0 10px 28px rgba(61, 76, 200, 0.35), 0 4px 10px rgba(61, 76, 200, 0.18);
     z-index: 100;
     line-height: 1;
     display: flex;
@@ -1783,7 +1883,7 @@
     gap: 8px;
     margin-bottom: 12px;
     position: sticky;
-    top: 49px;
+    top: 0;
     background: var(--bg);
     padding: 6px 0;
     z-index: 10;
@@ -1859,13 +1959,11 @@
 </header>
 
 <nav class="tabs" id="tabs">
-  <button class="tab active" data-tab="timeline">타임라인</button>
-  <button class="tab" data-tab="all">전체 <span class="tab-count" id="cnt-all">0</span></button>
-  <button class="tab" data-tab="ott">OTT별</button>
-  <button class="tab" data-tab="stats">통계</button>
-  <button class="tab" data-tab="hall">명예의전당</button>
-  <button class="tab" data-tab="calendar">연대기</button>
-  <button class="tab" data-tab="settings">설정</button>
+  <button class="tab active" data-tab="timeline"><span class="tab-icon">🏠</span>홈</button>
+  <button class="tab" data-tab="all"><span class="tab-icon">🗂</span>전체</button>
+  <button class="tab" data-tab="library"><span class="tab-icon">📚</span>서재</button>
+  <button class="tab" data-tab="stats"><span class="tab-icon">📊</span>통계</button>
+  <button class="tab" data-tab="settings"><span class="tab-icon">⋯</span>더보기</button>
 </nav>
 
 <main>
@@ -1880,16 +1978,22 @@
   </div>
 
   <section class="view active" id="view-timeline">
-    <h2 class="section-title">지금 <span>보는 중</span></h2>
-    <div class="section-sub">진행 중인 콘텐츠를 한눈에</div>
+    <h2 class="section-title">보는 중</h2>
+    <div class="section-sub"><span id="watchingCount">0</span>개 진행중 · <span id="watchingDesc">-</span></div>
 
-    <div class="timeline-hero">
-      <div class="timeline-hero-label">CURRENTLY</div>
-      <div class="timeline-hero-num"><span id="watchingCount">0</span> <small>개 진행중</small></div>
-      <div class="timeline-hero-desc" id="watchingDesc">아직 보고 있는 게 없어요</div>
-    </div>
+    <div class="home-scroll" id="homeScroll"></div>
 
-    <div class="filter-row" id="timelineSort" style="margin-bottom: 14px;">
+    <button class="entry-card" onclick="goTab('all')">
+      <span class="entry-icon">🗂</span>
+      <span class="entry-body">
+        <span class="entry-title" style="display:block;">전체 기록 보기</span>
+        <span class="entry-desc" style="display:block;">상태별·유형별로 모든 기록을 한눈에 볼 수 있어요</span>
+      </span>
+      <span class="entry-arrow">›</span>
+    </button>
+
+    <h2 class="section-title" style="font-size: 20px; margin-top: 28px;">진행중 목록</h2>
+    <div class="filter-row" id="timelineSort" style="margin: 12px 0 14px;">
       <button class="pill active" data-tsort="updated">최근순</button>
       <button class="pill" data-tsort="started">시작일순</button>
       <button class="pill" data-tsort="title">제목순</button>
@@ -1929,7 +2033,40 @@
     <div id="allList"></div>
   </section>
 
+  <section class="view" id="view-library">
+    <h2 class="section-title">서재</h2>
+    <div class="section-sub">모아보기와 돌아보기</div>
+
+    <button class="entry-card" onclick="goTab('ott')">
+      <span class="entry-icon">📺</span>
+      <span class="entry-body">
+        <span class="entry-title" style="display:block;">OTT별 보기</span>
+        <span class="entry-desc" style="display:block;">플랫폼마다 모아서 정리해요</span>
+      </span>
+      <span class="entry-arrow">›</span>
+    </button>
+
+    <button class="entry-card" onclick="goTab('hall')">
+      <span class="entry-icon">🏆</span>
+      <span class="entry-body">
+        <span class="entry-title" style="display:block;">명예의 전당</span>
+        <span class="entry-desc" style="display:block;">별점 ★4 이상의 인생작 모음</span>
+      </span>
+      <span class="entry-arrow">›</span>
+    </button>
+
+    <button class="entry-card" onclick="goTab('calendar')">
+      <span class="entry-icon">🗓</span>
+      <span class="entry-body">
+        <span class="entry-title" style="display:block;">연대기</span>
+        <span class="entry-desc" style="display:block;">월별로 돌아보는 나의 기록</span>
+      </span>
+      <span class="entry-arrow">›</span>
+    </button>
+  </section>
+
   <section class="view" id="view-ott">
+    <button class="pill" onclick="goTab('library')" style="margin-bottom: 14px;">‹ 서재</button>
     <h2 class="section-title">OTT <span>별 보기</span></h2>
     <div class="section-sub">플랫폼마다 모아서</div>
     <div id="ottView"></div>
@@ -1942,12 +2079,14 @@
   </section>
 
   <section class="view" id="view-hall">
+    <button class="pill" onclick="goTab('library')" style="margin-bottom: 14px;">‹ 서재</button>
     <h2 class="section-title">명예의 <span>전당</span></h2>
     <div class="section-sub">별점 ★4 이상의 인생작</div>
     <div id="hallView"></div>
   </section>
 
   <section class="view" id="view-calendar">
+    <button class="pill" onclick="goTab('library')" style="margin-bottom: 14px;">‹ 서재</button>
     <h2 class="section-title"><span>연대기</span></h2>
     <div class="section-sub">월별로 돌아보는 기록</div>
     <div class="controls-row">
@@ -2021,7 +2160,7 @@
     </div>
 
     <div style="text-align: center; margin-top: 40px; font-size: 11px; color: var(--ink-mute); letter-spacing: 0.04em; font-weight: 500;">
-      v2.8 · 데이터는 브라우저에 저장됩니다
+      v3.1 · 데이터는 브라우저에 저장됩니다
     </div>
   </section>
 </main>
@@ -3114,7 +3253,8 @@ function render() {
 }
 
 function updateCounts() {
-  document.getElementById('cnt-all').textContent = state.items.length;
+  const cntAll = document.getElementById('cnt-all');
+  if (cntAll) cntAll.textContent = state.items.length;
   // status filter pill counts (전체 탭 내부)
   const sc = (id, n) => { const el = document.getElementById(id); if (el) el.textContent = n; };
   sc('sc-all', state.items.length);
@@ -3140,6 +3280,33 @@ function renderTimeline() {
   list.innerHTML = watching.length === 0
     ? emptyHTML('진행 중인 콘텐츠 없음', '+ 버튼으로 새 기록을 추가하세요')
     : watching.map(cardHTML).join('');
+
+  // 홈 가로 포스터
+  const scroll = document.getElementById('homeScroll');
+  if (scroll) {
+    const typeEmoji = { youtube: '▶️', movie: '🎬', drama: '📺', anime: '✨', podcast: '🎧' };
+    const verb = t => t === 'podcast' ? '듣는 중' : '보는 중';
+    scroll.innerHTML = watching.length === 0
+      ? `<div style="padding: 30px 20px; color: var(--ink-mute); font-size: 13px;">+ 버튼으로 첫 기록을 시작해보세요</div>`
+      : watching.map(item => {
+        // N일째: 시작일부터 오늘까지 (시작일 = 1일째)
+        let dayBadge = '';
+        if (item.startDate) {
+          const days = Math.floor((new Date(today()) - new Date(item.startDate)) / 86400000) + 1;
+          if (days >= 1) dayBadge = `<div class="home-day-badge">${typeEmoji[item.type] || '📌'} ${days}일째</div>`;
+        }
+        const prog = getProgress(item);
+        const ptxt = progressText(item);
+        const thumb = item.thumb
+          ? `<img src="${escapeHTML(item.thumb)}" alt="" loading="lazy">`
+          : `<div class="home-poster-fallback">${typeEmoji[item.type] || '📌'}</div>`;
+        return `<div class="home-poster" onclick="openDetail('${item.id}')">
+          <div class="home-poster-thumb">${thumb}${dayBadge}</div>
+          <div class="home-poster-title">${escapeHTML(item.title)}</div>
+          ${prog !== null ? `<div class="home-poster-bar"><div class="home-poster-fill" style="width:${prog}%"></div></div><div class="home-poster-pct">${prog}% (${ptxt})</div>` : `<div class="home-poster-pct">${verb(item.type)}</div>`}
+        </div>`;
+      }).join('');
+  }
 }
 
 function renderAll() {
@@ -3457,15 +3624,23 @@ function cardHTML(item) {
 }
 
 // ============ TABS / FILTERS ============
+// 뷰 → 하단 네비 하이라이트 매핑 (ott/hall/calendar는 서재 소속)
+const NAV_MAP = { ott: 'library', hall: 'library', calendar: 'library' };
+
+function goTab(name) {
+  const navName = NAV_MAP[name] || name;
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === navName));
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  state.currentTab = name;
+  const view = document.getElementById('view-' + name);
+  if (view) view.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
 document.getElementById('tabs').addEventListener('click', (e) => {
   const tab = e.target.closest('.tab');
   if (!tab) return;
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  tab.classList.add('active');
-  state.currentTab = tab.dataset.tab;
-  document.getElementById('view-' + tab.dataset.tab).classList.add('active');
-  window.scrollTo(0, 0);
+  goTab(tab.dataset.tab);
 });
 
 document.getElementById('typeFilter').addEventListener('click', (e) => {
