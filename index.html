@@ -2160,7 +2160,7 @@
     </div>
 
     <div style="text-align: center; margin-top: 40px; font-size: 11px; color: var(--ink-mute); letter-spacing: 0.04em; font-weight: 500;">
-      v3.4 · 데이터는 브라우저에 저장됩니다
+      v3.5 · 데이터는 브라우저에 저장됩니다
     </div>
   </section>
 </main>
@@ -2584,6 +2584,27 @@
       <div class="btn-row">
         <button type="button" class="btn" onclick="closeCountryEditor()">취소</button>
         <button type="button" class="btn btn-primary" onclick="saveCountry()">저장</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- IMAGE RESULT MODAL -->
+<div class="modal" id="imageResultModal" style="z-index: 300;">
+  <div class="modal-content" style="max-height: 92vh;">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title">이미지 저장</div>
+      <button class="modal-close" onclick="closeImageResult()">×</button>
+    </div>
+    <div class="modal-body">
+      <div style="background: var(--accent-soft); border-radius: 10px; padding: 12px 14px; font-size: 13px; color: var(--ink); line-height: 1.6; margin-bottom: 14px;">
+        👇 아래 이미지를 <strong>길게 눌러</strong> <strong>"사진에 저장"</strong>을 선택하세요
+      </div>
+      <img id="imageResultImg" src="" alt="노트 이미지" style="width: 100%; border-radius: 12px; border: 1px solid var(--line); display: block; margin-bottom: 14px;">
+      <div class="btn-row">
+        <button type="button" class="btn" onclick="shareImageResult()">공유하기</button>
+        <button type="button" class="btn btn-primary" onclick="closeImageResult()">완료</button>
       </div>
     </div>
   </div>
@@ -4642,28 +4663,49 @@ function canvasToPdf(canvas, pdf) {
   }
 }
 
-// 캔버스 이미지를 공유 시트로 (사진앱 저장 가능). 안 되면 다운로드 fallback
-async function shareCanvasImage(canvas, filename) {
-  const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
-  if (blob && navigator.canShare) {
-    const file = new File([blob], filename, { type: 'image/png' });
-    if (navigator.canShare({ files: [file] })) {
-      try {
-        await navigator.share({ files: [file] });
-        showToast('공유 시트에서 "이미지 저장"을 누르면 사진앱에 저장돼요');
-        return true;
-      } catch(e) {
-        if (e.name === 'AbortError') return true; // 사용자가 취소
-        // 그 외 실패 → fallback
-      }
+// 이미지 결과 모달: 길게 눌러 사진에 저장 (PWA에서 가장 확실한 방식)
+let imageResultFile = null;
+let imageResultDataUrl = null;
+
+function shareCanvasImage(canvas, filename) {
+  imageResultDataUrl = canvas.toDataURL('image/png');
+  document.getElementById('imageResultImg').src = imageResultDataUrl;
+  canvas.toBlob(blob => {
+    imageResultFile = blob ? new File([blob], filename, { type: 'image/png' }) : null;
+  }, 'image/png');
+  document.getElementById('imageResultModal').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeImageResult() {
+  document.getElementById('imageResultModal').classList.remove('active');
+  document.body.style.overflow = '';
+  document.getElementById('imageResultImg').src = '';
+  imageResultFile = null;
+  imageResultDataUrl = null;
+}
+
+// 공유 버튼: 사용자 탭 직후 호출이라 권한 문제 없음. 3초 안전장치 포함
+async function shareImageResult() {
+  if (imageResultFile && navigator.canShare && navigator.canShare({ files: [imageResultFile] })) {
+    try {
+      await Promise.race([
+        navigator.share({ files: [imageResultFile] }),
+        new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 3000))
+      ]);
+      return;
+    } catch(e) {
+      if (e.name === 'AbortError') return;
+      // 실패 → 다운로드 fallback
     }
   }
-  const link = document.createElement('a');
-  link.download = filename;
-  link.href = canvas.toDataURL('image/png');
-  link.click();
-  showToast('이미지가 저장되었습니다');
-  return false;
+  if (imageResultDataUrl) {
+    const link = document.createElement('a');
+    link.download = (imageResultFile && imageResultFile.name) || 'note.png';
+    link.href = imageResultDataUrl;
+    link.click();
+    showToast('이미지가 다운로드되었습니다');
+  }
 }
 
 // 노트 하나 내보내기 코어 (편집/읽기 모드 공용)
@@ -4679,7 +4721,7 @@ async function exportNoteCore(item, note, format) {
     }
     const canvas = await htmlToCanvas(cardHTML);
     if (format === 'image') {
-      await shareCanvasImage(canvas, `${safeName}_노트.png`);
+      shareCanvasImage(canvas, `${safeName}_노트.png`);
     } else if (format === 'pdf') {
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
