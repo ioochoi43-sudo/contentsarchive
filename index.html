@@ -1152,7 +1152,7 @@
     border: 1px solid var(--line);
     border-radius: 8px;
     font-size: 14px;
-    line-height: 1.7;
+    line-height: 1.55;
     word-break: break-word;
   }
   .md-preview h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; margin: 20px 0 10px; padding-bottom: 6px; border-bottom: 2px solid var(--line); }
@@ -1167,8 +1167,8 @@
   .md-preview .md-under { text-decoration: underline; }
   .md-preview .md-strike { text-decoration: line-through; color: var(--ink-mute); }
   .md-preview .md-highlight { background: var(--highlight); padding: 0 3px; border-radius: 2px; }
-  .md-preview p { margin: 6px 0; }
-  .md-preview ul, .md-preview ol { margin: 6px 0 6px 24px; }
+  .md-preview p { margin: 0; }
+  .md-preview ul, .md-preview ol { margin: 4px 0 4px 22px; }
   .md-preview li { margin: 3px 0; }
 
   /* TEMPLATE PICKER */
@@ -2160,7 +2160,7 @@
     </div>
 
     <div style="text-align: center; margin-top: 40px; font-size: 11px; color: var(--ink-mute); letter-spacing: 0.04em; font-weight: 500;">
-      v3.2 · 데이터는 브라우저에 저장됩니다
+      v3.3 · 데이터는 브라우저에 저장됩니다
     </div>
   </section>
 </main>
@@ -4526,7 +4526,7 @@ function buildNoteCardHTML(item, note, includeContentHeader) {
       ${contentHeader}
       <div style="font-size: 16px; font-weight: 700; color: #c87f3f; margin-bottom: 12px;">📝 ${escapeHTML(note.title || '제목 없음')}</div>
       ${metaRow}
-      <div style="font-size: 14px; line-height: 1.8; color: #1c1b1a;">${renderedMD}</div>
+      <div style="font-size: 14px; line-height: 1.55; color: #1c1b1a;">${renderedMD}</div>
       ${Array.isArray(note.images) && note.images.length > 0 ? `<div style="margin-top: 16px;">${note.images.map(s => `<img src="${s}" style="max-width: 100%; border-radius: 8px; border: 1px solid #e8e6e1; margin: 6px 0; display: block;" alt="">`).join('')}</div>` : ''}
       <div style="margin-top: 32px; padding-top: 14px; border-top: 1px solid #e8e6e1; font-size: 10px; color: #9e9a93; letter-spacing: 0.06em; text-align: right;">
         CONTENTS ARCHIVE · ${fmtToday()}
@@ -4871,7 +4871,7 @@ function renderMarkdownForExport(md) {
   function flushList() {
     if (listBuffer.length === 0) return;
     const tag = listType;
-    blocks.push(`<${tag} style="margin: 6px 0 6px 24px;">` + listBuffer.map(item => `<li style="margin: 3px 0;">${processInlineExport(item)}</li>`).join('') + `</${tag}>`);
+    blocks.push(`<${tag} style="margin: 4px 0 4px 22px;">` + listBuffer.map(item => `<li style="margin: 3px 0;">${processInlineExport(item)}</li>`).join('') + `</${tag}>`);
     listBuffer = [];
     listType = null;
   }
@@ -4888,7 +4888,7 @@ function renderMarkdownForExport(md) {
     flushList();
     if (trimmed === '') { blocks.push('<br>'); continue; }
     if ((m = trimmed.match(/^&gt; (.+)/))) { blocks.push(`<p style="border-left: 3px solid #e8e6e1; padding-left: 12px; color: #5e5b56; margin: 8px 0;">${processInlineExport(m[1])}</p>`); continue; }
-    blocks.push(`<p style="margin: 6px 0;">${processInlineExport(line)}</p>`);
+    blocks.push(`<p style="margin: 0; line-height: 1.55;">${processInlineExport(line)}</p>`);
   }
   flushList();
   return blocks.join('');
