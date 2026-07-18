@@ -2160,7 +2160,7 @@
     </div>
 
     <div style="text-align: center; margin-top: 40px; font-size: 11px; color: var(--ink-mute); letter-spacing: 0.04em; font-weight: 500;">
-      v3.3 · 데이터는 브라우저에 저장됩니다
+      v3.4 · 데이터는 브라우저에 저장됩니다
     </div>
   </section>
 </main>
@@ -2266,6 +2266,22 @@
         <div class="form-group form-section" id="section-youtube">
           <label class="form-label">유튜브 링크</label>
           <input type="url" class="form-input" id="fLink" placeholder="https://youtube.com/...">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">썸네일 <span style="font-weight:400;color:var(--ink-mute);">— 포스터·커버 이미지 (선택)</span></label>
+          <div id="thumbPreviewWrap" style="display:none; position:relative; width:96px; margin-bottom:10px;">
+            <img id="thumbPreviewImg" src="" alt="" style="width:96px; height:128px; object-fit:cover; border-radius:10px; border:1px solid var(--line); display:block;">
+            <button type="button" class="note-photo-del" onclick="removeThumb()" style="top:-6px; right:-6px;">×</button>
+          </div>
+          <div class="form-row" style="margin-bottom:8px;">
+            <input type="url" class="form-input" id="fThumbUrl" placeholder="이미지 주소(URL) 붙여넣기" style="flex:2;">
+            <button type="button" class="btn" onclick="applyThumbUrl()" style="flex:1; padding:12px;">적용</button>
+          </div>
+          <label class="btn" style="width:100%; display:block; text-align:center;">
+            📷 사진에서 선택
+            <input type="file" accept="image/*" onchange="pickThumbFile(event)" style="display:none;">
+          </label>
         </div>
 
         <div class="form-group form-section" id="section-drama">
@@ -3807,6 +3823,8 @@ function resetForm() {
   state.ytThumb = null;
   document.getElementById('ytPreview').style.display = 'none';
   document.getElementById('ytImportInput').value = '';
+  document.getElementById('fThumbUrl').value = '';
+  updateThumbPreview();
   selectType('youtube');
   document.querySelectorAll('#statusPicker .status-option').forEach(o => o.classList.toggle('active', o.dataset.status === 'watching'));
   updateStars();
@@ -3836,6 +3854,8 @@ function fillForm(item) {
   state.selectedOtts = Array.isArray(item.otts) ? [...item.otts] : [];
   state.selectedCountry = item.country || null;
   state.ytThumb = item.thumb || null;
+  document.getElementById('fThumbUrl').value = '';
+  updateThumbPreview();
   selectType(state.selectedType);
   document.querySelectorAll('#statusPicker .status-option').forEach(o => o.classList.toggle('active', o.dataset.status === state.selectedStatus));
   updateStars();
@@ -4227,13 +4247,13 @@ function updatePodEp(id) {
 let noteEditingImages = [];
 
 // 이미지 리사이즈+압축 (최대 1000px, JPEG 0.72)
-function compressImage(file) {
+function compressImage(file, maxSize) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (e) => {
       const img = new Image();
       img.onload = () => {
-        const MAX = 1000;
+        const MAX = maxSize || 1000;
         let w = img.width, ht = img.height;
         if (w > MAX || ht > MAX) {
           if (w >= ht) { ht = Math.round(ht * MAX / w); w = MAX; }
@@ -4250,6 +4270,49 @@ function compressImage(file) {
     reader.onerror = reject;
     reader.readAsDataURL(file);
   });
+}
+
+// ===== 썸네일 입력 =====
+function updateThumbPreview() {
+  const wrap = document.getElementById('thumbPreviewWrap');
+  const img = document.getElementById('thumbPreviewImg');
+  if (!wrap) return;
+  if (state.ytThumb) {
+    img.src = state.ytThumb;
+    wrap.style.display = 'block';
+  } else {
+    img.src = '';
+    wrap.style.display = 'none';
+  }
+}
+
+function applyThumbUrl() {
+  const v = document.getElementById('fThumbUrl').value.trim();
+  if (!v) { showToast('이미지 주소를 붙여넣어 주세요'); return; }
+  state.ytThumb = v;
+  updateThumbPreview();
+  showToast('썸네일 적용됨 — 미리보기가 안 보이면 사진 저장 방식을 써보세요');
+}
+
+async function pickThumbFile(event) {
+  const file = (event.target.files || [])[0];
+  event.target.value = '';
+  if (!file) return;
+  showToast('이미지 처리 중...');
+  try {
+    state.ytThumb = await compressImage(file, 600);
+    updateThumbPreview();
+    showToast('썸네일 적용됨');
+  } catch(e) {
+    console.error(e);
+    showToast('이미지 처리 실패');
+  }
+}
+
+function removeThumb() {
+  state.ytThumb = null;
+  document.getElementById('fThumbUrl').value = '';
+  updateThumbPreview();
 }
 
 async function addNotePhotos(event) {
