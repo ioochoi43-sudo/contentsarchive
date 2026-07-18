@@ -2160,7 +2160,7 @@
     </div>
 
     <div style="text-align: center; margin-top: 40px; font-size: 11px; color: var(--ink-mute); letter-spacing: 0.04em; font-weight: 500;">
-      v3.1 · 데이터는 브라우저에 저장됩니다
+      v3.2 · 데이터는 브라우저에 저장됩니다
     </div>
   </section>
 </main>
@@ -2341,6 +2341,35 @@
 </div>
 
 <!-- NOTE EDITOR MODAL -->
+<!-- NOTE READ MODAL -->
+<div class="modal" id="noteReadModal">
+  <div class="modal-content">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title" id="noteReadTitle" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">노트</div>
+      <button class="modal-close" onclick="closeNoteRead()">×</button>
+    </div>
+    <div class="modal-body">
+      <div id="noteReadMeta" style="font-size:11px;color:var(--ink-mute);margin-bottom:14px;"></div>
+      <div class="md-preview" id="noteReadContent" style="margin-bottom:16px;"></div>
+
+      <div class="form-group">
+        <label class="form-label">노트 내보내기</label>
+        <div class="export-options export-options-3">
+          <button type="button" class="btn" onclick="exportNoteRead('image')">이미지</button>
+          <button type="button" class="btn" onclick="exportNoteRead('pdf')">PDF</button>
+          <button type="button" class="btn" onclick="exportNoteRead('word')">Word</button>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button type="button" class="btn" onclick="closeNoteRead()">닫기</button>
+        <button type="button" class="btn btn-primary" onclick="editFromNoteRead()">✎ 수정하기</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal" id="noteModal">
   <div class="modal-content">
     <div class="modal-handle"></div>
@@ -3954,7 +3983,7 @@ function openDetail(id) {
       : notes.map(n => {
           const preview = (n.content || '').replace(/[#*_~=/`-]/g, '').trim().slice(0, 80);
           const photoBadge = (Array.isArray(n.images) && n.images.length > 0) ? ` <span style="color: var(--accent); font-size: 11px;">📷${n.images.length}</span>` : '';
-          return `<div class="note-item" onclick="openNoteModal('${item.id}', '${n.id}')">
+          return `<div class="note-item" onclick="openNoteRead('${item.id}', '${n.id}')">
             <div class="note-item-title">
               <span style="flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHTML(n.title || '제목 없음')}${photoBadge}</span>
               <span class="note-item-date">${fmtDateTime(n.updatedAt)}</span>
@@ -4257,6 +4286,56 @@ function renderNotePhotoGrid() {
   ).join('');
 }
 
+// ===== 노트 읽기 모드 =====
+let noteReadItemId = null;
+let noteReadNoteId = null;
+
+function openNoteRead(itemId, noteId) {
+  const item = state.items.find(i => i.id === itemId);
+  if (!item) return;
+  const note = (item.notes || []).find(n => n.id === noteId);
+  if (!note) return;
+  noteReadItemId = itemId;
+  noteReadNoteId = noteId;
+  document.getElementById('noteReadTitle').textContent = note.title || '제목 없음';
+  document.getElementById('noteReadMeta').textContent = `${bracketTitle(item)} · ${fmtDateTime(note.updatedAt)}`;
+  let body = renderMarkdown(note.content || '');
+  if (Array.isArray(note.images) && note.images.length > 0) {
+    body += '<div class="note-photos-view">' + note.images.map(s => `<img class="note-inline-photo" src="${s}" alt="">`).join('') + '</div>';
+  }
+  document.getElementById('noteReadContent').innerHTML = body || '<span style="color:var(--ink-mute);">내용 없음</span>';
+  closeDetailModal();
+  setTimeout(() => {
+    document.getElementById('noteReadModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }, 150);
+}
+
+function closeNoteRead() {
+  document.getElementById('noteReadModal').classList.remove('active');
+  document.body.style.overflow = '';
+  if (noteReadItemId) {
+    const id = noteReadItemId;
+    noteReadItemId = null;
+    setTimeout(() => openDetail(id), 100);
+  }
+}
+
+function editFromNoteRead() {
+  const iid = noteReadItemId, nid = noteReadNoteId;
+  noteReadItemId = null;
+  document.getElementById('noteReadModal').classList.remove('active');
+  setTimeout(() => openNoteModal(iid, nid), 150);
+}
+
+async function exportNoteRead(format) {
+  const item = state.items.find(i => i.id === noteReadItemId);
+  if (!item) return;
+  const note = (item.notes || []).find(n => n.id === noteReadNoteId);
+  if (!note) return;
+  await exportNoteCore(item, note, format);
+}
+
 function openNoteModal(itemId, noteId) {
   const item = state.items.find(i => i.id === itemId);
   if (!item) return;
@@ -4500,21 +4579,35 @@ function canvasToPdf(canvas, pdf) {
   }
 }
 
-async function exportNote(format) {
-  const item = state.items.find(i => i.id === state.noteEditingItemId);
-  if (!item) return;
-  const content = document.getElementById('noteContent').value.trim();
-  const noteTitle = document.getElementById('noteTitleInput').value.trim() || '제목 없음';
-  if (!content) {
-    showToast('노트 내용을 먼저 입력해주세요');
-    return;
+// 캔버스 이미지를 공유 시트로 (사진앱 저장 가능). 안 되면 다운로드 fallback
+async function shareCanvasImage(canvas, filename) {
+  const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+  if (blob && navigator.canShare) {
+    const file = new File([blob], filename, { type: 'image/png' });
+    if (navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file] });
+        showToast('공유 시트에서 "이미지 저장"을 누르면 사진앱에 저장돼요');
+        return true;
+      } catch(e) {
+        if (e.name === 'AbortError') return true; // 사용자가 취소
+        // 그 외 실패 → fallback
+      }
+    }
   }
-  const note = { title: noteTitle, content, images: [...noteEditingImages] };
-  const safeName = (noteTitle || 'note').replace(/[\\/:*?"<>|]/g, '_').slice(0, 40);
+  const link = document.createElement('a');
+  link.download = filename;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+  showToast('이미지가 저장되었습니다');
+  return false;
+}
+
+// 노트 하나 내보내기 코어 (편집/읽기 모드 공용)
+async function exportNoteCore(item, note, format) {
+  const safeName = (note.title || 'note').replace(/[\\/:*?"<>|]/g, '_').slice(0, 40);
   const cardHTML = buildNoteCardHTML(item, note, true);
-
   showToast(format === 'pdf' ? 'PDF 생성 중...' : format === 'word' ? 'Word 생성 중...' : '이미지 생성 중...');
-
   try {
     if (format === 'word') {
       downloadWordDoc(cardHTML, `${safeName}_노트`);
@@ -4523,11 +4616,7 @@ async function exportNote(format) {
     }
     const canvas = await htmlToCanvas(cardHTML);
     if (format === 'image') {
-      const link = document.createElement('a');
-      link.download = `${safeName}_노트.png`;
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-      showToast('이미지가 저장되었습니다');
+      await shareCanvasImage(canvas, `${safeName}_노트.png`);
     } else if (format === 'pdf') {
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
@@ -4539,6 +4628,18 @@ async function exportNote(format) {
     console.error(e);
     showToast('내보내기 실패');
   }
+}
+
+async function exportNote(format) {
+  const item = state.items.find(i => i.id === state.noteEditingItemId);
+  if (!item) return;
+  const content = document.getElementById('noteContent').value.trim();
+  const noteTitle = document.getElementById('noteTitleInput').value.trim() || '제목 없음';
+  if (!content) {
+    showToast('노트 내용을 먼저 입력해주세요');
+    return;
+  }
+  await exportNoteCore(item, { title: noteTitle, content, images: [...noteEditingImages] }, format);
 }
 
 // ============ BULK NOTE EXPORT ============
