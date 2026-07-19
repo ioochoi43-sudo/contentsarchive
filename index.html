@@ -1961,7 +1961,7 @@
 <nav class="tabs" id="tabs">
   <button class="tab active" data-tab="timeline"><span class="tab-icon">🏠</span>홈</button>
   <button class="tab" data-tab="all"><span class="tab-icon">🗂</span>전체</button>
-  <button class="tab" data-tab="library"><span class="tab-icon">📚</span>서재</button>
+  <button class="tab" data-tab="library"><span class="tab-icon">📚</span>모아보기</button>
   <button class="tab" data-tab="stats"><span class="tab-icon">📊</span>통계</button>
   <button class="tab" data-tab="settings"><span class="tab-icon">⋯</span>더보기</button>
 </nav>
@@ -2034,7 +2034,7 @@
   </section>
 
   <section class="view" id="view-library">
-    <h2 class="section-title">서재</h2>
+    <h2 class="section-title">모아보기</h2>
     <div class="section-sub">모아보기와 돌아보기</div>
 
     <button class="entry-card" onclick="goTab('ott')">
@@ -2066,7 +2066,7 @@
   </section>
 
   <section class="view" id="view-ott">
-    <button class="pill" onclick="goTab('library')" style="margin-bottom: 14px;">‹ 서재</button>
+    <button class="pill" onclick="goTab('library')" style="margin-bottom: 14px;">‹ 모아보기</button>
     <h2 class="section-title">OTT <span>별 보기</span></h2>
     <div class="section-sub">플랫폼마다 모아서</div>
     <div id="ottView"></div>
@@ -2079,14 +2079,14 @@
   </section>
 
   <section class="view" id="view-hall">
-    <button class="pill" onclick="goTab('library')" style="margin-bottom: 14px;">‹ 서재</button>
+    <button class="pill" onclick="goTab('library')" style="margin-bottom: 14px;">‹ 모아보기</button>
     <h2 class="section-title">명예의 <span>전당</span></h2>
     <div class="section-sub">별점 ★4 이상의 인생작</div>
     <div id="hallView"></div>
   </section>
 
   <section class="view" id="view-calendar">
-    <button class="pill" onclick="goTab('library')" style="margin-bottom: 14px;">‹ 서재</button>
+    <button class="pill" onclick="goTab('library')" style="margin-bottom: 14px;">‹ 모아보기</button>
     <h2 class="section-title"><span>연대기</span></h2>
     <div class="section-sub">월별로 돌아보는 기록</div>
     <div class="controls-row">
@@ -2160,7 +2160,7 @@
     </div>
 
     <div style="text-align: center; margin-top: 40px; font-size: 11px; color: var(--ink-mute); letter-spacing: 0.04em; font-weight: 500;">
-      v3.5 · 데이터는 브라우저에 저장됩니다
+      v3.6 · 데이터는 브라우저에 저장됩니다
     </div>
   </section>
 </main>
@@ -2282,6 +2282,10 @@
             📷 사진에서 선택
             <input type="file" accept="image/*" onchange="pickThumbFile(event)" style="display:none;">
           </label>
+          <div class="seg-picker" id="thumbFitPicker" style="margin-top:8px;">
+            <button type="button" class="seg-option active" data-fit="cover">꽉 채움</button>
+            <button type="button" class="seg-option" data-fit="contain">원본 비율 (안 잘림)</button>
+          </div>
         </div>
 
         <div class="form-group form-section" id="section-drama">
@@ -2371,10 +2375,11 @@
 
       <div class="form-group">
         <label class="form-label">노트 내보내기</label>
-        <div class="export-options export-options-3">
+        <div class="export-options">
           <button type="button" class="btn" onclick="exportNoteRead('image')">이미지</button>
           <button type="button" class="btn" onclick="exportNoteRead('pdf')">PDF</button>
           <button type="button" class="btn" onclick="exportNoteRead('word')">Word</button>
+          <button type="button" class="btn" onclick="exportNoteRead('text')">📋 텍스트 복사</button>
         </div>
       </div>
 
@@ -2452,10 +2457,11 @@
 
       <div class="form-group" style="margin-top: 16px;">
         <label class="form-label">이 노트 내보내기</label>
-        <div class="export-options export-options-3">
+        <div class="export-options">
           <button type="button" class="btn" onclick="exportNote('image')">이미지</button>
           <button type="button" class="btn" onclick="exportNote('pdf')">PDF</button>
           <button type="button" class="btn" onclick="exportNote('word')">Word</button>
+          <button type="button" class="btn" onclick="exportNote('text')">📋 텍스트 복사</button>
         </div>
       </div>
 
@@ -2724,10 +2730,11 @@
 
       <div class="form-group">
         <label class="form-label">파일 형식</label>
-        <div class="status-picker" id="bulkFormatPicker" style="grid-template-columns: repeat(3, 1fr);">
+        <div class="status-picker" id="bulkFormatPicker" style="grid-template-columns: repeat(2, 1fr);">
           <div class="status-option active" data-format="pdf">PDF</div>
           <div class="status-option" data-format="word">Word</div>
           <div class="status-option" data-format="image">이미지</div>
+          <div class="status-option" data-format="text">📋 텍스트 복사</div>
         </div>
       </div>
 
@@ -2834,6 +2841,7 @@ let state = {
   searchQuery: '',
   timelineSort: 'updated',
   ytThumb: null,
+  selectedThumbFit: 'cover',
   lastBackupAt: null,
   changesSinceBackup: 0,
   bannerDismissedAt: null
@@ -2996,6 +3004,47 @@ function fmtDateTime(ts) {
   if (!ts) return '';
   const d = new Date(ts);
   return `${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+
+// 마크다운 기호를 걷어낸 순수 텍스트
+function stripMarkdownText(md) {
+  return (md || '')
+    .replace(/^#{1,3}\s*/gm, '')
+    .replace(/^>\s?/gm, '')
+    .replace(/^-{5,}\s*$/gm, '─────')
+    .replace(/\*\*(.+?)\*\*/g, '$1')
+    .replace(/\/\/(.+?)\/\//g, '$1')
+    .replace(/__(.+?)__/g, '$1')
+    .replace(/~~(.+?)~~/g, '$1')
+    .replace(/==(.+?)==/g, '$1');
+}
+
+function buildNoteText(item, note) {
+  return `📝 ${note.title || '제목 없음'}\n${bracketTitle(item)}\n\n${stripMarkdownText(note.content || '')}`;
+}
+
+function copyPlain(text, msg) {
+  const done = () => showToast(msg || '복사되었습니다');
+  const fb = () => {
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.focus(); ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      done();
+    } catch(e) { showToast('복사 실패'); }
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(done, fb);
+  } else fb();
+}
+
+function thumbFitStyle(item) {
+  return item.thumbFit === 'contain' ? 'object-fit:contain;background:var(--bg-soft);' : 'object-fit:cover;';
 }
 
 function typeName(t) { return {youtube:'유튜브', movie:'영화', drama:'드라마', anime:'애니', podcast:'팟캐스트'}[t] || t; }
@@ -3364,7 +3413,7 @@ function renderTimeline() {
         const prog = getProgress(item);
         const ptxt = progressText(item);
         const thumb = item.thumb
-          ? `<img src="${escapeHTML(item.thumb)}" alt="" loading="lazy">`
+          ? `<img src="${escapeHTML(item.thumb)}" alt="" loading="lazy" style="${thumbFitStyle(item)}">`
           : `<div class="home-poster-fallback">${typeEmoji[item.type] || '📌'}</div>`;
         return `<div class="home-poster" onclick="openDetail('${item.id}')">
           <div class="home-poster-thumb">${thumb}${dayBadge}</div>
@@ -3573,7 +3622,7 @@ function renderHallView() {
   container.innerHTML = items.map((item, idx) => {
     const rank = idx < 3 ? medals[idx] : `<span style="font-size: 13px; color: var(--ink-mute); font-weight: 700;">${idx+1}</span>`;
     const thumb = item.thumb
-      ? `<img class="hall-thumb" src="${escapeHTML(item.thumb)}" alt="" loading="lazy">`
+      ? `<img class="hall-thumb" src="${escapeHTML(item.thumb)}" alt="" loading="lazy" style="${thumbFitStyle(item)}">`
       : `<div class="hall-thumb" style="display:flex;align-items:center;justify-content:center;background:var(--bg-soft);color:var(--ink-mute);font-size:18px;">${{youtube:'▶',movie:'★',drama:'●',anime:'◆',podcast:'🎙'}[item.type]||''}</div>`;
     return `<div class="hall-item" onclick="openDetail('${item.id}')">
       <div class="hall-rank">${rank}</div>
@@ -3670,7 +3719,7 @@ function cardHTML(item) {
   let titleExtra = '';
   if (noteCount > 0) titleExtra = `<span class="badge-note">노트 ${noteCount}</span>`;
 
-  const thumbHTML = item.thumb ? `<img class="card-thumb" src="${escapeHTML(item.thumb)}" alt="" loading="lazy">` : '';
+  const thumbHTML = item.thumb ? `<img class="card-thumb" src="${escapeHTML(item.thumb)}" alt="" loading="lazy" style="${thumbFitStyle(item)}">` : '';
 
   return `<div class="card" onclick="openDetail('${item.id}')">
     <div class="card-head">
@@ -3690,7 +3739,7 @@ function cardHTML(item) {
 }
 
 // ============ TABS / FILTERS ============
-// 뷰 → 하단 네비 하이라이트 매핑 (ott/hall/calendar는 서재 소속)
+// 뷰 → 하단 네비 하이라이트 매핑 (ott/hall/calendar는 모아보기 소속)
 const NAV_MAP = { ott: 'library', hall: 'library', calendar: 'library' };
 
 function goTab(name) {
@@ -3735,6 +3784,13 @@ document.getElementById('statusFilter').addEventListener('click', (e) => {
   pill.classList.add('active');
   state.statusFilter = pill.dataset.status;
   renderAll();
+});
+
+document.getElementById('thumbFitPicker').addEventListener('click', (e) => {
+  const opt = e.target.closest('.seg-option');
+  if (!opt) return;
+  state.selectedThumbFit = opt.dataset.fit;
+  document.querySelectorAll('#thumbFitPicker .seg-option').forEach(o => o.classList.toggle('active', o === opt));
 });
 
 document.getElementById('copyDefaultPicker').addEventListener('click', (e) => {
@@ -3842,6 +3898,8 @@ function resetForm() {
   state.selectedOtts = [];
   state.selectedCountry = null;
   state.ytThumb = null;
+  state.selectedThumbFit = 'cover';
+  document.querySelectorAll('#thumbFitPicker .seg-option').forEach(o => o.classList.toggle('active', o.dataset.fit === 'cover'));
   document.getElementById('ytPreview').style.display = 'none';
   document.getElementById('ytImportInput').value = '';
   document.getElementById('fThumbUrl').value = '';
@@ -3875,6 +3933,8 @@ function fillForm(item) {
   state.selectedOtts = Array.isArray(item.otts) ? [...item.otts] : [];
   state.selectedCountry = item.country || null;
   state.ytThumb = item.thumb || null;
+  state.selectedThumbFit = item.thumbFit || 'cover';
+  document.querySelectorAll('#thumbFitPicker .seg-option').forEach(o => o.classList.toggle('active', o.dataset.fit === state.selectedThumbFit));
   document.getElementById('fThumbUrl').value = '';
   updateThumbPreview();
   selectType(state.selectedType);
@@ -3910,6 +3970,7 @@ function saveContent(e) {
     country: (state.selectedType === 'movie' || state.selectedType === 'drama' || state.selectedType === 'anime') ? state.selectedCountry : null,
     link: document.getElementById('fLink').value.trim(),
     thumb: state.ytThumb || '',
+    thumbFit: state.selectedThumbFit || 'cover',
     totalEp: parseInt(document.getElementById('fTotalEp').value) || 0,
     currentEp: parseInt(document.getElementById('fCurrentEp').value) || 0,
     totalPodEp: parseInt(document.getElementById('fTotalPodEp').value) || 0,
@@ -4004,7 +4065,7 @@ function openDetail(id) {
     </div>`;
   }
 
-  const thumbHTML = item.thumb ? `<img class="detail-thumb" src="${escapeHTML(item.thumb)}" alt="" style="margin-bottom: 12px;">` : '';
+  const thumbHTML = item.thumb ? `<img class="detail-thumb" src="${escapeHTML(item.thumb)}" alt="" style="margin-bottom: 12px; ${thumbFitStyle(item)}">` : '';
 
   // Notes list
   const notes = (item.notes || []).sort((a,b) => (b.updatedAt||0) - (a.updatedAt||0));
@@ -4639,8 +4700,23 @@ function downloadWordDoc(bodyHTML, filename) {
 async function htmlToCanvas(innerHTML) {
   const renderEl = document.getElementById('exportRender');
   renderEl.innerHTML = innerHTML;
-  await new Promise(r => setTimeout(r, 150));
-  const canvas = await html2canvas(renderEl, { scale: 2, backgroundColor: '#ffffff', logging: false, useCORS: true });
+  // 이미지 로딩 대기 (사진 포함 노트가 빈 채로 찍히거나 멈추는 문제 방지)
+  const imgs = Array.from(renderEl.querySelectorAll('img'));
+  await Promise.all(imgs.map(im => (im.decode ? im.decode() : Promise.resolve()).catch(() => {})));
+  await new Promise(r => setTimeout(r, 100));
+  // iOS 캔버스 픽셀 한계(약 1,670만) 넘지 않게 배율 자동 조절
+  const w = renderEl.scrollWidth || 600;
+  const hgt = renderEl.scrollHeight || 800;
+  let scale = 2;
+  const MAX_PIXELS = 16000000;
+  if (w * hgt * 4 > MAX_PIXELS) {
+    scale = Math.max(0.8, Math.sqrt(MAX_PIXELS / (w * hgt)));
+  }
+  // 15초 안전장치: 멈추지 않고 실패 안내
+  const canvas = await Promise.race([
+    html2canvas(renderEl, { scale, backgroundColor: '#ffffff', logging: false, useCORS: true }),
+    new Promise((_, rej) => setTimeout(() => rej(new Error('render-timeout')), 15000))
+  ]);
   renderEl.innerHTML = '';
   return canvas;
 }
@@ -4710,6 +4786,10 @@ async function shareImageResult() {
 
 // 노트 하나 내보내기 코어 (편집/읽기 모드 공용)
 async function exportNoteCore(item, note, format) {
+  if (format === 'text') {
+    copyPlain(buildNoteText(item, note), '노트 텍스트가 클립보드에 복사됐어요');
+    return;
+  }
   const safeName = (note.title || 'note').replace(/[\\/:*?"<>|]/g, '_').slice(0, 40);
   const cardHTML = buildNoteCardHTML(item, note, true);
   showToast(format === 'pdf' ? 'PDF 생성 중...' : format === 'word' ? 'Word 생성 중...' : '이미지 생성 중...');
@@ -4731,7 +4811,7 @@ async function exportNoteCore(item, note, format) {
     }
   } catch(e) {
     console.error(e);
-    showToast('내보내기 실패');
+    showToast(e.message === 'render-timeout' ? '이미지 생성 시간 초과 — 사진을 줄이거나 텍스트 복사를 써보세요' : '내보내기 실패');
   }
 }
 
@@ -4801,6 +4881,10 @@ document.getElementById('bulkModePicker').addEventListener('click', (e) => {
 
 function updateBulkModeHint() {
   const hint = document.getElementById('bulkModeHint');
+  if (bulkExportFormat === 'text') {
+    hint.textContent = '모든 노트를 이어붙여 클립보드에 복사해요. (묶는 방식과 무관)';
+    return;
+  }
   if (bulkExportMode === 'merged') {
     if (bulkExportFormat === 'image') {
       hint.textContent = '모든 노트를 세로로 이어붙인 긴 이미지 1장으로 저장해요.';
@@ -4826,7 +4910,10 @@ async function runBulkExport() {
   const safeBase = (item.title || 'notes').replace(/[\\/:*?"<>|]/g, '_').slice(0, 40);
 
   try {
-    if (bulkExportMode === 'separate') {
+    if (bulkExportFormat === 'text') {
+      const txt = notes.map(n => buildNoteText(item, n)).join('\n\n──────────\n\n');
+      copyPlain(txt, `${notes.length}개 노트를 클립보드에 복사했어요`);
+    } else if (bulkExportMode === 'separate') {
       await bulkExportSeparate(item, notes, safeBase);
     } else {
       await bulkExportMerged(item, notes, safeBase);
