@@ -2160,7 +2160,7 @@
     </div>
 
     <div style="text-align: center; margin-top: 40px; font-size: 11px; color: var(--ink-mute); letter-spacing: 0.04em; font-weight: 500;">
-      v3.6 · 데이터는 브라우저에 저장됩니다
+      v3.7 · 데이터는 브라우저에 저장됩니다
     </div>
   </section>
 </main>
@@ -4739,6 +4739,164 @@ function canvasToPdf(canvas, pdf) {
   }
 }
 
+// ===== 캔버스 직접 렌더링 (외부 라이브러리 불필요 — PWA에서 확실히 동작) =====
+function tokenizeInline(text, base) {
+  base = base || {};
+  const tokens = [];
+  const re = /(\*\*(.+?)\*\*)|(\/\/(.+?)\/\/)|(__(.+?)__)|(~~(.+?)~~)|(==(.+?)==)/;
+  let rest = String(text);
+  while (rest.length > 0) {
+    const m = rest.match(re);
+    if (!m) { tokens.push(Object.assign({}, base, { text: rest })); break; }
+    if (m.index > 0) tokens.push(Object.assign({}, base, { text: rest.slice(0, m.index) }));
+    if (m[2] !== undefined) tokens.push.apply(tokens, tokenizeInline(m[2], Object.assign({}, base, { bold: true })));
+    else if (m[4] !== undefined) tokens.push.apply(tokens, tokenizeInline(m[4], base));
+    else if (m[6] !== undefined) tokens.push.apply(tokens, tokenizeInline(m[6], Object.assign({}, base, { underline: true })));
+    else if (m[8] !== undefined) tokens.push.apply(tokens, tokenizeInline(m[8], Object.assign({}, base, { strike: true })));
+    else if (m[10] !== undefined) tokens.push.apply(tokens, tokenizeInline(m[10], Object.assign({}, base, { highlight: true })));
+    rest = rest.slice(m.index + m[0].length);
+  }
+  return tokens;
+}
+
+function loadImageEl(src) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(null);
+    img.src = src;
+  });
+}
+
+function layoutNoteCanvas(ctx, item, note, photos, W, draw) {
+  const PAD = 64;
+  const CW = W - PAD * 2;
+  let y = PAD + 24;
+  const FONT = "-apple-system, 'Pretendard Variable', Pretendard, sans-serif";
+  const setF = (bold, size) => { ctx.font = (bold ? '700 ' : '400 ') + size + 'px ' + FONT; };
+
+  function drawTokens(tokens, size, lineH, color, indent) {
+    indent = indent || 0;
+    let x = PAD + indent;
+    ctx.textBaseline = 'alphabetic';
+    tokens.forEach(t => {
+      const chars = Array.from(t.text || '');
+      chars.forEach(ch => {
+        setF(t.bold, size);
+        const cw = ctx.measureText(ch).width;
+        if (x + cw > PAD + CW) { x = PAD + indent; y += lineH; }
+        if (draw) {
+          if (t.highlight) { ctx.fillStyle = '#fdf3c8'; ctx.fillRect(x, y - size * 0.82, cw + 1, size * 1.08); }
+          ctx.fillStyle = color;
+          ctx.fillText(ch, x, y);
+          if (t.underline) { ctx.fillRect(x, y + 6, cw, 2.5); }
+          if (t.strike) { ctx.fillRect(x, y - size * 0.32, cw, 2.5); }
+        }
+        x += cw;
+      });
+    });
+    y += lineH;
+  }
+
+  function plainLine(text, size, lineH, color, bold, indent) {
+    drawTokens([{ text: text, bold: !!bold }], size, lineH, color, indent || 0);
+  }
+
+  // 헤더: 유형 라벨 + 작품 제목
+  if (draw) { ctx.fillStyle = '#9a9daa'; setF(true, 22); ctx.fillText(typeName(item.type) + ' 노트', PAD, y); }
+  y += 50;
+  plainLine(item.title || '', 46, 62, '#17181c', true);
+  if (item.creator) plainLine(item.creator, 26, 40, '#5b5e6b', false);
+  y += 12;
+  if (draw) { ctx.fillStyle = '#17181c'; ctx.fillRect(PAD, y, CW, 3); }
+  y += 44;
+
+  // 노트 제목 + 메타
+  plainLine('📝 ' + (note.title || '제목 없음'), 34, 50, '#3d4cc8', true);
+  const metaBits = [];
+  if (item.rating > 0) metaBits.push('★'.repeat(item.rating));
+  if (item.startDate || item.endDate) metaBits.push((item.startDate ? fmtDate(item.startDate) : '?') + ' → ' + (item.endDate ? fmtDate(item.endDate) : '진행중'));
+  if (metaBits.length) plainLine(metaBits.join('   ·   '), 24, 38, '#9a9daa', false);
+  y += 20;
+
+  // 본문
+  const lines = String(note.content || '').split('\n');
+  lines.forEach(line => {
+    if (/^###\s+/.test(line)) { y += 10; plainLine(line.replace(/^###\s+/, ''), 30, 46, '#17181c', true); }
+    else if (/^##\s+/.test(line)) { y += 14; plainLine(line.replace(/^##\s+/, ''), 34, 52, '#17181c', true); }
+    else if (/^#\s+/.test(line)) { y += 16; plainLine(line.replace(/^#\s+/, ''), 40, 58, '#17181c', true); }
+    else if (/^-{5,}\s*$/.test(line)) { y += 16; if (draw) { ctx.fillStyle = '#e9eaef'; ctx.fillRect(PAD, y, CW, 2); } y += 32; }
+    else if (/^-\s+/.test(line)) {
+      if (draw) { ctx.fillStyle = '#3d4cc8'; setF(true, 28); ctx.fillText('•', PAD + 6, y); }
+      drawTokens(tokenizeInline(line.replace(/^-\s+/, '')), 28, 44, '#17181c', 40);
+    }
+    else if (/^>\s?/.test(line)) {
+      const startY = y;
+      drawTokens(tokenizeInline(line.replace(/^>\s?/, '')), 28, 44, '#5b5e6b', 30);
+      if (draw) { ctx.fillStyle = '#d9dbe4'; ctx.fillRect(PAD, startY - 30, 6, y - startY + 4); }
+    }
+    else if (line.trim() === '') { y += 26; }
+    else { drawTokens(tokenizeInline(line), 28, 44, '#17181c', 0); }
+  });
+
+  // 사진
+  photos.forEach(img => {
+    y += 24;
+    const ratio = img.height / img.width;
+    const w = Math.min(CW, Math.max(img.width, 200));
+    const hh = Math.min(w * ratio, 1500);
+    if (draw) ctx.drawImage(img, PAD, y, w, hh);
+    y += hh;
+  });
+
+  // 푸터
+  y += 48;
+  if (draw) { ctx.fillStyle = '#e9eaef'; ctx.fillRect(PAD, y, CW, 2); }
+  y += 34;
+  if (draw) {
+    ctx.fillStyle = '#9a9daa'; setF(false, 20);
+    ctx.textAlign = 'right';
+    ctx.fillText('CONTENTS ARCHIVE · ' + fmtToday(), W - PAD, y);
+    ctx.textAlign = 'left';
+  }
+  y += 64;
+  return y;
+}
+
+async function drawNoteToCanvas(item, note) {
+  const W = 1080;
+  const photos = [];
+  for (const src of (note.images || [])) {
+    const im = await loadImageEl(src);
+    if (im) photos.push(im);
+  }
+  const mc = document.createElement('canvas');
+  mc.width = 10; mc.height = 10;
+  const totalH = layoutNoteCanvas(mc.getContext('2d'), item, note, photos, W, false);
+  const H = Math.min(Math.ceil(totalH), 14000);
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, W, H);
+  layoutNoteCanvas(ctx, item, note, photos, W, true);
+  return canvas;
+}
+
+function composeCanvasesVertically(list, gap) {
+  const W = Math.max.apply(null, list.map(c => c.width));
+  const H = list.reduce((s, c) => s + c.height, 0) + gap * (list.length - 1);
+  const out = document.createElement('canvas');
+  out.width = W;
+  out.height = Math.min(H, 16000);
+  const ctx = out.getContext('2d');
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, out.width, out.height);
+  let y = 0;
+  list.forEach(c => { ctx.drawImage(c, 0, y); y += c.height + gap; });
+  return out;
+}
+
 // 이미지 결과 모달: 길게 눌러 사진에 저장 (PWA에서 가장 확실한 방식)
 let imageResultFile = null;
 let imageResultDataUrl = null;
@@ -4791,15 +4949,14 @@ async function exportNoteCore(item, note, format) {
     return;
   }
   const safeName = (note.title || 'note').replace(/[\\/:*?"<>|]/g, '_').slice(0, 40);
-  const cardHTML = buildNoteCardHTML(item, note, true);
   showToast(format === 'pdf' ? 'PDF 생성 중...' : format === 'word' ? 'Word 생성 중...' : '이미지 생성 중...');
   try {
     if (format === 'word') {
-      downloadWordDoc(cardHTML, `${safeName}_노트`);
+      downloadWordDoc(buildNoteCardHTML(item, note, true), `${safeName}_노트`);
       showToast('Word 파일이 저장되었습니다');
       return;
     }
-    const canvas = await htmlToCanvas(cardHTML);
+    const canvas = await drawNoteToCanvas(item, note);
     if (format === 'image') {
       shareCanvasImage(canvas, `${safeName}_노트.png`);
     } else if (format === 'pdf') {
@@ -4811,7 +4968,7 @@ async function exportNoteCore(item, note, format) {
     }
   } catch(e) {
     console.error(e);
-    showToast(e.message === 'render-timeout' ? '이미지 생성 시간 초과 — 사진을 줄이거나 텍스트 복사를 써보세요' : '내보내기 실패');
+    showToast('내보내기 실패: ' + (e && e.message ? e.message : '알 수 없는 오류'));
   }
 }
 
@@ -4949,9 +5106,8 @@ async function bulkExportMerged(item, notes, safeBase) {
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
     for (let i = 0; i < notes.length; i++) {
-      const canvas = await htmlToCanvas(buildNoteCardHTML(item, notes[i], true));
+      const canvas = await drawNoteToCanvas(item, notes[i]);
       if (i > 0) pdf.addPage();
-      // 각 노트를 새 페이지부터: canvasToPdf는 현재 페이지에 그림
       canvasToPdfFresh(canvas, pdf);
     }
     pdf.save(`${safeBase}_노트모음.pdf`);
@@ -4961,16 +5117,11 @@ async function bulkExportMerged(item, notes, safeBase) {
 
   if (bulkExportFormat === 'image') {
     showToast('이미지 생성 중...');
-    // 모든 노트를 하나의 컨테이너에 세로로 쌓아서 한 장으로
-    const combined = notes.map((n, i) =>
-      `<div style="${i > 0 ? 'margin-top: 32px; padding-top: 32px; border-top: 2px dashed #e8e6e1;' : ''}">${buildNoteCardHTML(item, n, i === 0)}</div>`
-    ).join('');
-    const canvas = await htmlToCanvas(combined);
-    const link = document.createElement('a');
-    link.download = `${safeBase}_노트모음.png`;
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-    showToast(`이미지로 ${notes.length}개 노트를 저장했어요`);
+    // 노트별 캔버스를 세로로 합쳐 한 장으로
+    const cs = [];
+    for (const n of notes) cs.push(await drawNoteToCanvas(item, n));
+    const canvas = composeCanvasesVertically(cs, 40);
+    shareCanvasImage(canvas, `${safeBase}_노트모음.png`);
     return;
   }
 }
@@ -5012,7 +5163,7 @@ async function bulkExportSeparate(item, notes, safeBase) {
     showToast('PDF 생성 중...');
     const { jsPDF } = window.jspdf;
     for (let i = 0; i < notes.length; i++) {
-      const canvas = await htmlToCanvas(buildNoteCardHTML(item, notes[i], true));
+      const canvas = await drawNoteToCanvas(item, notes[i]);
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
       canvasToPdfFresh(canvas, pdf);
       const nm = (notes[i].title || `노트${i+1}`).replace(/[\\/:*?"<>|]/g, '_').slice(0, 30);
@@ -5025,7 +5176,7 @@ async function bulkExportSeparate(item, notes, safeBase) {
   if (bulkExportFormat === 'image') {
     showToast('이미지 생성 중...');
     for (let i = 0; i < notes.length; i++) {
-      const canvas = await htmlToCanvas(buildNoteCardHTML(item, notes[i], true));
+      const canvas = await drawNoteToCanvas(item, notes[i]);
       const link = document.createElement('a');
       const nm = (notes[i].title || `노트${i+1}`).replace(/[\\/:*?"<>|]/g, '_').slice(0, 30);
       link.download = `${safeBase}_${i+1}_${nm}.png`;
