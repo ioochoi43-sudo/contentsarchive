@@ -2159,8 +2159,8 @@
       <button class="btn btn-danger" onclick="confirmClearAll()" style="width: 100%;">모든 데이터 삭제</button>
     </div>
 
-    <div style="text-align: center; margin-top: 40px; font-size: 11px; color: var(--ink-mute); letter-spacing: 0.04em; font-weight: 500;">
-      v3.7 · 데이터는 브라우저에 저장됩니다
+    <div id="versionText" style="text-align: center; margin-top: 40px; font-size: 11px; color: var(--ink-mute); letter-spacing: 0.04em; font-weight: 500;">
+      v3.8 · 데이터는 브라우저에 저장됩니다
     </div>
   </section>
 </main>
@@ -2595,6 +2595,19 @@
   </div>
 </div>
 
+<!-- UPDATE MODAL -->
+<div class="modal confirm-modal" id="updateModal" style="z-index: 400;">
+  <div class="confirm-content" style="text-align: left;">
+    <div style="text-align: center; font-size: 34px; margin-bottom: 6px;">🎉</div>
+    <div class="confirm-title" style="text-align: center;">업데이트 완료</div>
+    <div class="confirm-desc" style="text-align: center; margin-bottom: 16px;">
+      <span id="updateVersionText" style="font-weight: 700; color: var(--accent);"></span> 버전으로 새로워졌어요
+    </div>
+    <ul id="updateNotes" style="margin: 0 0 18px 18px; padding: 0; font-size: 13px; color: var(--ink-dim); line-height: 1.7;"></ul>
+    <button class="btn btn-primary" onclick="closeUpdateModal()" style="width: 100%;">확인</button>
+  </div>
+</div>
+
 <!-- IMAGE RESULT MODAL -->
 <div class="modal" id="imageResultModal" style="z-index: 300;">
   <div class="modal-content" style="max-height: 92vh;">
@@ -2808,6 +2821,20 @@ const DEFAULT_OTT = [
   { id: 'ott-apple', name: 'Apple TV+', color: '#1b1b1b' },
   { id: 'ott-prime', name: 'Prime Video', color: '#00a8e1' },
 ];
+
+// ============ VERSION ============
+const APP_VERSION = '3.8';
+const VERSION_KEY = 'contentsArchive_seenVersion';
+const VERSION_NOTES = {
+  '3.8': [
+    '유튜브 링크 가져오기 수정 — 제목을 못 가져와도 썸네일·링크는 채워져요',
+    '업데이트 알림 팝업 추가 (지금 보고 있는 게 그거예요!)'
+  ],
+  '3.7': [
+    '노트 내보내기 완전히 새로 만듦 — 이미지·PDF 안정화',
+    '텍스트 복사로도 내보내기 가능'
+  ]
+};
 
 // ============ STATE ============
 const STORAGE_KEY = 'contentsArchive_v1';
@@ -3258,6 +3285,27 @@ function extractVideoId(url) {
   return m ? m[1] : null;
 }
 
+// 제목·채널 조회: 여러 경로를 순서대로 시도 (일부는 CORS 차단될 수 있음)
+async function fetchYouTubeMeta(videoId) {
+  const watchUrl = `https://www.youtube.com/watch?v=${videoId}`;
+  const endpoints = [
+    `https://noembed.com/embed?url=${encodeURIComponent(watchUrl)}`,
+    `https://www.youtube.com/oembed?url=${encodeURIComponent(watchUrl)}&format=json`
+  ];
+  for (const ep of endpoints) {
+    try {
+      const res = await Promise.race([
+        fetch(ep),
+        new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 7000))
+      ]);
+      if (!res.ok) continue;
+      const data = await res.json();
+      if (data && data.title) return { title: data.title, author: data.author_name || '' };
+    } catch(e) { /* 다음 경로 시도 */ }
+  }
+  return null;
+}
+
 async function importYouTube() {
   const input = document.getElementById('ytImportInput');
   const btn = document.getElementById('ytImportBtn');
@@ -3267,21 +3315,29 @@ async function importYouTube() {
   if (!videoId) { showToast('올바른 유튜브 링크가 아닙니다'); return; }
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span>';
+
+  // 링크와 썸네일은 영상 ID만으로 항상 채울 수 있음
+  const watchUrl = `https://www.youtube.com/watch?v=${videoId}`;
+  document.getElementById('fLink').value = watchUrl;
+  state.ytThumb = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+  state.selectedThumbFit = 'cover';
+  updateThumbPreview();
+  document.getElementById('ytPreviewThumb').src = state.ytThumb;
+  document.getElementById('ytPreview').style.display = 'flex';
+
   try {
-    const res = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`);
-    if (!res.ok) throw new Error('fail');
-    const data = await res.json();
-    document.getElementById('fTitle').value = data.title || '';
-    document.getElementById('fCreator').value = data.author_name || '';
-    document.getElementById('fLink').value = `https://www.youtube.com/watch?v=${videoId}`;
-    state.ytThumb = `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg`;
-    document.getElementById('ytPreviewThumb').src = state.ytThumb;
-    document.getElementById('ytPreviewTitle').textContent = data.title || '';
-    document.getElementById('ytPreviewChannel').textContent = data.author_name || '';
-    document.getElementById('ytPreview').style.display = 'flex';
-    showToast('자동으로 채워졌어요');
-  } catch(e) {
-    showToast('정보를 가져올 수 없어요. 수동 입력하세요');
+    const meta = await fetchYouTubeMeta(videoId);
+    if (meta) {
+      document.getElementById('fTitle').value = meta.title;
+      document.getElementById('fCreator').value = meta.author;
+      document.getElementById('ytPreviewTitle').textContent = meta.title;
+      document.getElementById('ytPreviewChannel').textContent = meta.author;
+      showToast('자동으로 채워졌어요');
+    } else {
+      document.getElementById('ytPreviewTitle').textContent = '제목을 직접 입력해주세요';
+      document.getElementById('ytPreviewChannel').textContent = '썸네일과 링크는 채웠어요';
+      showToast('썸네일·링크는 채웠어요. 제목은 직접 입력해주세요');
+    }
   } finally {
     btn.disabled = false;
     btn.innerHTML = '불러오기';
@@ -6146,6 +6202,29 @@ document.querySelectorAll('.modal').forEach(modal => {
   });
 });
 
+// ============ VERSION CHECK ============
+function checkVersionUpdate() {
+  let seen = null;
+  try { seen = localStorage.getItem(VERSION_KEY); } catch(e) {}
+  // 푸터 버전 표시(단일 출처)
+  const vt = document.getElementById('versionText');
+  if (vt) vt.textContent = `v${APP_VERSION} · 데이터는 브라우저에 저장됩니다`;
+
+  try { localStorage.setItem(VERSION_KEY, APP_VERSION); } catch(e) {}
+  if (!seen || seen === APP_VERSION) return; // 첫 실행 or 동일 버전이면 조용히
+
+  document.getElementById('updateVersionText').textContent = 'v' + APP_VERSION;
+  const notes = VERSION_NOTES[APP_VERSION] || ['여러 부분이 개선되었어요'];
+  document.getElementById('updateNotes').innerHTML = notes.map(n => `<li style="margin-bottom: 6px;">${escapeHTML(n)}</li>`).join('');
+  setTimeout(() => {
+    document.getElementById('updateModal').classList.add('active');
+  }, 600);
+}
+
+function closeUpdateModal() {
+  document.getElementById('updateModal').classList.remove('active');
+}
+
 // ============ INIT ============
 load();
 render();
@@ -6153,6 +6232,7 @@ updateBackupBanner();
 renderBackupStatus();
 updateSaveIndicator(false);
 syncCopyDefaultPicker();
+checkVersionUpdate();
 document.querySelectorAll('#timelineSort .pill').forEach(p => p.classList.toggle('active', p.dataset.tsort === state.timelineSort));
 </script>
 </body>
