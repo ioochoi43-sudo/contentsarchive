@@ -2128,6 +2128,18 @@
     </div>
 
     <div style="margin-top: 24px;">
+      <h3 style="font-size: 13px; font-weight: 600; color: var(--ink-mute); letter-spacing: 0.04em; margin-bottom: 10px;">유튜브 제목 자동 채우기</h3>
+      <div style="font-size: 12px; color: var(--ink-dim); line-height: 1.6; margin-bottom: 10px;">
+        평소엔 키 없이도 대부분 잘 가져와요. 자꾸 실패한다면 <strong>유튜브 공식 API 키</strong>를 넣으면 항상 안정적으로 채워져요. (무료 · 구글 계정 필요)
+      </div>
+      <div class="form-row" style="margin-bottom: 8px;">
+        <input type="text" class="form-input" id="ytApiKeyInput" placeholder="API 키 (선택 사항)" style="flex:2;">
+        <button type="button" class="btn" onclick="saveYtApiKey()" style="flex:1; padding:12px;">저장</button>
+      </div>
+      <div id="ytApiKeyStatus" style="font-size: 11px; color: var(--ink-mute);"></div>
+    </div>
+
+    <div style="margin-top: 24px;">
       <h3 style="font-size: 13px; font-weight: 600; color: var(--ink-mute); letter-spacing: 0.04em; margin-bottom: 10px;">복사 설정</h3>
       <div style="font-size: 12px; color: var(--ink-dim); line-height: 1.6; margin-bottom: 10px;">카드의 <strong>복사</strong> 버튼을 눌렀을 때 기본으로 복사할 형식이에요. (상세 화면에서는 매번 골라서 복사할 수 있어요)</div>
       <div class="seg-picker" id="copyDefaultPicker">
@@ -2160,7 +2172,7 @@
     </div>
 
     <div id="versionText" style="text-align: center; margin-top: 40px; font-size: 11px; color: var(--ink-mute); letter-spacing: 0.04em; font-weight: 500;">
-      v3.8 · 데이터는 브라우저에 저장됩니다
+      v3.9 · 데이터는 브라우저에 저장됩니다
     </div>
   </section>
 </main>
@@ -2823,9 +2835,13 @@ const DEFAULT_OTT = [
 ];
 
 // ============ VERSION ============
-const APP_VERSION = '3.8';
+const APP_VERSION = '3.9';
 const VERSION_KEY = 'contentsArchive_seenVersion';
 const VERSION_NOTES = {
+  '3.9': [
+    '유튜브 제목 가져오기 성공률 개선 — 여러 경로를 동시에 시도해요',
+    '설정에서 유튜브 API 키를 넣으면 항상 안정적으로 채워져요 (선택)'
+  ],
   '3.8': [
     '유튜브 링크 가져오기 수정 — 제목을 못 가져와도 썸네일·링크는 채워져요',
     '업데이트 알림 팝업 추가 (지금 보고 있는 게 그거예요!)'
@@ -2869,6 +2885,7 @@ let state = {
   timelineSort: 'updated',
   ytThumb: null,
   selectedThumbFit: 'cover',
+  ytApiKey: '',
   lastBackupAt: null,
   changesSinceBackup: 0,
   bannerDismissedAt: null
@@ -2938,6 +2955,7 @@ function load() {
         state.bannerDismissedAt = data.settings.bannerDismissedAt || null;
         if (data.settings.copyDefaultProgress !== undefined) state.copyDefaultProgress = data.settings.copyDefaultProgress;
         if (data.settings.timelineSort) state.timelineSort = data.settings.timelineSort;
+        if (typeof data.settings.ytApiKey === 'string') state.ytApiKey = data.settings.ytApiKey;
       }
     } else {
       state.templates = DEFAULT_TEMPLATES.map(t => ({ ...t, createdAt: Date.now() }));
@@ -2970,7 +2988,8 @@ function save(isDataChange) {
         changesSinceBackup: state.changesSinceBackup,
         bannerDismissedAt: state.bannerDismissedAt,
         copyDefaultProgress: state.copyDefaultProgress,
-        timelineSort: state.timelineSort
+        timelineSort: state.timelineSort,
+        ytApiKey: state.ytApiKey
       },
       savedAt: now
     }));
@@ -3285,25 +3304,55 @@ function extractVideoId(url) {
   return m ? m[1] : null;
 }
 
-// 제목·채널 조회: 여러 경로를 순서대로 시도 (일부는 CORS 차단될 수 있음)
+// 여러 후보 중 가장 먼저 성공하는 결과를 반환 (전부 실패하면 null)
+function firstSuccess(promises) {
+  return new Promise(resolve => {
+    let remaining = promises.length;
+    let done = false;
+    if (remaining === 0) return resolve(null);
+    promises.forEach(p => p.then(
+      v => {
+        if (v && !done) { done = true; resolve(v); }
+        if (--remaining === 0 && !done) resolve(null);
+      },
+      () => { if (--remaining === 0 && !done) resolve(null); }
+    ));
+  });
+}
+
+function fetchJSON(url, ms) {
+  return Promise.race([
+    fetch(url).then(r => { if (!r.ok) throw new Error('http ' + r.status); return r.json(); }),
+    new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), ms || 8000))
+  ]);
+}
+
+// 제목·채널 조회: 여러 경로를 '동시에' 시도해서 가장 먼저 성공한 걸 사용
 async function fetchYouTubeMeta(videoId) {
   const watchUrl = `https://www.youtube.com/watch?v=${videoId}`;
-  const endpoints = [
-    `https://noembed.com/embed?url=${encodeURIComponent(watchUrl)}`,
-    `https://www.youtube.com/oembed?url=${encodeURIComponent(watchUrl)}&format=json`
-  ];
-  for (const ep of endpoints) {
-    try {
-      const res = await Promise.race([
-        fetch(ep),
-        new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 7000))
-      ]);
-      if (!res.ok) continue;
-      const data = await res.json();
-      if (data && data.title) return { title: data.title, author: data.author_name || '' };
-    } catch(e) { /* 다음 경로 시도 */ }
+  const oembedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(watchUrl)}&format=json`;
+  const fromOembed = d => (d && d.title) ? { title: d.title, author: d.author_name || '' } : null;
+
+  const attempts = [];
+
+  // 1) 공식 API 키가 설정돼 있으면 함께 시도 (가장 안정적)
+  if (state.ytApiKey) {
+    attempts.push(
+      fetchJSON(`https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoId}&key=${encodeURIComponent(state.ytApiKey)}`)
+        .then(d => (d && d.items && d.items[0])
+          ? { title: d.items[0].snippet.title, author: d.items[0].snippet.channelTitle || '' }
+          : null)
+    );
   }
-  return null;
+  // 2) noembed (CORS 허용)
+  attempts.push(fetchJSON(`https://noembed.com/embed?url=${encodeURIComponent(watchUrl)}`).then(fromOembed));
+  // 3~4) 공개 프록시를 통한 유튜브 공식 oembed
+  attempts.push(fetchJSON(`https://api.allorigins.win/raw?url=${encodeURIComponent(oembedUrl)}`).then(fromOembed));
+  attempts.push(fetchJSON(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(oembedUrl)}`).then(fromOembed));
+  // 5) 직접 호출 (환경에 따라 성공하기도 함)
+  attempts.push(fetchJSON(oembedUrl).then(fromOembed));
+
+  return await firstSuccess(attempts);
 }
 
 async function importYouTube() {
@@ -3856,6 +3905,22 @@ document.getElementById('copyDefaultPicker').addEventListener('click', (e) => {
   document.querySelectorAll('#copyDefaultPicker .seg-option').forEach(o => o.classList.toggle('active', o === opt));
   save();
 });
+
+function saveYtApiKey() {
+  const v = document.getElementById('ytApiKeyInput').value.trim();
+  state.ytApiKey = v;
+  save();
+  syncYtApiKey();
+  showToast(v ? 'API 키가 저장됐어요' : 'API 키를 지웠어요');
+}
+
+function syncYtApiKey() {
+  const input = document.getElementById('ytApiKeyInput');
+  const status = document.getElementById('ytApiKeyStatus');
+  if (!input || !status) return;
+  input.value = state.ytApiKey || '';
+  status.textContent = state.ytApiKey ? '✓ 키가 저장돼 있어요 (이 기기에만 저장됩니다)' : '키 없이도 대부분 동작해요';
+}
 
 function syncCopyDefaultPicker() {
   const picker = document.getElementById('copyDefaultPicker');
@@ -6232,6 +6297,7 @@ updateBackupBanner();
 renderBackupStatus();
 updateSaveIndicator(false);
 syncCopyDefaultPicker();
+syncYtApiKey();
 checkVersionUpdate();
 document.querySelectorAll('#timelineSort .pill').forEach(p => p.classList.toggle('active', p.dataset.tsort === state.timelineSort));
 </script>
