@@ -854,6 +854,102 @@
   .ep-btn.watched { background: var(--accent); color: white; border-color: var(--accent); }
   .ep-btn:active { transform: scale(0.92); }
 
+  /* PLANNER */
+  .plan-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .plan-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .plan-nav-btn {
+    width: 40px; height: 40px; border-radius: 12px;
+    border: 1px solid var(--line); background: var(--bg-elev);
+    font-size: 22px; line-height: 1; color: var(--ink-dim); cursor: pointer; font-family: var(--sans);
+  }
+  .plan-nav-title { font-size: 17px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  .plan-copy-all { width: 100%; margin-bottom: 16px; display: block; }
+  .plan-day {
+    background: var(--bg-elev); border: 1px solid var(--line-soft);
+    box-shadow: 0 2px 14px rgba(23,24,28,0.05);
+    border-radius: 18px; padding: 14px 16px; margin-bottom: 10px;
+  }
+  .plan-day.today { border: 1.5px solid var(--accent); }
+  .plan-day.slim { padding: 8px 10px 8px 16px; box-shadow: none; background: var(--bg-soft); border-color: transparent; }
+  .plan-day.slim.today { background: var(--bg-elev); border: 1.5px solid var(--accent); }
+  .plan-day.slim .plan-day-title { font-size: 14px; font-weight: 600; color: var(--ink-dim); }
+  .plan-day.slim .plan-mini-btn.primary { background: var(--bg-elev); }
+  #view-plan { padding-bottom: 24px; }
+  .plan-day-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .plan-day-title { font-size: 15px; font-weight: 700; letter-spacing: -0.02em; color: var(--ink); }
+  .plan-today-badge {
+    font-size: 10px; font-weight: 700; background: var(--accent); color: #fff;
+    border-radius: 100px; padding: 2px 8px; margin-left: 6px; vertical-align: 2px;
+  }
+  .plan-day-actions { display: flex; gap: 6px; flex-shrink: 0; }
+  .plan-mini-btn {
+    font-size: 12px; padding: 6px 11px; border-radius: 100px;
+    border: 1px solid var(--line); background: var(--bg-soft); color: var(--ink-dim);
+    font-weight: 600; cursor: pointer; font-family: var(--sans); white-space: nowrap;
+  }
+  .plan-mini-btn.primary { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
+  .plan-row { display: flex; align-items: center; gap: 10px; padding-top: 10px; }
+  .plan-check {
+    width: 22px; height: 22px; border-radius: 50%; padding: 0;
+    border: 1.5px solid var(--line); background: var(--bg-elev);
+    color: #fff; font-size: 12px; font-weight: 700; cursor: pointer; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .plan-row.done .plan-check { background: var(--accent); border-color: var(--accent); }
+  .plan-row-text { flex: 1; min-width: 0; font-size: 14px; color: var(--ink); cursor: pointer; word-break: keep-all; line-height: 1.45; }
+  .plan-row.done .plan-row-text { color: var(--ink-mute); }
+  .plan-row.done .plan-row-line { text-decoration: line-through; }
+  .plan-row-note { font-size: 11px; color: var(--accent); margin-top: 2px; display: block; }
+  .plan-row.done .plan-row-note { color: var(--ink-mute); }
+  .plan-check-preview { font-size: 13px; color: var(--ink); line-height: 1.6; word-break: keep-all; }
+  .plan-check-preview div + div { margin-top: 4px; }
+  .plan-empty { font-size: 12px; color: var(--ink-mute); padding-top: 8px; line-height: 1.6; }
+  .plan-month { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 14px; }
+  .plan-dow { text-align: center; font-size: 11px; color: var(--ink-mute); font-weight: 600; padding: 4px 0; }
+  .plan-dow.sat { color: var(--accent); }
+  .plan-dow.sun { color: #d0524a; }
+  .plan-cell {
+    aspect-ratio: 1; border: none; background: var(--bg-soft); border-radius: 12px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+    cursor: pointer; font-family: var(--sans); padding: 0;
+  }
+  .plan-cell.out { opacity: 0.35; }
+  .plan-cell-num { font-size: 14px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .plan-cell.today .plan-cell-num { color: var(--accent); font-weight: 800; }
+  .plan-cell.selected { background: var(--accent); }
+  .plan-cell.selected .plan-cell-num { color: #fff; }
+  .plan-cell-badge {
+    min-width: 16px; height: 16px; border-radius: 8px; padding: 0 4px;
+    background: var(--accent); color: #fff; font-size: 10px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .plan-cell-badge.empty { background: transparent; }
+  .plan-cell-badge.done { background: #3f9a6b; }
+  .plan-cell.selected .plan-cell-badge:not(.empty) { background: #fff; color: var(--accent); }
+  .plan-item-list { display: flex; flex-direction: column; gap: 6px; max-height: 230px; overflow-y: auto; }
+  .plan-pick {
+    display: flex; align-items: center; gap: 10px; width: 100%;
+    padding: 11px 12px; border: 1px solid var(--line); border-radius: 12px;
+    background: var(--bg-elev); cursor: pointer; text-align: left; font-family: var(--sans);
+  }
+  .plan-pick.selected { border-color: var(--accent); background: var(--accent-soft); }
+  .plan-pick-title { flex: 1; min-width: 0; font-size: 14px; font-weight: 600; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .plan-pick-prog { font-size: 11px; color: var(--ink-mute); flex-shrink: 0; font-variant-numeric: tabular-nums; }
+  .plan-quick { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 2px; }
+  .ep-btn.seen { background: var(--bg-soft); color: var(--ink-mute); border-color: transparent; }
+  .ep-btn.elsewhere { border: 1.5px dashed var(--accent); }
+  .ep-btn.planned { background: var(--accent); color: #fff; border: 1px solid var(--accent); }
+  .plan-legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; font-size: 11px; color: var(--ink-mute); }
+  .plan-legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .plan-legend .lg { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+  .plan-legend .lg.planned { background: var(--accent); }
+  .plan-legend .lg.seen { background: var(--bg-soft); border: 1px solid var(--line); }
+  .plan-legend .lg.elsewhere { border: 1.5px dashed var(--accent); }
+  .plan-preview-box { background: var(--bg-soft); border-radius: 12px; padding: 12px 14px; }
+  .plan-preview-label { font-size: 11px; color: var(--ink-mute); font-weight: 600; margin-bottom: 4px; }
+  .plan-preview { font-size: 15px; font-weight: 600; color: var(--ink); word-break: keep-all; }
+  .plan-preview.muted { color: var(--ink-mute); font-weight: 500; }
+
   .ep-mode-toggle {
     display: inline-flex;
     background: var(--bg-soft);
@@ -1961,6 +2057,7 @@
 <nav class="tabs" id="tabs">
   <button class="tab active" data-tab="timeline"><span class="tab-icon">🏠</span>홈</button>
   <button class="tab" data-tab="all"><span class="tab-icon">🗂</span>전체</button>
+  <button class="tab" data-tab="plan"><span class="tab-icon">📅</span>계획</button>
   <button class="tab" data-tab="library"><span class="tab-icon">📚</span>모아보기</button>
   <button class="tab" data-tab="stats"><span class="tab-icon">📊</span>통계</button>
   <button class="tab" data-tab="settings"><span class="tab-icon">⋯</span>더보기</button>
@@ -2031,6 +2128,25 @@
     </div>
     <div class="filter-row" id="countryFilter" style="margin-top: -8px; margin-bottom: 18px;"></div>
     <div id="allList"></div>
+  </section>
+
+  <section class="view" id="view-plan">
+    <h2 class="section-title">계획</h2>
+    <div class="section-sub">진행중인 콘텐츠를 날짜별로 미리 계획해요</div>
+    <div class="plan-toolbar">
+      <div class="ep-mode-toggle" id="planViewToggle">
+        <button type="button" class="ep-mode-btn active" data-pv="week">주간</button>
+        <button type="button" class="ep-mode-btn" data-pv="month">월간</button>
+      </div>
+      <button type="button" class="plan-mini-btn" onclick="planGoToday()">오늘로</button>
+    </div>
+    <div class="plan-nav">
+      <button type="button" class="plan-nav-btn" onclick="planShift(-1)" aria-label="이전">‹</button>
+      <div class="plan-nav-title" id="planNavTitle"></div>
+      <button type="button" class="plan-nav-btn" onclick="planShift(1)" aria-label="다음">›</button>
+    </div>
+    <button type="button" class="btn plan-copy-all" id="planCopyAllBtn" onclick="copyPlanRange()">📋 이 주 계획 전체 복사</button>
+    <div id="planBody"></div>
   </section>
 
   <section class="view" id="view-library">
@@ -2172,7 +2288,7 @@
     </div>
 
     <div id="versionText" style="text-align: center; margin-top: 40px; font-size: 11px; color: var(--ink-mute); letter-spacing: 0.04em; font-weight: 500;">
-      v3.9 · 데이터는 브라우저에 저장됩니다
+      v4.1 · 데이터는 브라우저에 저장됩니다
     </div>
   </section>
 </main>
@@ -2585,6 +2701,77 @@
   </div>
 </div>
 
+<!-- PLAN CHECK MODAL -->
+<div class="modal" id="planCheckModal">
+  <div class="modal-content">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title" id="planCheckTitle">어디까지 봤나요?</div>
+      <button class="modal-close" onclick="closePlanCheck()">×</button>
+    </div>
+    <div class="modal-body">
+      <div id="planCheckSub" style="font-size: 13px; color: var(--ink-dim); margin-bottom: 14px; word-break: keep-all;"></div>
+      <div class="plan-quick" style="margin-bottom: 4px;">
+        <button type="button" class="plan-mini-btn primary" onclick="planCheckAll(true)">전부 봤어요</button>
+        <button type="button" class="plan-mini-btn" onclick="planCheckAll(false)">하나도 못 봤어요</button>
+      </div>
+      <div class="episodes-grid" id="planCheckGrid"></div>
+      <div id="planCheckHint" style="font-size: 11px; color: var(--ink-mute); margin-top: 8px;"></div>
+      <div class="plan-preview-box" style="margin-top: 14px;">
+        <div class="plan-preview-label">이렇게 반영돼요</div>
+        <div id="planCheckPreview" class="plan-check-preview"></div>
+      </div>
+      <div class="btn-row">
+        <button type="button" class="btn" onclick="closePlanCheck()">취소</button>
+        <button type="button" class="btn btn-primary" id="planCheckConfirm" onclick="confirmPlanCheck()">다 봤어요 ✓</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PLAN EDITOR MODAL -->
+<div class="modal" id="planEditorModal">
+  <div class="modal-content">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title" id="planEditorTitle">계획 추가</div>
+      <button class="modal-close" onclick="closePlanEditor()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">날짜</label>
+        <input type="date" class="form-input" id="planDate">
+      </div>
+      <div class="form-group">
+        <label class="form-label">콘텐츠 <span style="font-weight:400;color:var(--ink-mute);">— 진행중 목록</span></label>
+        <div class="plan-item-list" id="planItemList"></div>
+      </div>
+      <div class="form-group" id="planEpGroup" style="display:none;">
+        <label class="form-label" id="planEpLabel">볼 회차 선택</label>
+        <div class="plan-quick" id="planQuick"></div>
+        <div class="episodes-grid" id="planEpGrid"></div>
+        <div class="plan-legend">
+          <span><i class="lg planned"></i>선택</span>
+          <span><i class="lg seen"></i>이미 봄</span>
+          <span><i class="lg elsewhere"></i>다른 날 계획됨</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">직접 입력 <span style="font-weight:400;color:var(--ink-mute);">(선택)</span></label>
+        <input type="text" class="form-input" id="planText" placeholder="예: 3~5화, 30분, 끝까지" oninput="updatePlanPreview()">
+      </div>
+      <div class="plan-preview-box">
+        <div class="plan-preview-label">이렇게 들어가요</div>
+        <div class="plan-preview muted" id="planPreview">콘텐츠를 선택하세요</div>
+      </div>
+      <div class="btn-row">
+        <button type="button" class="btn btn-danger" id="planDeleteBtn" onclick="deletePlan()" style="display:none;">삭제</button>
+        <button type="button" class="btn btn-primary" onclick="savePlan()">저장</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- COUNTRY EDITOR MODAL -->
 <div class="modal" id="countryEditorModal">
   <div class="modal-content">
@@ -2835,9 +3022,19 @@ const DEFAULT_OTT = [
 ];
 
 // ============ VERSION ============
-const APP_VERSION = '3.9';
+const APP_VERSION = '4.1';
 const VERSION_KEY = 'contentsArchive_seenVersion';
 const VERSION_NOTES = {
+  '4.1': [
+    '계획 체크 시 "어디까지 봤나요?"를 물어보고 진행 기록에도 체크돼요',
+    '못 본 회차는 다음 계획 앞으로 자동으로 넘어가요 (3~5화 중 4화까지 → 다음날 5화부터)',
+    '체크를 취소하면 진행 기록과 넘긴 회차가 원래대로 돌아가요'
+  ],
+  '4.0': [
+    '하단에 📅 계획 탭 추가 — 진행중 콘텐츠를 날짜별로 미리 계획해요',
+    '주간·월간 보기, 회차 탭 선택 또는 직접 입력',
+    '〈제목〉 3~5화 형식으로 하루·주간·월간 텍스트 복사'
+  ],
   '3.9': [
     '유튜브 제목 가져오기 성공률 개선 — 여러 경로를 동시에 시도해요',
     '설정에서 유튜브 API 키를 넣으면 항상 안정적으로 채워져요 (선택)'
@@ -2859,6 +3056,8 @@ let state = {
   templates: [],
   ottPlatforms: [],
   countries: [],
+  plans: [],
+  planView: 'week',
   countryFilter: 'all',
   selectedCountry: null,
   countryEditingId: null,
@@ -2939,6 +3138,7 @@ function load() {
       }
       state.ottPlatforms = Array.isArray(data.ottPlatforms) ? data.ottPlatforms : [];
       state.countries = Array.isArray(data.countries) ? data.countries : [];
+      state.plans = Array.isArray(data.plans) ? data.plans : [];
       if (state.countries.length === 0) state.countries = DEFAULT_COUNTRIES.map((c, i) => ({ ...c, order: i, createdAt: Date.now() }));
       else state.countries.forEach((c, i) => { if (c.order === undefined) c.order = i; });
       if (state.ottPlatforms.length === 0) {
@@ -2956,6 +3156,7 @@ function load() {
         if (data.settings.copyDefaultProgress !== undefined) state.copyDefaultProgress = data.settings.copyDefaultProgress;
         if (data.settings.timelineSort) state.timelineSort = data.settings.timelineSort;
         if (typeof data.settings.ytApiKey === 'string') state.ytApiKey = data.settings.ytApiKey;
+        if (data.settings.planView) state.planView = data.settings.planView;
       }
     } else {
       state.templates = DEFAULT_TEMPLATES.map(t => ({ ...t, createdAt: Date.now() }));
@@ -2965,6 +3166,7 @@ function load() {
   } catch(e) {
     console.error('Load failed', e);
     state.items = [];
+    state.plans = [];
     state.templates = DEFAULT_TEMPLATES.map(t => ({ ...t, createdAt: Date.now() }));
     state.ottPlatforms = DEFAULT_OTT.map((o, i) => ({ ...o, order: i, createdAt: Date.now() }));
   }
@@ -2981,6 +3183,7 @@ function save(isDataChange) {
       templates: state.templates,
       ottPlatforms: state.ottPlatforms,
       countries: state.countries,
+      plans: state.plans,
       settings: {
         sortBy: state.sortBy,
         sortDir: state.sortDir,
@@ -2989,7 +3192,8 @@ function save(isDataChange) {
         bannerDismissedAt: state.bannerDismissedAt,
         copyDefaultProgress: state.copyDefaultProgress,
         timelineSort: state.timelineSort,
-        ytApiKey: state.ytApiKey
+        ytApiKey: state.ytApiKey,
+        planView: state.planView
       },
       savedAt: now
     }));
@@ -3032,7 +3236,8 @@ function getOttById(id) {
 
 // ============ UTILITIES ============
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
-function today() { return new Date().toISOString().slice(0, 10); }
+function ymdLocal(d) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+function today() { return ymdLocal(new Date()); }
 
 function fmtDate(d) {
   if (!d) return '';
@@ -3458,6 +3663,7 @@ document.addEventListener('click', (e) => {
 
 // ============ RENDER ============
 function render() {
+  renderPlanView();
   updateCounts();
   renderTimeline();
   renderAll();
@@ -3854,6 +4060,8 @@ function goTab(name) {
   state.currentTab = name;
   const view = document.getElementById('view-' + name);
   if (view) view.classList.add('active');
+  const fab = document.querySelector('.fab');
+  if (fab) fab.style.display = name === 'plan' ? 'none' : '';
   window.scrollTo(0, 0);
 }
 
@@ -6051,6 +6259,7 @@ function exportData() {
     templates: state.templates,
     ottPlatforms: state.ottPlatforms,
     countries: state.countries,
+    plans: state.plans,
     exportedAt: new Date().toISOString(),
     version: 3
   };
@@ -6237,6 +6446,14 @@ function importData(event) {
             state.countries = [...cExisting.values()];
             getCountrySorted().forEach((c, i) => { c.order = i; });
           }
+          if (Array.isArray(data.plans)) {
+            const pExisting = new Map((state.plans || []).map(p => [p.id, p]));
+            data.plans.forEach(p => {
+              const cur = pExisting.get(p.id);
+              if (!cur || (p.updatedAt || 0) >= (cur.updatedAt || 0)) pExisting.set(p.id, p);
+            });
+            state.plans = [...pExisting.values()];
+          }
           save();
           // 가져오기는 백업본이 존재한다는 의미 → 백업 추적 리셋
           state.lastBackupAt = Date.now();
@@ -6265,6 +6482,711 @@ document.querySelectorAll('.modal').forEach(modal => {
       document.body.style.overflow = '';
     }
   });
+});
+
+// ============ PLANNER (주간·월간 시청 계획) ============
+let planAnchor = null;       // 보고 있는 주/월의 기준 날짜 'YYYY-MM-DD'
+let planSelectedDay = null;  // 월간 뷰에서 고른 날짜
+let planEdit = { id: null, itemId: null, eps: [] };
+
+const DOW_KO = ['일', '월', '화', '수', '목', '금', '토'];
+
+function parseYmd(s) { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); }
+function addDaysYmd(s, n) { const d = parseYmd(s); d.setDate(d.getDate() + n); return ymdLocal(d); }
+function weekStartYmd(s) { const d = parseYmd(s); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return ymdLocal(d); }
+function fmtPlanDay(s) { const d = parseYmd(s); return `${d.getMonth() + 1}월 ${d.getDate()}일 (${DOW_KO[d.getDay()]})`; }
+
+// 회차 배열 → "3~5화" / "1, 3~5화" / "EP3~5, EP7"
+function formatEpRanges(eps, isPodcast) {
+  const arr = [...new Set(eps || [])].map(Number).filter(n => n > 0).sort((a, b) => a - b);
+  if (!arr.length) return '';
+  const parts = [];
+  let s = arr[0], p = arr[0];
+  for (let i = 1; i <= arr.length; i++) {
+    const v = arr[i];
+    if (v === p + 1) { p = v; continue; }
+    parts.push(s === p ? `${s}` : `${s}~${p}`);
+    s = p = v;
+  }
+  return isPodcast ? 'EP' + parts.join(', EP') : parts.join(', ') + '화';
+}
+
+function planLine(plan) {
+  const item = state.items.find(i => i.id === plan.itemId);
+  const title = item ? item.title : (plan.titleSnap || '삭제된 기록');
+  const type = item ? item.type : plan.typeSnap;
+  let line = `〈${title}〉`;
+  const ep = formatEpRanges(plan.eps, type === 'podcast');
+  if (ep) line += ' ' + ep;
+  if (plan.text) line += ' ' + plan.text;
+  if (plan.done && plan.check && !plan.check.simple && (plan.check.watchedEps || []).length === 0) line += ' (못 봄)';
+  return line;
+}
+
+function planRowNote(p) {
+  const bits = [];
+  if (p.done && p.check && p.check.carry && p.check.carry.eps.length) {
+    const t = (state.plans || []).find(x => x.id === p.check.carry.planId);
+    const item = state.items.find(i => i.id === p.itemId);
+    const pod = (item ? item.type : p.typeSnap) === 'podcast';
+    bits.push(`↪ ${formatEpRanges(p.check.carry.eps, pod)} → ${t ? fmtPlanDay(t.date) : '다음 계획'}로 넘김`);
+  }
+  if (!p.done && p.carried) bits.push('↩ 못 본 회차를 옮겨온 계획');
+  return bits.length ? `<div class="plan-row-note">${escapeHTML(bits.join(' · '))}</div>` : '';
+}
+
+function plansOn(day) {
+  return (state.plans || []).filter(p => p.date === day).sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+}
+
+// ----- 뷰 -----
+function planDayCardHTML(day, isToday, compact) {
+  const plans = plansOn(day);
+  const slim = compact && plans.length === 0;
+  return `<div class="plan-day ${isToday ? 'today' : ''} ${slim ? 'slim' : ''}">
+    <div class="plan-day-head">
+      <div class="plan-day-title">${fmtPlanDay(day)}${isToday ? '<span class="plan-today-badge">오늘</span>' : ''}</div>
+      <div class="plan-day-actions">
+        ${plans.length ? `<button type="button" class="plan-mini-btn" onclick="copyPlanDay('${day}')">📋 복사</button>` : ''}
+        <button type="button" class="plan-mini-btn primary" onclick="openPlanEditor('${day}')">+ 추가</button>
+      </div>
+    </div>
+    ${plans.length
+      ? plans.map(p => `<div class="plan-row ${p.done ? 'done' : ''}">
+          <button type="button" class="plan-check" onclick="onPlanCheck('${p.id}')" aria-label="봤어요 체크">${p.done ? '✓' : ''}</button>
+          <div class="plan-row-text" onclick="openPlanEditor('${day}', '${p.id}')"><span class="plan-row-line">${escapeHTML(planLine(p))}</span>${planRowNote(p)}</div>
+        </div>`).join('')
+      : (slim ? '' : `<div class="plan-empty">계획 없음</div>`)}
+  </div>`;
+}
+
+function renderPlanView() {
+  const body = document.getElementById('planBody');
+  if (!body) return;
+  const todayYmd = today();
+  if (!planAnchor) planAnchor = todayYmd;
+  const mode = state.planView === 'month' ? 'month' : 'week';
+  document.querySelectorAll('#planViewToggle .ep-mode-btn').forEach(b => b.classList.toggle('active', b.dataset.pv === mode));
+
+  if (mode === 'week') {
+    const start = weekStartYmd(planAnchor);
+    const sd = parseYmd(start), ed = parseYmd(addDaysYmd(start, 6));
+    document.getElementById('planNavTitle').textContent = `${sd.getMonth() + 1}.${sd.getDate()} – ${ed.getMonth() + 1}.${ed.getDate()}`;
+    document.getElementById('planCopyAllBtn').textContent = '📋 이 주 계획 전체 복사';
+    let html = '';
+    for (let i = 0; i < 7; i++) {
+      const day = addDaysYmd(start, i);
+      html += planDayCardHTML(day, day === todayYmd, true);
+    }
+    body.innerHTML = html;
+    return;
+  }
+
+  // 월간
+  const a = parseYmd(planAnchor);
+  const y = a.getFullYear(), m = a.getMonth();
+  document.getElementById('planNavTitle').textContent = `${y}년 ${m + 1}월`;
+  document.getElementById('planCopyAllBtn').textContent = '📋 이 달 계획 전체 복사';
+  const monthPrefix = `${y}-${String(m + 1).padStart(2, '0')}`;
+  if (!planSelectedDay || !planSelectedDay.startsWith(monthPrefix)) {
+    planSelectedDay = todayYmd.startsWith(monthPrefix) ? todayYmd : `${monthPrefix}-01`;
+  }
+  const firstDow = (new Date(y, m, 1).getDay() + 6) % 7;
+  const lastDate = new Date(y, m + 1, 0).getDate();
+  const weeks = Math.ceil((firstDow + lastDate) / 7);
+  const gridStart = weekStartYmd(`${monthPrefix}-01`);
+  const head = ['월', '화', '수', '목', '금', '토', '일']
+    .map((d, i) => `<div class="plan-dow ${i === 5 ? 'sat' : i === 6 ? 'sun' : ''}">${d}</div>`).join('');
+  let cells = '';
+  for (let i = 0; i < weeks * 7; i++) {
+    const day = addDaysYmd(gridStart, i);
+    const d = parseYmd(day);
+    const plans = plansOn(day);
+    const allDone = plans.length > 0 && plans.every(p => p.done);
+    cells += `<button type="button" class="plan-cell ${d.getMonth() !== m ? 'out' : ''} ${day === todayYmd ? 'today' : ''} ${day === planSelectedDay ? 'selected' : ''}" onclick="selectPlanDay('${day}')">
+      <span class="plan-cell-num">${d.getDate()}</span>
+      <span class="plan-cell-badge ${plans.length ? (allDone ? 'done' : '') : 'empty'}">${plans.length || ''}</span>
+    </button>`;
+  }
+  body.innerHTML = `<div class="plan-month">${head}${cells}</div>` + planDayCardHTML(planSelectedDay, planSelectedDay === todayYmd);
+}
+
+function selectPlanDay(day) {
+  planSelectedDay = day;
+  planAnchor = day;
+  renderPlanView();
+}
+
+function planShift(dir) {
+  if (!planAnchor) planAnchor = today();
+  if (state.planView === 'month') {
+    const a = parseYmd(planAnchor);
+    planAnchor = ymdLocal(new Date(a.getFullYear(), a.getMonth() + dir, 1));
+    planSelectedDay = null;
+  } else {
+    planAnchor = addDaysYmd(planAnchor, 7 * dir);
+  }
+  renderPlanView();
+}
+
+function planGoToday() {
+  planAnchor = today();
+  planSelectedDay = planAnchor;
+  renderPlanView();
+}
+
+function setPlanView(mode) {
+  state.planView = mode;
+  if (mode === 'month') planSelectedDay = planAnchor;
+  save();
+  renderPlanView();
+}
+
+// ----- 복사 -----
+function planDayText(day) {
+  const plans = plansOn(day);
+  if (!plans.length) return '';
+  return fmtPlanDay(day) + '\n' + plans.map(planLine).join('\n');
+}
+
+function copyPlanDay(day) {
+  const t = planDayText(day);
+  if (!t) { showToast('복사할 계획이 없어요'); return; }
+  copyPlain(t, '하루 계획을 복사했어요');
+}
+
+function planRangeDays() {
+  if (!planAnchor) planAnchor = today();
+  const days = [];
+  if (state.planView === 'month') {
+    const a = parseYmd(planAnchor);
+    const last = new Date(a.getFullYear(), a.getMonth() + 1, 0).getDate();
+    for (let d = 1; d <= last; d++) days.push(ymdLocal(new Date(a.getFullYear(), a.getMonth(), d)));
+  } else {
+    const s = weekStartYmd(planAnchor);
+    for (let i = 0; i < 7; i++) days.push(addDaysYmd(s, i));
+  }
+  return days;
+}
+
+function buildPlanRangeText() {
+  return planRangeDays().map(planDayText).filter(Boolean).join('\n\n');
+}
+
+function copyPlanRange() {
+  const t = buildPlanRangeText();
+  if (!t) { showToast('복사할 계획이 없어요'); return; }
+  copyPlain(t, state.planView === 'month' ? '이 달 계획을 복사했어요' : '이 주 계획을 복사했어요');
+}
+
+// ----- 입력 -----
+function planCandidates() {
+  const list = state.items.filter(i => i.status === 'watching').sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+  if (planEdit.itemId && !list.some(i => i.id === planEdit.itemId)) {
+    const it = state.items.find(i => i.id === planEdit.itemId);
+    if (it) list.unshift(it);
+  }
+  return list;
+}
+
+// 다른 날 이미 계획에 넣은 회차
+function planEpsElsewhere(itemId) {
+  const set = new Set();
+  (state.plans || []).forEach(p => {
+    if (p.itemId === itemId && p.id !== planEdit.id) (p.eps || []).forEach(e => set.add(e));
+  });
+  return set;
+}
+
+function openPlanEditor(day, planId) {
+  const plan = planId ? (state.plans || []).find(p => p.id === planId) : null;
+  planEdit = { id: plan ? plan.id : null, itemId: plan ? plan.itemId : null, eps: plan ? [...(plan.eps || [])] : [] };
+  document.getElementById('planEditorTitle').textContent = plan ? '계획 수정' : '계획 추가';
+  document.getElementById('planDate').value = plan ? plan.date : day;
+  document.getElementById('planText').value = plan ? (plan.text || '') : '';
+  document.getElementById('planDeleteBtn').style.display = plan ? '' : 'none';
+  renderPlanItemList();
+  renderPlanEpPicker();
+  updatePlanPreview();
+  document.getElementById('planEditorModal').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePlanEditor() {
+  document.getElementById('planEditorModal').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function renderPlanItemList() {
+  const el = document.getElementById('planItemList');
+  const list = planCandidates();
+  el.innerHTML = list.length
+    ? list.map(i => `<button type="button" class="plan-pick ${planEdit.itemId === i.id ? 'selected' : ''}" onclick="selectPlanItem('${i.id}')">
+        <span class="card-type ${i.type}" style="padding: 2px 8px; font-size: 10px; flex-shrink: 0;">${typeName(i.type)}</span>
+        <span class="plan-pick-title">${escapeHTML(i.title)}</span>
+        <span class="plan-pick-prog">${escapeHTML(progressText(i) || '')}</span>
+      </button>`).join('')
+    : `<div class="plan-empty" style="padding: 14px 0;">진행중인 콘텐츠가 없어요.<br>위시에서 "진행하기"를 누르거나 새 기록을 추가해보세요.</div>`;
+}
+
+function selectPlanItem(id) {
+  if (planEdit.itemId !== id) { planEdit.itemId = id; planEdit.eps = []; }
+  renderPlanItemList();
+  renderPlanEpPicker();
+  updatePlanPreview();
+}
+
+function renderPlanEpPicker() {
+  const grp = document.getElementById('planEpGroup');
+  const item = state.items.find(i => i.id === planEdit.itemId);
+  const info = planEpInfo(item);
+  if (!info) { grp.style.display = 'none'; return; }
+  grp.style.display = 'block';
+  const unit = info.podcast ? '편' : '화';
+  document.getElementById('planEpLabel').textContent = info.podcast ? '들을 에피소드 선택' : '볼 회차 선택';
+  const elsewhere = planEpsElsewhere(item.id);
+  document.getElementById('planQuick').innerHTML =
+    [1, 2, 3].map(n => `<button type="button" class="plan-mini-btn primary" onclick="planQuickPick(${n})">다음 ${n}${unit}</button>`).join('') +
+    (planEdit.eps.length ? `<button type="button" class="plan-mini-btn" onclick="planClearEps()">선택 해제</button>` : '');
+  let grid = '';
+  for (let e = 1; e <= info.total; e++) {
+    const cls = ['ep-btn'];
+    if (info.seen.has(e)) cls.push('seen');
+    if (elsewhere.has(e)) cls.push('elsewhere');
+    if (planEdit.eps.includes(e)) cls.push('planned');
+    grid += `<button type="button" class="${cls.join(' ')}" onclick="togglePlanEp(${e})">${e}</button>`;
+  }
+  document.getElementById('planEpGrid').innerHTML = grid;
+}
+
+function togglePlanEp(e) {
+  const i = planEdit.eps.indexOf(e);
+  if (i >= 0) planEdit.eps.splice(i, 1); else planEdit.eps.push(e);
+  planEdit.eps.sort((a, b) => a - b);
+  renderPlanEpPicker();
+  updatePlanPreview();
+}
+
+// 아직 안 봤고, 다른 날에도 계획 안 된 회차부터 n개
+function planQuickPick(n) {
+  const item = state.items.find(i => i.id === planEdit.itemId);
+  const info = planEpInfo(item);
+  if (!info) return;
+  const elsewhere = planEpsElsewhere(item.id);
+  const picked = [];
+  for (let e = 1; e <= info.total && picked.length < n; e++) {
+    if (!info.seen.has(e) && !elsewhere.has(e)) picked.push(e);
+  }
+  if (!picked.length) { showToast('남은 회차가 없어요'); return; }
+  planEdit.eps = picked;
+  renderPlanEpPicker();
+  updatePlanPreview();
+}
+
+function planClearEps() {
+  planEdit.eps = [];
+  renderPlanEpPicker();
+  updatePlanPreview();
+}
+
+function updatePlanPreview() {
+  const el = document.getElementById('planPreview');
+  if (!el) return;
+  const item = state.items.find(i => i.id === planEdit.itemId);
+  if (!item) { el.textContent = '콘텐츠를 선택하세요'; el.classList.add('muted'); return; }
+  el.classList.remove('muted');
+  el.textContent = planLine({ itemId: item.id, eps: planEdit.eps, text: document.getElementById('planText').value.trim() });
+}
+
+function savePlan() {
+  const date = document.getElementById('planDate').value;
+  if (!date) { showToast('날짜를 선택하세요'); return; }
+  const item = state.items.find(i => i.id === planEdit.itemId);
+  if (!item) { showToast('콘텐츠를 선택하세요'); return; }
+  if (!Array.isArray(state.plans)) state.plans = [];
+  const data = {
+    date,
+    itemId: item.id,
+    titleSnap: item.title,
+    typeSnap: item.type,
+    eps: [...planEdit.eps].sort((a, b) => a - b),
+    text: document.getElementById('planText').value.trim(),
+    updatedAt: Date.now()
+  };
+  const existing = planEdit.id ? state.plans.find(p => p.id === planEdit.id) : null;
+  if (existing && existing.check && !existing.check.simple && existing.itemId !== data.itemId) {
+    existing.check = { simple: true };
+  }
+  if (existing) Object.assign(existing, data);
+  else state.plans.push(Object.assign({ id: uid(), done: false, createdAt: Date.now() }, data));
+  save(true);
+  planAnchor = date;
+  planSelectedDay = date;
+  renderPlanView();
+  closePlanEditor();
+  showToast(existing ? '계획을 수정했어요' : '계획을 추가했어요');
+}
+
+function deletePlan() {
+  const id = planEdit.id;
+  if (!id) return;
+  closePlanEditor();
+  document.getElementById('confirmTitle').textContent = '이 계획을 삭제할까요?';
+  const p = (state.plans || []).find(x => x.id === id);
+  document.getElementById('confirmDesc').textContent = p ? `${fmtPlanDay(p.date)} · ${planLine(p)}` : '';
+  confirmCallback = () => {
+    state.plans = (state.plans || []).filter(x => x.id !== id);
+    save(true);
+    renderPlanView();
+    closeConfirm();
+    showToast('삭제되었습니다');
+  };
+  document.getElementById('confirmModal').classList.add('active');
+}
+
+
+// ===== 시청 진행 기록 읽기/쓰기 (드라마·애니·팟캐스트 공용) =====
+// 순차 모드 = "N화까지", 개별 모드 = "본 회차 집합". 계획 체크는 항상 이 두 함수를 거쳐요.
+function progressSpec(item) {
+  if (!item) return null;
+  if (item.type === 'podcast') {
+    return { total: item.totalPodEp || 0, seq: item.podSeqMode === true, cur: 'currentPodEp', list: 'podWatched', mode: 'podSeqMode' };
+  }
+  if (item.type === 'drama' || item.type === 'anime') {
+    return { total: item.totalEp || 0, seq: item.epSeqMode !== false, cur: 'currentEp', list: 'epWatched', mode: 'epSeqMode' };
+  }
+  return null;
+}
+
+function getWatchedSet(item) {
+  const f = progressSpec(item);
+  if (!f || !(f.total > 0)) return null;
+  if (f.seq) {
+    const n = Math.min(Math.max(item[f.cur] || 0, 0), f.total);
+    return new Set(Array.from({ length: n }, (_, i) => i + 1));
+  }
+  return new Set((item[f.list] || []).filter(e => e >= 1 && e <= f.total));
+}
+
+// 본 회차 집합을 기록에 써넣기. 순차 모드인데 띄엄띄엄이면 개별 모드로 바꿔서 보존.
+function setWatchedSet(item, set) {
+  const f = progressSpec(item);
+  if (!f || !(f.total > 0)) return { converted: false, count: 0 };
+  const arr = [...set].map(Number).filter(e => e >= 1 && e <= f.total).sort((a, b) => a - b);
+  const s = new Set(arr);
+  let cur = 0;
+  while (s.has(cur + 1)) cur++;
+  let converted = false;
+  if (f.seq) {
+    if (arr.length === cur) {
+      item[f.cur] = cur;
+    } else {
+      item[f.mode] = false;
+      item[f.list] = arr;
+      item[f.cur] = cur;
+      converted = true;
+    }
+  } else {
+    item[f.list] = arr;
+    item[f.cur] = cur;
+  }
+  return { converted, count: arr.length };
+}
+
+// 회차 정보: 전체 수 + 이미 본 회차 (계획 입력 그리드용)
+function planEpInfo(item) {
+  const f = progressSpec(item);
+  if (!f || !(f.total > 0)) return null;
+  return { total: f.total, seen: getWatchedSet(item), podcast: item.type === 'podcast', seq: f.seq };
+}
+
+function snapshotProgress(item) {
+  const f = progressSpec(item);
+  return {
+    mode: item[f.mode],
+    cur: item[f.cur],
+    list: Array.isArray(item[f.list]) ? [...item[f.list]] : item[f.list],
+    status: item.status,
+    endDate: item.endDate
+  };
+}
+
+function restoreProgress(item, snap) {
+  const f = progressSpec(item);
+  item[f.mode] = snap.mode;
+  item[f.cur] = snap.cur;
+  item[f.list] = Array.isArray(snap.list) ? [...snap.list] : snap.list;
+  item.status = snap.status;
+  item.endDate = snap.endDate;
+}
+
+// 같은 콘텐츠의 "다음" 미완료 계획 (날짜 → 만든 순서)
+function planOrderKey(p) { return `${p.date}|${String(p.createdAt || 0).padStart(15, '0')}`; }
+function findNextPlan(plan) {
+  const key = planOrderKey(plan);
+  return (state.plans || [])
+    .filter(p => p.id !== plan.id && p.itemId === plan.itemId && !p.done && planOrderKey(p) > key)
+    .sort((a, b) => planOrderKey(a).localeCompare(planOrderKey(b)))[0] || null;
+}
+
+// 이월할 새 계획 날짜: 계획 다음날, 단 지난 계획이면 오늘
+function carryDateFor(plan) {
+  const next = addDaysYmd(plan.date, 1);
+  const t = today();
+  return next > t ? next : t;
+}
+
+// ===== 체크 모달 =====
+let planCheck = { planId: null, picked: [], seq: true };
+
+function onPlanCheck(id) {
+  const p = (state.plans || []).find(x => x.id === id);
+  if (!p) return;
+  if (p.done) { confirmUncheckPlan(p); return; }
+  const item = state.items.find(i => i.id === p.itemId);
+  const info = planEpInfo(item);
+  const eps = (p.eps || []).filter(e => info && e <= info.total);
+  if (!info || eps.length === 0) {
+    // 회차가 없는 계획(영화·직접 입력)은 바로 체크
+    p.done = true;
+    p.check = { simple: true };
+    p.updatedAt = Date.now();
+    save(true);
+    renderPlanView();
+    return;
+  }
+  planCheck = { planId: id, picked: [...eps], seq: info.seq };
+  const unit = info.podcast ? '들었나요' : '봤나요';
+  document.getElementById('planCheckTitle').textContent = `어디까지 ${unit}?`;
+  document.getElementById('planCheckSub').textContent = `${fmtPlanDay(p.date)} · ${planLine(p)}`;
+  document.getElementById('planCheckHint').textContent = info.seq
+    ? '마지막으로 본 회차를 탭하세요 (그 회차까지 한꺼번에 선택돼요)'
+    : '본 회차만 하나씩 탭하세요';
+  renderPlanCheck();
+  document.getElementById('planCheckModal').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePlanCheck() {
+  document.getElementById('planCheckModal').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function planCheckPlanned() {
+  const p = (state.plans || []).find(x => x.id === planCheck.planId);
+  const item = p && state.items.find(i => i.id === p.itemId);
+  const info = planEpInfo(item);
+  return { p, item, info, eps: p ? [...(p.eps || [])].filter(e => info && e <= info.total).sort((a, b) => a - b) : [] };
+}
+
+function planCheckTap(e) {
+  const { eps } = planCheckPlanned();
+  const picked = planCheck.picked;
+  if (planCheck.seq) {
+    const upTo = eps.filter(x => x <= e);
+    const isSameAsCurrent = picked.length === upTo.length && Math.max(...picked) === e;
+    planCheck.picked = isSameAsCurrent ? eps.filter(x => x < e) : upTo;
+  } else {
+    const i = picked.indexOf(e);
+    if (i >= 0) picked.splice(i, 1); else picked.push(e);
+    picked.sort((a, b) => a - b);
+  }
+  renderPlanCheck();
+}
+
+function planCheckAll(all) {
+  const { eps } = planCheckPlanned();
+  planCheck.picked = all ? [...eps] : [];
+  renderPlanCheck();
+}
+
+// 체크 결과 미리 계산 (모달 미리보기와 실제 저장이 같은 계산을 써요)
+function computePlanCheck(p, item, picked) {
+  const info = planEpInfo(item);
+  const planned = [...(p.eps || [])].filter(e => e <= info.total).sort((a, b) => a - b);
+  const watched = planned.filter(e => picked.includes(e));
+  const before = getWatchedSet(item);
+  const after = new Set([...before, ...watched]);
+  const added = watched.filter(e => !before.has(e));
+  const leftover = planned.filter(e => !watched.includes(e) && !after.has(e));
+  const next = leftover.length ? findNextPlan(p) : null;
+  return { planned, watched, added, leftover, next, after, total: info.total, podcast: info.podcast };
+}
+
+function renderPlanCheck() {
+  const { p, item, info, eps } = planCheckPlanned();
+  if (!p || !info) return;
+  const picked = planCheck.picked;
+  document.getElementById('planCheckGrid').innerHTML = eps.map(e =>
+    `<button type="button" class="ep-btn ${picked.includes(e) ? 'planned' : ''}" onclick="planCheckTap(${e})">${e}</button>`
+  ).join('');
+  const r = computePlanCheck(p, item, picked);
+  const fmt = arr => formatEpRanges(arr, r.podcast);
+  const lines = [];
+  if (r.added.length) lines.push(`✓ ${fmt(r.added)} → 진행 기록에 체크돼요`);
+  else if (r.watched.length) lines.push('✓ 이미 진행 기록에 체크돼 있어요');
+  if (r.leftover.length) {
+    if (r.next) {
+      const merged = [...new Set([...r.leftover, ...(r.next.eps || [])])];
+      lines.push(`↪ 못 본 ${fmt(r.leftover)} → ${fmtPlanDay(r.next.date)} 계획이 ${planLine({ itemId: r.next.itemId, eps: merged, text: r.next.text })}(으)로 바뀌어요`);
+    } else {
+      lines.push(`↪ 못 본 ${fmt(r.leftover)} → ${fmtPlanDay(carryDateFor(p))} 새 계획으로 옮겨요`);
+    }
+  }
+  if (r.after.size >= r.total && item.status !== 'done') lines.push('🎉 마지막 회차까지 다 보면 완료로 바뀌어요');
+  document.getElementById('planCheckPreview').innerHTML = lines.length
+    ? lines.map(l => `<div>${escapeHTML(l)}</div>`).join('')
+    : '<div>선택한 회차가 없어요</div>';
+  const btn = document.getElementById('planCheckConfirm');
+  if (r.watched.length === r.planned.length) btn.textContent = '다 봤어요 ✓';
+  else if (r.watched.length === 0) btn.textContent = '못 봤어요 · 전부 다음으로';
+  else btn.textContent = `${fmt(r.watched)}만 봤어요`;
+}
+
+function confirmPlanCheck() {
+  const { p, item, info } = planCheckPlanned();
+  if (!p || !item || !info) { closePlanCheck(); return; }
+  const r = computePlanCheck(p, item, planCheck.picked);
+  const snap = snapshotProgress(item);
+  const wasDone = item.status === 'done';
+
+  // 1) 진행중 기록에 반영
+  let converted = false;
+  if (r.added.length) {
+    converted = setWatchedSet(item, r.after).converted;
+  }
+  let becameDone = false;
+  if (!wasDone && r.after.size >= r.total) {
+    item.status = 'done';
+    if (!item.endDate) item.endDate = today();
+    becameDone = true;
+  }
+  if (r.added.length || becameDone) item.updatedAt = Date.now();
+
+  // 2) 못 본 회차 이월
+  let carry = null;
+  if (r.leftover.length) {
+    if (r.next) {
+      const had = new Set(r.next.eps || []);
+      const moved = r.leftover.filter(e => !had.has(e));
+      r.next.eps = [...new Set([...(r.next.eps || []), ...r.leftover])].sort((a, b) => a - b);
+      r.next.updatedAt = Date.now();
+      carry = { planId: r.next.id, eps: moved, created: false };
+    } else {
+      const np = {
+        id: uid(), date: carryDateFor(p), itemId: item.id, titleSnap: item.title, typeSnap: item.type,
+        eps: [...r.leftover], text: '', done: false, createdAt: Date.now(), updatedAt: Date.now(), carried: true
+      };
+      state.plans.push(np);
+      carry = { planId: np.id, eps: [...r.leftover], created: true };
+    }
+  }
+
+  // 3) 계획 체크 + 되돌리기용 기록
+  p.check = {
+    origEps: [...(p.eps || [])],
+    watchedEps: [...r.watched],
+    addedEps: [...r.added],
+    prev: snap,
+    afterSig: JSON.stringify(snapshotProgress(item)),
+    madeDone: becameDone,
+    carry
+  };
+  p.eps = [...r.watched];
+  p.done = true;
+  p.updatedAt = Date.now();
+
+  save(true);
+  closePlanCheck();
+  render();
+  const msgs = [];
+  if (r.added.length) msgs.push(`${formatEpRanges(r.added, r.podcast)} 체크됨`);
+  if (carry) msgs.push(`${formatEpRanges(r.leftover, r.podcast)}는 ${fmtPlanDay(state.plans.find(x => x.id === carry.planId).date)}로 넘겼어요`);
+  if (converted) msgs.push('띄엄띄엄 봐서 개별 모드로 바뀌었어요');
+  showToast(msgs.join(' · ') || '체크했어요');
+  if (becameDone) setTimeout(() => promptDoneReview(item.id), 350);
+}
+
+// ===== 체크 취소 (원상복구) =====
+function confirmUncheckPlan(p) {
+  const c = p.check;
+  if (!c || c.simple) {
+    p.done = false;
+    delete p.check;
+    p.updatedAt = Date.now();
+    save(true);
+    renderPlanView();
+    return;
+  }
+  const item = state.items.find(i => i.id === p.itemId);
+  const pod = (item ? item.type : p.typeSnap) === 'podcast';
+  const parts = [];
+  if (c.addedEps && c.addedEps.length) parts.push(`진행 기록에 체크된 ${formatEpRanges(c.addedEps, pod)}를 해제`);
+  if (c.carry && c.carry.eps.length) parts.push(`다음 계획으로 넘긴 ${formatEpRanges(c.carry.eps, pod)}를 원래대로`);
+  document.getElementById('confirmTitle').textContent = '체크를 취소할까요?';
+  document.getElementById('confirmDesc').textContent = parts.length ? parts.join('하고, ') + ' 돌려요.' : '계획을 다시 미완료로 돌려요.';
+  confirmCallback = () => { uncheckPlan(p.id); closeConfirm(); };
+  document.getElementById('confirmModal').classList.add('active');
+}
+
+function uncheckPlan(id) {
+  const p = (state.plans || []).find(x => x.id === id);
+  if (!p || !p.check) return;
+  const c = p.check;
+  const item = state.items.find(i => i.id === p.itemId);
+
+  // 1) 진행 기록 되돌리기
+  if (item && progressSpec(item) && (c.addedEps && c.addedEps.length || c.madeDone)) {
+    if (c.prev && c.afterSig === JSON.stringify(snapshotProgress(item))) {
+      // 체크 이후 아무 변화가 없으면 정확히 원래 상태로
+      restoreProgress(item, c.prev);
+    } else {
+      // 그 사이 다른 회차를 체크했다면, 이 체크로 추가된 회차만 빼기
+      const set = getWatchedSet(item);
+      if (set) {
+        (c.addedEps || []).forEach(e => set.delete(e));
+        setWatchedSet(item, set);
+      }
+      if (c.madeDone && item.status === 'done') {
+        item.status = 'watching';
+        item.endDate = c.prev ? c.prev.endDate : item.endDate;
+      }
+    }
+    item.updatedAt = Date.now();
+  }
+
+  // 2) 이월 되돌리기 (이미 체크한 다음 계획은 건드리지 않음)
+  if (c.carry) {
+    const t = (state.plans || []).find(x => x.id === c.carry.planId);
+    if (t && !t.done) {
+      const moved = new Set(c.carry.eps);
+      const sameAsCreated = c.carry.created && !t.text &&
+        (t.eps || []).length === moved.size && (t.eps || []).every(e => moved.has(e));
+      if (sameAsCreated) {
+        state.plans = state.plans.filter(x => x.id !== t.id);
+      } else {
+        t.eps = (t.eps || []).filter(e => !moved.has(e));
+        t.updatedAt = Date.now();
+      }
+    }
+  }
+
+  // 3) 계획 원래대로 (그 사이 계획을 직접 고쳤다면 고친 내용 유지)
+  const sameWatched = (p.eps || []).length === (c.watchedEps || []).length &&
+    (p.eps || []).every(e => (c.watchedEps || []).includes(e));
+  if (sameWatched) p.eps = [...(c.origEps || p.eps)];
+  p.done = false;
+  delete p.check;
+  p.updatedAt = Date.now();
+
+  save(true);
+  render();
+  showToast('체크를 취소했어요');
+}
+
+document.getElementById('planViewToggle').addEventListener('click', (e) => {
+  const b = e.target.closest('.ep-mode-btn');
+  if (b) setPlanView(b.dataset.pv);
 });
 
 // ============ VERSION CHECK ============
