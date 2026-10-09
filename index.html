@@ -37,6 +37,10 @@
   }
 
   body { padding-bottom: calc(74px + env(safe-area-inset-bottom, 0px)); }
+  /* iOS 자동 확대 방지: 입력칸 16px 이상 + 더블탭 확대 끄기 */
+  * { touch-action: manipulation; }
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+  input, textarea, select { font-size: 16px !important; }
   html, body {
     background: var(--bg);
     color: var(--ink);
@@ -635,6 +639,7 @@
     margin-bottom: 8px;
   }
 
+  .form-row > .form-input { min-width: 0; }
   .form-input, .form-select, .form-textarea {
     width: 100%;
     padding: 12px 13px;
@@ -697,6 +702,7 @@
   .yt-import-row { display: flex; gap: 6px; }
   .yt-import-input {
     flex: 1;
+    min-width: 0;
     padding: 9px 11px;
     background: var(--bg-elev);
     border: 1px solid #f0d6cb;
@@ -863,7 +869,25 @@
     font-size: 22px; line-height: 1; color: var(--ink-dim); cursor: pointer; font-family: var(--sans);
   }
   .plan-nav-title { font-size: 17px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
-  .plan-copy-all { width: 100%; margin-bottom: 16px; display: block; }
+  .plan-summary {
+    background: var(--accent-soft); border-radius: 18px; padding: 14px 14px 8px; margin-bottom: 16px;
+  }
+  .plan-summary-title { font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 8px; padding: 0 2px; }
+  .plan-summary-title span { font-size: 11px; font-weight: 500; color: var(--ink-mute); margin-left: 6px; }
+  .plan-summary-row {
+    display: flex; align-items: center; gap: 10px; width: 100%;
+    background: var(--bg-elev); border: none; border-radius: 12px;
+    padding: 11px 12px; margin-bottom: 6px; cursor: pointer; text-align: left; font-family: var(--sans);
+  }
+  .plan-summary-row:active { transform: scale(0.98); }
+  .plan-summary-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .plan-summary-line { font-size: 15px; font-weight: 600; color: var(--ink); word-break: keep-all; }
+  .plan-summary-when { font-size: 11px; color: var(--ink-mute); }
+  .plan-summary-copy { font-size: 16px; flex-shrink: 0; }
+  .plan-row-copy {
+    border: none; background: var(--bg-soft); border-radius: 8px;
+    width: 32px; height: 32px; font-size: 14px; cursor: pointer; flex-shrink: 0; padding: 0;
+  }
   .plan-day {
     background: var(--bg-elev); border: 1px solid var(--line-soft);
     box-shadow: 0 2px 14px rgba(23,24,28,0.05);
@@ -2145,7 +2169,7 @@
       <div class="plan-nav-title" id="planNavTitle"></div>
       <button type="button" class="plan-nav-btn" onclick="planShift(1)" aria-label="다음">›</button>
     </div>
-    <button type="button" class="btn plan-copy-all" id="planCopyAllBtn" onclick="copyPlanRange()">📋 이 주 계획 전체 복사</button>
+    <div id="planSummary"></div>
     <div id="planBody"></div>
   </section>
 
@@ -2288,7 +2312,7 @@
     </div>
 
     <div id="versionText" style="text-align: center; margin-top: 40px; font-size: 11px; color: var(--ink-mute); letter-spacing: 0.04em; font-weight: 500;">
-      v4.1 · 데이터는 브라우저에 저장됩니다
+      v4.2 · 데이터는 브라우저에 저장됩니다
     </div>
   </section>
 </main>
@@ -2403,7 +2427,7 @@
             <button type="button" class="note-photo-del" onclick="removeThumb()" style="top:-6px; right:-6px;">×</button>
           </div>
           <div class="form-row" style="margin-bottom:8px;">
-            <input type="url" class="form-input" id="fThumbUrl" placeholder="이미지 주소(URL) 붙여넣기" style="flex:2;">
+            <input type="url" class="form-input" id="fThumbUrl" placeholder="이미지 주소(URL)" style="flex:2;">
             <button type="button" class="btn" onclick="applyThumbUrl()" style="flex:1; padding:12px;">적용</button>
           </div>
           <label class="btn" style="width:100%; display:block; text-align:center;">
@@ -3022,9 +3046,14 @@ const DEFAULT_OTT = [
 ];
 
 // ============ VERSION ============
-const APP_VERSION = '4.1';
+const APP_VERSION = '4.2';
 const VERSION_KEY = 'contentsArchive_seenVersion';
 const VERSION_NOTES = {
+  '4.2': [
+    '계획 복사를 작품별로 하나씩 — 주간은 월~일을 합쳐서 〈제목〉 3~19화처럼',
+    '계획 줄마다 📋 복사 버튼',
+    '입력칸을 누를 때 화면이 확대되던 문제 수정'
+  ],
   '4.1': [
     '계획 체크 시 "어디까지 봤나요?"를 물어보고 진행 기록에도 체크돼요',
     '못 본 회차는 다음 계획 앞으로 자동으로 넘어가요 (3~5화 중 4화까지 → 다음날 5화부터)',
@@ -6547,7 +6576,6 @@ function planDayCardHTML(day, isToday, compact) {
     <div class="plan-day-head">
       <div class="plan-day-title">${fmtPlanDay(day)}${isToday ? '<span class="plan-today-badge">오늘</span>' : ''}</div>
       <div class="plan-day-actions">
-        ${plans.length ? `<button type="button" class="plan-mini-btn" onclick="copyPlanDay('${day}')">📋 복사</button>` : ''}
         <button type="button" class="plan-mini-btn primary" onclick="openPlanEditor('${day}')">+ 추가</button>
       </div>
     </div>
@@ -6555,6 +6583,7 @@ function planDayCardHTML(day, isToday, compact) {
       ? plans.map(p => `<div class="plan-row ${p.done ? 'done' : ''}">
           <button type="button" class="plan-check" onclick="onPlanCheck('${p.id}')" aria-label="봤어요 체크">${p.done ? '✓' : ''}</button>
           <div class="plan-row-text" onclick="openPlanEditor('${day}', '${p.id}')"><span class="plan-row-line">${escapeHTML(planLine(p))}</span>${planRowNote(p)}</div>
+          <button type="button" class="plan-row-copy" onclick="copyPlanItem('${p.id}')" aria-label="복사">📋</button>
         </div>`).join('')
       : (slim ? '' : `<div class="plan-empty">계획 없음</div>`)}
   </div>`;
@@ -6572,7 +6601,7 @@ function renderPlanView() {
     const start = weekStartYmd(planAnchor);
     const sd = parseYmd(start), ed = parseYmd(addDaysYmd(start, 6));
     document.getElementById('planNavTitle').textContent = `${sd.getMonth() + 1}.${sd.getDate()} – ${ed.getMonth() + 1}.${ed.getDate()}`;
-    document.getElementById('planCopyAllBtn').textContent = '📋 이 주 계획 전체 복사';
+    renderPlanSummary('week');
     let html = '';
     for (let i = 0; i < 7; i++) {
       const day = addDaysYmd(start, i);
@@ -6586,7 +6615,7 @@ function renderPlanView() {
   const a = parseYmd(planAnchor);
   const y = a.getFullYear(), m = a.getMonth();
   document.getElementById('planNavTitle').textContent = `${y}년 ${m + 1}월`;
-  document.getElementById('planCopyAllBtn').textContent = '📋 이 달 계획 전체 복사';
+  renderPlanSummary('month');
   const monthPrefix = `${y}-${String(m + 1).padStart(2, '0')}`;
   if (!planSelectedDay || !planSelectedDay.startsWith(monthPrefix)) {
     planSelectedDay = todayYmd.startsWith(monthPrefix) ? todayYmd : `${monthPrefix}-01`;
@@ -6671,6 +6700,66 @@ function planRangeDays() {
 
 function buildPlanRangeText() {
   return planRangeDays().map(planDayText).filter(Boolean).join('\n\n');
+}
+
+// 기간 안의 계획을 작품별로 합치기: 월 3~6화 + 화 7~18화 + 일 19화 → 〈제목〉 3~19화
+function planSummaryRows(days) {
+  const inRange = new Set(days);
+  const groups = new Map();
+  (state.plans || [])
+    .filter(p => inRange.has(p.date))
+    .sort((a, b) => planOrderKey(a).localeCompare(planOrderKey(b)))
+    .forEach(p => {
+      const key = p.itemId || ('snap:' + (p.titleSnap || ''));
+      if (!groups.has(key)) {
+        groups.set(key, { key, itemId: p.itemId, titleSnap: p.titleSnap, typeSnap: p.typeSnap, eps: new Set(), texts: [], dates: [] });
+      }
+      const g = groups.get(key);
+      (p.eps || []).forEach(e => g.eps.add(e));
+      if (p.text && !g.texts.includes(p.text)) g.texts.push(p.text);
+      if (!g.dates.includes(p.date)) g.dates.push(p.date);
+    });
+  return [...groups.values()].map(g => {
+    g.line = planLine({ itemId: g.itemId, titleSnap: g.titleSnap, typeSnap: g.typeSnap, eps: [...g.eps], text: g.texts.join(', ') });
+    return g;
+  });
+}
+
+let planSummaryCache = [];
+
+function renderPlanSummary(mode) {
+  const el = document.getElementById('planSummary');
+  if (!el) return;
+  planSummaryCache = planSummaryRows(planRangeDays());
+  if (!planSummaryCache.length) { el.innerHTML = ''; return; }
+  const when = g => mode === 'week'
+    ? g.dates.map(d => DOW_KO[parseYmd(d).getDay()]).join('·')
+    : (g.dates.length === 1
+        ? fmtPlanDay(g.dates[0])
+        : `${parseYmd(g.dates[0]).getMonth() + 1}/${parseYmd(g.dates[0]).getDate()} ~ ${parseYmd(g.dates[g.dates.length - 1]).getMonth() + 1}/${parseYmd(g.dates[g.dates.length - 1]).getDate()} · ${g.dates.length}일`);
+  el.innerHTML = `<div class="plan-summary">
+    <div class="plan-summary-title">${mode === 'week' ? '이번 주' : '이번 달'} 작품별 <span>탭해서 하나씩 복사</span></div>
+    ${planSummaryCache.map((g, i) => `<button type="button" class="plan-summary-row" onclick="copyPlanSummary(${i})">
+      <span class="plan-summary-body">
+        <span class="plan-summary-line">${escapeHTML(g.line)}</span>
+        <span class="plan-summary-when">${escapeHTML(when(g))}</span>
+      </span>
+      <span class="plan-summary-copy">📋</span>
+    </button>`).join('')}
+  </div>`;
+}
+
+function copyPlanSummary(i) {
+  const g = planSummaryCache[i];
+  if (!g) return;
+  copyPlain(g.line, '복사했어요: ' + g.line);
+}
+
+function copyPlanItem(id) {
+  const p = (state.plans || []).find(x => x.id === id);
+  if (!p) return;
+  const t = planLine(p);
+  copyPlain(t, '복사했어요: ' + t);
 }
 
 function copyPlanRange() {
