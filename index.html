@@ -7,7 +7,6 @@
 <title>Contents Archive</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
@@ -1389,6 +1388,37 @@
   .rec-stars { display: flex; gap: 4px; }
   .rec-star { font-size: 30px; line-height: 1; border: none; background: none; color: var(--line); cursor: pointer; padding: 0 2px; }
   .rec-star.on { color: #f2b230; }
+  .mm-swatches { display: flex; flex-wrap: wrap; gap: 9px; align-items: center; }
+  .mm-sw {
+    width: 30px; height: 30px; border-radius: 50%; border: 2px solid #fff; padding: 0;
+    box-shadow: 0 0 0 1px var(--line); cursor: pointer; position: relative; flex-shrink: 0;
+  }
+  .mm-sw.on { box-shadow: 0 0 0 2.5px var(--ink); }
+  .mm-sw.auto {
+    width: auto; height: 30px; padding: 0 12px 0 8px; border-radius: 100px; background: var(--bg-soft);
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 700; color: var(--ink-dim); font-family: var(--sans);
+  }
+  .mm-sw.auto i { width: 14px; height: 14px; border-radius: 50%; display: inline-block; }
+  .mm-sw.custom {
+    display: inline-flex; align-items: center; justify-content: center; overflow: hidden;
+    background: conic-gradient(#ff5a5a, #ffd23f, #4cd964, #3fc7ff, #6a5cff, #ff5ac8, #ff5a5a);
+  }
+  .mm-sw.custom span { font-size: 13px; filter: drop-shadow(0 0 1px #fff); }
+  .mm-sw.custom input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; border: 0; padding: 0; }
+  .mm-group-apply { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 13px; color: var(--ink-dim); cursor: pointer; }
+  .mm-group-apply input { width: 18px; height: 18px; accent-color: var(--accent); }
+  .rec-line { width: 4px; align-self: stretch; border-radius: 2px; flex-shrink: 0; }
+  .rec-autosave { font-size: 11px; color: var(--ink-mute); margin-top: 6px; min-height: 14px; text-align: right; }
+  .rec-x-list { display: flex; flex-direction: column; gap: 8px; }
+  .rec-x-row {
+    display: flex; align-items: center; gap: 10px; padding: 13px 14px;
+    border: 1px solid var(--line); border-radius: 12px; background: #fff; cursor: pointer;
+  }
+  .rec-x-row input { width: 18px; height: 18px; margin: 0; accent-color: var(--accent); flex-shrink: 0; }
+  .rec-x-name { font-size: 14px; font-weight: 700; color: var(--ink); white-space: nowrap; }
+  .rec-x-sub { margin-left: auto; font-size: 12px; color: var(--ink-mute); text-align: right; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .rec-x-row.off { opacity: .5; cursor: default; }
   .rel-pick { display: flex; gap: 8px; align-items: center; }
   .rel-pick select { flex: 1; min-width: 0; }
   .rel-pick .plan-nav-btn { flex-shrink: 0; font-size: 18px; }
@@ -2402,7 +2432,7 @@
 
     <div style="margin-top: 24px;">
       <h3 style="font-size: 13px; font-weight: 600; color: var(--ink-mute); letter-spacing: 0.04em; margin-bottom: 10px;">템플릿 관리</h3>
-      <button class="btn" onclick="openTemplateManager()" style="width: 100%; margin-bottom: 8px;">노트 템플릿 관리</button>
+      <button class="btn" onclick="openTemplateManager()" style="width: 100%; margin-bottom: 8px;">메모 템플릿 관리</button>
       <button class="btn" onclick="openOttManagerFromSettings()" style="width: 100%; margin-bottom: 8px;">OTT 플랫폼 관리</button>
       <button class="btn" onclick="openCountryManagerFromSettings()" style="width: 100%; margin-bottom: 8px;">국가 관리</button>
     </div>
@@ -2423,7 +2453,7 @@
     </div>
 
     <div id="versionText" style="text-align: center; margin-top: 40px; font-size: 11px; color: var(--ink-mute); letter-spacing: 0.04em; font-weight: 500;">
-      v4.3 · 데이터는 브라우저에 저장됩니다
+      v4.5 · 데이터는 브라우저에 저장됩니다
     </div>
   </section>
 </main>
@@ -2632,7 +2662,7 @@
   <div class="modal-content">
     <div class="modal-handle"></div>
     <div class="modal-header">
-      <div class="modal-title" id="noteReadTitle" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">노트</div>
+      <div class="modal-title" id="noteReadTitle" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">메모</div>
       <button class="modal-close" onclick="closeNoteRead()">×</button>
     </div>
     <div class="modal-body">
@@ -2640,7 +2670,7 @@
       <div class="md-preview" id="noteReadContent" style="margin-bottom:16px;"></div>
 
       <div class="form-group">
-        <label class="form-label">노트 내보내기</label>
+        <label class="form-label">메모 내보내기</label>
         <div class="export-options">
           <button type="button" class="btn" onclick="exportNoteRead('image')">이미지</button>
           <button type="button" class="btn" onclick="exportNoteRead('pdf')">PDF</button>
@@ -2661,8 +2691,8 @@
   <div class="modal-content">
     <div class="modal-handle"></div>
     <div class="modal-header">
-      <div class="modal-title" id="noteModalTitle">노트 편집</div>
-      <button class="modal-close" onclick="closeNoteModal()">×</button>
+      <div class="modal-title" id="noteModalTitle">메모 편집</div>
+      <button class="modal-close" onclick="closeNoteEditor()">×</button>
     </div>
     <div class="modal-body">
       <div id="noteItemInfo" style="margin-bottom: 14px; padding: 12px; background: var(--bg-soft); border-radius: 8px;">
@@ -2672,7 +2702,7 @@
       </div>
 
       <div class="note-meta-row">
-        <input type="text" class="note-title-input" id="noteTitleInput" placeholder="노트 제목">
+        <input type="text" class="note-title-input" id="noteTitleInput" placeholder="메모 제목">
       </div>
 
       <div class="md-help">
@@ -2682,7 +2712,7 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label">템플릿 — 빈 노트에 삽입</label>
+        <label class="form-label">템플릿 — 빈 메모에 삽입</label>
         <div class="template-pills" id="templatePills"></div>
       </div>
 
@@ -2693,7 +2723,8 @@
 
       <div id="editorPane">
         <div class="md-tools-slot" data-for="noteContent"></div>
-        <textarea class="note-textarea" id="noteContent" placeholder="자유롭게 기록해보세요..."></textarea>
+        <textarea class="note-textarea" id="noteContent" placeholder="보면서 참고할 점을 간단히 적어두세요"></textarea>
+        <div class="rec-autosave" id="noteSaveState"></div>
         <div class="form-group" style="margin-top: 12px;">
           <label class="form-label">사진 첨부 <span style="font-weight:400;color:var(--ink-mute);">— 자동으로 압축돼요</span></label>
           <div class="note-photo-grid" id="notePhotoGrid"></div>
@@ -2709,7 +2740,7 @@
       </div>
 
       <div class="form-group" style="margin-top: 16px;">
-        <label class="form-label">이 노트 내보내기</label>
+        <label class="form-label">이 메모 내보내기</label>
         <div class="export-options">
           <button type="button" class="btn" onclick="exportNote('image')">이미지</button>
           <button type="button" class="btn" onclick="exportNote('pdf')">PDF</button>
@@ -2833,11 +2864,46 @@
     <div class="modal-handle"></div>
     <div class="modal-header">
       <div class="modal-title" id="recordTitle" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">기록장</div>
-      <button type="button" class="plan-mini-btn" onclick="copyRecordAll()" style="margin-right:8px;">📋 전체</button>
+      <button type="button" class="plan-mini-btn primary" id="recExportBtn" onclick="openRecExport()" style="margin-right:8px;">내보내기</button>
       <button class="modal-close" onclick="closeRecord()">×</button>
     </div>
     <div class="rec-tabs" id="recordTabs"></div>
     <div class="modal-body" id="recordBody" style="padding-top: 14px;"></div>
+  </div>
+</div>
+
+<!-- RECORD EXPORT -->
+<div class="modal" id="recExportModal" style="z-index: 250;">
+  <div class="modal-content">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title">기록장 내보내기</div>
+      <button class="modal-close" onclick="closeRecExport()">×</button>
+    </div>
+    <div class="modal-body">
+      <div style="margin-bottom: 16px; padding: 12px; background: var(--bg-soft); border-radius: 8px;">
+        <div style="font-size: 11px; color: var(--ink-mute); font-weight: 600; margin-bottom: 2px;">작품</div>
+        <div id="recExportTitle" style="font-size: 14px; font-weight: 600;"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">담을 내용</label>
+        <div class="rec-x-list" id="recExportSecs"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">파일 형식</label>
+        <div class="status-picker" id="recExportFormat">
+          <div class="status-option active" data-format="pdf" onclick="setRecExportFormat('pdf')">PDF</div>
+          <div class="status-option" data-format="word" onclick="setRecExportFormat('word')">Word</div>
+          <div class="status-option" data-format="image" onclick="setRecExportFormat('image')">이미지</div>
+          <div class="status-option" data-format="text" onclick="setRecExportFormat('text')">📋 텍스트 복사</div>
+        </div>
+        <div id="recExportHint" style="font-size: 11px; color: var(--ink-mute); margin-top: 8px; line-height: 1.5;"></div>
+      </div>
+      <div class="btn-row">
+        <button type="button" class="btn" onclick="closeRecExport()">취소</button>
+        <button type="button" class="btn btn-primary" id="recExportRunBtn" onclick="runRecExport()">내보내기</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -2856,8 +2922,13 @@
       </div>
       <div class="form-group">
         <label class="form-label">소속 · 그룹 <span style="font-weight:400;color:var(--ink-mute);">— 같은 소속은 같은 색으로 묶여요</span></label>
-        <input type="text" class="form-input" id="chGroup" placeholder="예: 검찰, 가족, 주인공">
+        <input type="text" class="form-input" id="chGroup" placeholder="예: 검찰, 가족, 주인공" oninput="syncChGroupApply()">
         <div class="plan-quick" id="chGroupChips" style="margin-top: 8px;"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">색상 <span style="font-weight:400;color:var(--ink-mute);">— 자동은 소속별로 색이 정해져요</span></label>
+        <div class="mm-swatches" id="chColors"></div>
+        <label class="mm-group-apply" id="chGroupApplyRow"><input type="checkbox" id="chGroupApply" checked onchange="syncChGroupApply()"> <span id="chGroupApplyText">같은 소속 모두 이 색으로</span></label>
       </div>
       <div class="md-field">
         <div class="md-field-head"><label class="form-label" style="margin:0;">설명</label><button type="button" class="md-pv-btn" id="chDesc_pvbtn" onclick="toggleMdPreview('chDesc')">미리보기</button></div>
@@ -2896,6 +2967,10 @@
         <div class="plan-quick" id="relChips" style="margin-top: 8px;"></div>
       </div>
       <div class="form-group">
+        <label class="form-label">선 색</label>
+        <div class="mm-swatches" id="relColors"></div>
+      </div>
+      <div class="form-group">
         <label class="form-label">방향</label>
         <div class="seg-picker" id="relDirPicker">
           <button type="button" class="seg-option active" data-dir="0" onclick="setRelDir(false)">↔ 서로</button>
@@ -2925,6 +3000,7 @@
         <div class="md-tools-slot" data-for="recEpText"></div>
         <textarea class="form-textarea md-ta" id="recEpText" placeholder="이 회차에서 있었던 일, 인상 깊은 장면, 떡밥…" style="min-height: 220px;"></textarea>
         <div class="md-view md-pv-box" id="recEpText_pv" style="display:none; min-height: 160px;" onclick="setMdPreview('recEpText', false)"></div>
+        <div class="rec-autosave" id="epSaveState"></div>
       </div>
       <div class="ep-nav">
         <button type="button" class="btn" id="epPrevBtn" onclick="moveEp(-1)">‹</button>
@@ -3054,7 +3130,7 @@
       <div style="background: var(--accent-soft); border-radius: 10px; padding: 12px 14px; font-size: 13px; color: var(--ink); line-height: 1.6; margin-bottom: 14px;">
         👇 아래 이미지를 <strong>길게 눌러</strong> <strong>"사진에 저장"</strong>을 선택하세요
       </div>
-      <img id="imageResultImg" src="" alt="노트 이미지" style="width: 100%; border-radius: 12px; border: 1px solid var(--line); display: block; margin-bottom: 14px;">
+      <img id="imageResultImg" src="" alt="메모 이미지" style="width: 100%; border-radius: 12px; border: 1px solid var(--line); display: block; margin-bottom: 14px;">
       <div class="btn-row">
         <button type="button" class="btn" onclick="shareImageResult()">공유하기</button>
         <button type="button" class="btn btn-primary" onclick="closeImageResult()">완료</button>
@@ -3165,7 +3241,7 @@
   <div class="modal-content">
     <div class="modal-handle"></div>
     <div class="modal-header">
-      <div class="modal-title">전체 노트 내보내기</div>
+      <div class="modal-title">전체 메모 내보내기</div>
       <button class="modal-close" onclick="closeBulkExport()">×</button>
     </div>
     <div class="modal-body">
@@ -3189,9 +3265,9 @@
         <label class="form-label">묶는 방식</label>
         <div class="seg-picker" id="bulkModePicker">
           <button type="button" class="seg-option active" data-mode="merged">하나로 합치기</button>
-          <button type="button" class="seg-option" data-mode="separate">노트별 따로</button>
+          <button type="button" class="seg-option" data-mode="separate">메모별 따로</button>
         </div>
-        <div id="bulkModeHint" style="font-size: 11px; color: var(--ink-mute); margin-top: 8px; line-height: 1.5;">모든 노트를 한 파일에 순서대로 담아요.</div>
+        <div id="bulkModeHint" style="font-size: 11px; color: var(--ink-mute); margin-top: 8px; line-height: 1.5;">모든 메모를 한 파일에 순서대로 담아요.</div>
       </div>
 
       <div class="btn-row">
@@ -3202,8 +3278,6 @@
   </div>
 </div>
 
-<!-- HIDDEN export render -->
-<div id="exportRender" style="position: fixed; left: -9999px; top: 0; width: 600px; background: white; padding: 40px; font-family: 'Pretendard Variable', Pretendard, sans-serif; color: #1c1b1a;"></div>
 
 <!-- CONFIRM MODAL -->
 <div class="modal confirm-modal" id="confirmModal" style="z-index: 320;">
@@ -3257,9 +3331,21 @@ const DEFAULT_OTT = [
 ];
 
 // ============ VERSION ============
-const APP_VERSION = '4.3';
+const APP_VERSION = '4.5';
 const VERSION_KEY = 'contentsArchive_seenVersion';
 const VERSION_NOTES = {
+  '4.5': [
+    '중요 수정: \'기록 수정\'으로 회차 등을 고치면 작품 기록장(관계도·회차 기록)과 회차별 체크가 사라지던 문제를 고쳤어요',
+    '회차 기록·총평·메모는 쓰는 동안 자동 저장돼요. 앱을 내리거나 창을 닫아도 쓰던 내용이 남아요',
+    '인물·관계·작품 정보 창은 저장하지 않고 닫으려 하면 한 번 물어봐요',
+    '작품 기록장을 PDF·Word·이미지·텍스트로 내보낼 수 있어요 — 기록장 오른쪽 위 \'내보내기\'',
+    '메모 PDF가 긴 글도 끝까지 담기고, 쪽이 바뀌는 곳에서 글줄이 잘리지 않아요',
+    '노트는 이제 \'메모\'예요 — 보면서 참고할 점을 간단히 적어두는 곳'
+  ],
+  '4.4': [
+    '인물 관계도 색을 직접 고를 수 있어요 — 인물을 눌러 색상 선택 (소속 전체에 한 번에 적용도 가능)',
+    '관계선도 색을 고를 수 있고, 이제 곡선 대신 반듯한 직선으로 이어져요'
+  ],
   '4.3': [
     '📒 작품 기록장 — 인물 관계도(마인드맵) · 회차별 기록 · 총평',
     '한줄 메모가 총평이 됐어요 (기존 메모는 그대로 총평에 들어가요)',
@@ -4421,7 +4507,7 @@ function renderStatsView() {
 
   // notes count
   html += `<div class="stat-card" style="display: flex; justify-content: space-between; align-items: center;">
-    <div class="stat-card-title" style="margin-bottom: 0;">작성한 노트</div>
+    <div class="stat-card-title" style="margin-bottom: 0;">작성한 메모</div>
     <div style="font-size: 22px; font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums;">${totalNotes}<span style="font-size: 13px; color: var(--ink-mute); font-weight: 500;"> 개</span></div>
   </div>`;
 
@@ -4537,7 +4623,7 @@ function cardHTML(item) {
 
   const noteCount = (item.notes || []).length;
   let titleExtra = '';
-  if (noteCount > 0) titleExtra = `<span class="badge-note">노트 ${noteCount}</span>`;
+  if (noteCount > 0) titleExtra = `<span class="badge-note">메모 ${noteCount}</span>`;
 
   const thumbHTML = item.thumb ? `<img class="card-thumb" src="${escapeHTML(item.thumb)}" alt="" loading="lazy" style="${thumbFitStyle(item)}">` : '';
 
@@ -4720,9 +4806,21 @@ function openAddModal(id) {
   }
   document.getElementById('addModal').classList.add('active');
   document.body.style.overflow = 'hidden';
+  addFormSnap = addFormState();
 }
 
-function closeAddModal() {
+function addFormState() {
+  const vals = [...document.querySelectorAll('#contentForm input, #contentForm textarea, #contentForm select')]
+    .filter(el => el.type !== 'file').map(el => el.type === 'checkbox' ? el.checked : el.value);
+  return JSON.stringify([vals, state.selectedType, state.selectedStatus, state.selectedRating, state.selectedOtts, state.selectedCountry, state.ytThumb, state.selectedThumbFit]);
+}
+let addFormSnap = null;
+function closeAddModal(force) {
+  if (!force && isModalOpen('addModal') && addFormSnap != null && addFormState() !== addFormSnap) {
+    askConfirm('저장하지 않고 닫을까요?', '입력하거나 바꾼 내용이 사라져요.', '닫기', () => { closeConfirm(); closeAddModal(true); });
+    return;
+  }
+  addFormSnap = null;
   document.getElementById('addModal').classList.remove('active');
   document.body.style.overflow = '';
 }
@@ -4792,13 +4890,27 @@ function fillForm(item) {
   }
 }
 
+// 수정 폼에서 '현재 회차' 숫자를 바꿨을 때, 개별 체크 모드면 체크 목록에도 반영 (다른 체크는 보존)
+function applyFormProgress(item, prev) {
+  const f = progressSpec(item);
+  if (!f || f.seq) return;
+  const before = f.cur === 'currentPodEp' ? prev.pod : prev.ep;
+  const cur = item[f.cur] || 0;
+  if (cur === before) return;
+  const set = new Set((Array.isArray(item[f.list]) ? item[f.list] : []).map(Number).filter(n => n > 0));
+  if (cur > before) { for (let e = 1; e <= cur; e++) set.add(e); }
+  else { for (let e = cur + 1; e <= before; e++) set.delete(e); }
+  if (f.total > 0) setWatchedSet(item, set);
+  else item[f.list] = [...set].sort((a, b) => a - b);
+}
+
 function saveContent(e) {
   e.preventDefault();
   const id = document.getElementById('editId').value || uid();
   const isEdit = !!document.getElementById('editId').value;
   const existing = isEdit ? state.items.find(i => i.id === id) : null;
 
-  const item = {
+  const form = {
     id,
     type: state.selectedType,
     status: state.selectedStatus,
@@ -4819,19 +4931,23 @@ function saveContent(e) {
     endDate: document.getElementById('fEndDate').value,
     rating: state.selectedRating,
     memo: document.getElementById('fMemo').value.trim(),
-    notes: existing ? (existing.notes || []) : [],
     updatedAt: Date.now()
   };
   if (isEdit && existing) {
-    item.createdAt = existing.createdAt || Date.now();
-    state.items[state.items.findIndex(i => i.id === id)] = item;
+    // 폼에 없는 값(작품 기록장, 회차별 체크, 체크 방식, 메모 등)은 절대 버리지 않고 그대로 둔 채 덮어쓰기
+    const prev = { ep: existing.currentEp || 0, pod: existing.currentPodEp || 0 };
+    Object.assign(existing, form);
+    if (!existing.createdAt) existing.createdAt = Date.now();
+    if (!Array.isArray(existing.notes)) existing.notes = [];
+    applyFormProgress(existing, prev);
   } else {
-    item.createdAt = Date.now();
-    state.items.unshift(item);
+    form.notes = [];
+    form.createdAt = Date.now();
+    state.items.unshift(form);
   }
   save(true);
   render();
-  closeAddModal();
+  closeAddModal(true);
   showToast(isEdit ? '수정되었습니다' : '추가되었습니다');
 }
 
@@ -4911,17 +5027,17 @@ function openDetail(id) {
   const notes = (item.notes || []).sort((a,b) => (b.updatedAt||0) - (a.updatedAt||0));
   const bulkExportHTML = notes.length >= 2 ? `
     <div style="margin-top: 12px; padding: 12px 14px; background: var(--bg-soft); border-radius: 10px;">
-      <div style="font-size: 12px; font-weight: 600; color: var(--ink-dim); margin-bottom: 4px;">전체 노트 내보내기 <span style="color: var(--ink-mute); font-weight: 500;">(${notes.length}개)</span></div>
-      <div style="font-size: 11px; color: var(--ink-mute); margin-bottom: 10px;">이 콘텐츠의 노트를 한꺼번에 저장해요</div>
-      <button type="button" class="btn btn-primary" onclick="openBulkExport('${item.id}')" style="width: 100%;">📦 전체 노트 내보내기</button>
+      <div style="font-size: 12px; font-weight: 600; color: var(--ink-dim); margin-bottom: 4px;">전체 메모 내보내기 <span style="color: var(--ink-mute); font-weight: 500;">(${notes.length}개)</span></div>
+      <div style="font-size: 11px; color: var(--ink-mute); margin-bottom: 10px;">이 콘텐츠의 메모를 한꺼번에 저장해요</div>
+      <button type="button" class="btn btn-primary" onclick="openBulkExport('${item.id}')" style="width: 100%;">📦 전체 메모 내보내기</button>
     </div>` : '';
   const notesHTML = `<div class="notes-section">
     <div class="notes-header">
-      <div class="notes-header-title">📝 노트 <span style="color: var(--ink-mute); font-weight: 500;">(${notes.length})</span></div>
-      <button class="notes-add" onclick="openNoteModal('${item.id}', null)">+ 새 노트</button>
+      <div class="notes-header-title">📝 메모 <span style="color: var(--ink-mute); font-weight: 500;">(${notes.length})</span></div>
+      <button class="notes-add" onclick="openNoteModal('${item.id}', null)">+ 새 메모</button>
     </div>
     ${notes.length === 0
-      ? `<div style="color: var(--ink-mute); font-size: 12px; padding: 16px; text-align: center; background: var(--bg-soft); border-radius: 8px;">아직 노트가 없어요. 새 노트를 만들어보세요.</div>`
+      ? `<div style="color: var(--ink-mute); font-size: 12px; padding: 16px; text-align: center; background: var(--bg-soft); border-radius: 8px;">아직 메모가 없어요. 보면서 참고할 점을 남겨보세요.</div>`
       : notes.map(n => {
           const preview = mdPreviewLine(n.content || '', 80);
           const photoBadge = (Array.isArray(n.images) && n.images.length > 0) ? ` <span style="color: var(--accent); font-size: 11px;">📷${n.images.length}</span>` : '';
@@ -5242,7 +5358,7 @@ async function addNotePhotos(event) {
   event.target.value = '';
   if (files.length === 0) return;
   if (noteEditingImages.length + files.length > 6) {
-    showToast('사진은 노트당 최대 6장까지예요');
+    showToast('사진은 메모당 최대 6장까지예요');
     return;
   }
   showToast('사진 처리 중...');
@@ -5253,6 +5369,7 @@ async function addNotePhotos(event) {
     }
     renderNotePhotoGrid();
     showToast(`${files.length}장 추가됨`);
+    scheduleAutoSave('note', autoSaveNote, 300);
   } catch(e) {
     console.error(e);
     showToast('사진 추가 실패');
@@ -5262,6 +5379,7 @@ async function addNotePhotos(event) {
 function removeNotePhoto(idx) {
   noteEditingImages.splice(idx, 1);
   renderNotePhotoGrid();
+  scheduleAutoSave('note', autoSaveNote, 300);
 }
 
 function renderNotePhotoGrid() {
@@ -5330,10 +5448,10 @@ function openNoteModal(itemId, noteId) {
   let note;
   if (noteId) {
     note = (item.notes || []).find(n => n.id === noteId);
-    document.getElementById('noteModalTitle').textContent = '노트 편집';
+    document.getElementById('noteModalTitle').textContent = '메모 편집';
   } else {
     note = { id: '', title: '', content: '' };
-    document.getElementById('noteModalTitle').textContent = '새 노트';
+    document.getElementById('noteModalTitle').textContent = '새 메모';
   }
 
   document.getElementById('noteItemTitle').textContent = item.title;
@@ -5342,6 +5460,7 @@ function openNoteModal(itemId, noteId) {
   document.getElementById('noteContent').value = note.content || '';
   noteEditingImages = Array.isArray(note.images) ? [...note.images] : [];
   renderNotePhotoGrid();
+  setSaveState('noteSaveState', '쓰는 동안 자동으로 저장돼요');
 
   // Populate templates for this type
   const pills = document.getElementById('templatePills');
@@ -5361,7 +5480,9 @@ function openNoteModal(itemId, noteId) {
   }, 200);
 }
 
-function closeNoteModal() {
+function closeNoteModal(skipSave) {
+  cancelAutoSave('note');
+  if (!skipSave && isModalOpen('noteModal') && persistNote()) render(); // 다른 화면으로 넘어갈 때도 내용 보존
   document.getElementById('noteModal').classList.remove('active');
   document.body.style.overflow = '';
   state.noteEditingItemId = null;
@@ -5392,63 +5513,82 @@ function insertTemplate(templateId) {
   const ta = document.getElementById('noteContent');
   ta.value = ta.value.trim() ? ta.value + '\n\n' + tmpl.content : tmpl.content;
   ta.focus();
+  ta.dispatchEvent(new Event('input', { bubbles: true }));
   showToast(`"${tmpl.name}" 삽입됨`);
+}
+
+// 메모 저장 (창은 그대로). 새 메모면 만들고 id 기억 → 이어서 저장해도 중복 안 생김. 바뀐 게 없으면 false
+function persistNote() {
+  const item = state.items.find(i => i.id === state.noteEditingItemId);
+  if (!item) return false;
+  const rawTitle = document.getElementById('noteTitleInput').value.trim();
+  const content = document.getElementById('noteContent').value;
+  const images = [...noteEditingImages];
+  if (!Array.isArray(item.notes)) item.notes = [];
+  let note = state.noteEditingNoteId ? item.notes.find(n => n.id === state.noteEditingNoteId) : null;
+  if (!note && !rawTitle && !content.trim() && !images.length) return false; // 빈 새 메모는 만들지 않음
+  const title = rawTitle || '제목 없음';
+  const sameImgs = note && (note.images || []).length === images.length && images.every((s, i) => s === note.images[i]);
+  if (note && note.title === title && (note.content || '') === content && sameImgs) return false;
+  const now = Date.now();
+  if (note) {
+    note.title = title; note.content = content; note.images = images; note.updatedAt = now;
+  } else {
+    note = { id: uid(), title, content, images, createdAt: now, updatedAt: now };
+    item.notes.unshift(note);
+    state.noteEditingNoteId = note.id;
+  }
+  item.updatedAt = now;
+  save(true);
+  return true;
 }
 
 function saveNote() {
   const item = state.items.find(i => i.id === state.noteEditingItemId);
   if (!item) return;
-  const title = document.getElementById('noteTitleInput').value.trim() || '제목 없음';
-  const content = document.getElementById('noteContent').value;
-  const now = Date.now();
-  if (!item.notes) item.notes = [];
-
-  if (state.noteEditingNoteId) {
-    const note = item.notes.find(n => n.id === state.noteEditingNoteId);
-    if (note) {
-      note.title = title;
-      note.content = content;
-      note.images = [...noteEditingImages];
-      note.updatedAt = now;
-    }
-  } else {
-    item.notes.unshift({
-      id: uid(),
-      title,
-      content,
-      images: [...noteEditingImages],
-      createdAt: now,
-      updatedAt: now
-    });
-  }
-  item.updatedAt = now;
-  save(true);
+  cancelAutoSave('note');
+  persistNote();
+  const has = !!state.noteEditingNoteId;
   render();
-  closeNoteModal();
-  showToast('노트가 저장되었습니다');
+  closeNoteModal(true);
+  showToast(has ? '메모가 저장되었습니다' : '내용이 없어서 저장하지 않았어요');
   setTimeout(() => openDetail(item.id), 100);
+}
+
+// ×·바깥 눌러 닫기: 쓰던 내용은 저장하고 닫은 뒤 상세로
+function closeNoteEditor() {
+  const itemId = state.noteEditingItemId;
+  cancelAutoSave('note');
+  const changed = persistNote();
+  if (changed) render();
+  closeNoteModal(true);
+  if (changed) showToast('메모를 저장했어요');
+  if (itemId && state.items.some(i => i.id === itemId)) setTimeout(() => openDetail(itemId), 120);
 }
 
 function confirmDeleteNote() {
   if (!state.noteEditingNoteId) {
-    closeNoteModal();
+    const itemId = state.noteEditingItemId;
+    closeNoteModal(true); // 아직 저장 안 된 새 메모 → 버리기
+    if (itemId) setTimeout(() => openDetail(itemId), 120);
     return;
   }
   const item = state.items.find(i => i.id === state.noteEditingItemId);
   if (!item) return;
   const note = (item.notes || []).find(n => n.id === state.noteEditingNoteId);
   if (!note) return;
-  document.getElementById('confirmTitle').textContent = '노트를 삭제할까요?';
+  document.getElementById('confirmTitle').textContent = '메모를 삭제할까요?';
   document.getElementById('confirmDesc').textContent = `"${note.title}"이(가) 영구적으로 삭제됩니다.`;
   confirmCallback = () => {
+    cancelAutoSave('note');
     item.notes = item.notes.filter(n => n.id !== state.noteEditingNoteId);
     item.updatedAt = Date.now();
     save(true);
     render();
     closeConfirm();
-    closeNoteModal();
+    closeNoteModal(true);
     setTimeout(() => openDetail(item.id), 100);
-    showToast('노트가 삭제되었습니다');
+    showToast('메모가 삭제되었습니다');
   };
   document.getElementById('confirmModal').classList.add('active');
 }
@@ -5463,7 +5603,7 @@ function buildNoteCardHTML(item, note, includeContentHeader) {
   const renderedMD = renderMarkdownForExport(note.content || '');
   const contentHeader = includeContentHeader ? `
       <div style="border-bottom: 2px solid #1c1b1a; padding-bottom: 16px; margin-bottom: 20px;">
-        <div style="font-size: 11px; letter-spacing: 0.12em; color: #9e9a93; font-weight: 600; margin-bottom: 4px;">${typeName(item.type).toUpperCase()} NOTE</div>
+        <div style="font-size: 11px; letter-spacing: 0.12em; color: #9e9a93; font-weight: 600; margin-bottom: 4px;">${typeName(item.type).toUpperCase()} MEMO</div>
         <div style="font-size: 24px; font-weight: 700; letter-spacing: -0.02em; color: #1c1b1a; margin-bottom: 4px;">${escapeHTML(item.title)}</div>
         ${item.creator ? `<div style="font-size: 13px; color: #5e5b56;">${escapeHTML(item.creator)}</div>` : ''}
       </div>` : '';
@@ -5502,49 +5642,6 @@ function downloadWordDoc(bodyHTML, filename) {
   URL.revokeObjectURL(url);
 }
 
-// 이미지/PDF 렌더 (html2canvas)용 공통: 주어진 HTML을 캔버스로
-async function htmlToCanvas(innerHTML) {
-  const renderEl = document.getElementById('exportRender');
-  renderEl.innerHTML = innerHTML;
-  // 이미지 로딩 대기 (사진 포함 노트가 빈 채로 찍히거나 멈추는 문제 방지)
-  const imgs = Array.from(renderEl.querySelectorAll('img'));
-  await Promise.all(imgs.map(im => (im.decode ? im.decode() : Promise.resolve()).catch(() => {})));
-  await new Promise(r => setTimeout(r, 100));
-  // iOS 캔버스 픽셀 한계(약 1,670만) 넘지 않게 배율 자동 조절
-  const w = renderEl.scrollWidth || 600;
-  const hgt = renderEl.scrollHeight || 800;
-  let scale = 2;
-  const MAX_PIXELS = 16000000;
-  if (w * hgt * 4 > MAX_PIXELS) {
-    scale = Math.max(0.8, Math.sqrt(MAX_PIXELS / (w * hgt)));
-  }
-  // 15초 안전장치: 멈추지 않고 실패 안내
-  const canvas = await Promise.race([
-    html2canvas(renderEl, { scale, backgroundColor: '#ffffff', logging: false, useCORS: true }),
-    new Promise((_, rej) => setTimeout(() => rej(new Error('render-timeout')), 15000))
-  ]);
-  renderEl.innerHTML = '';
-  return canvas;
-}
-
-function canvasToPdf(canvas, pdf) {
-  const imgData = canvas.toDataURL('image/png');
-  const pdfWidth = 210;
-  const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-  const pageHeight = 297;
-  if (pdfHeight <= pageHeight) {
-    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-  } else {
-    let position = 0;
-    let remaining = pdfHeight;
-    while (remaining > 0) {
-      pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
-      remaining -= pageHeight;
-      if (remaining > 0) { pdf.addPage(); position -= pageHeight; }
-    }
-  }
-}
-
 // ===== 캔버스 직접 렌더링 (외부 라이브러리 불필요 — PWA에서 확실히 동작) =====
 function loadImageEl(src) {
   return new Promise((resolve) => {
@@ -5555,137 +5652,79 @@ function loadImageEl(src) {
   });
 }
 
-function layoutNoteCanvas(ctx, item, note, photos, W, draw) {
-  const PAD = 64;
-  const CW = W - PAD * 2;
-  let y = PAD + 24;
-  const FONT = "-apple-system, 'Pretendard Variable', Pretendard, sans-serif";
-  const setF = (bold, size, italic, code) => { ctx.font = (italic ? 'italic ' : '') + (bold ? '700 ' : '400 ') + size + 'px ' + (code ? "Menlo, 'Courier New', monospace" : FONT); };
-
-  function drawTokens(tokens, size, lineH, color, indent) {
-    indent = indent || 0;
-    let x = PAD + indent;
-    ctx.textBaseline = 'alphabetic';
-    tokens.forEach(t => {
-      const chars = Array.from(t.text || '');
-      chars.forEach(ch => {
-        setF(t.bold, t.code ? size * 0.9 : size, t.italic, t.code);
-        const cw = ctx.measureText(ch).width;
-        if (x + cw > PAD + CW) { x = PAD + indent; y += lineH; }
-        if (draw) {
-          if (t.mark) { ctx.fillStyle = '#fdf3c8'; ctx.fillRect(x, y - size * 0.82, cw + 1, size * 1.08); }
-          if (t.code) { ctx.fillStyle = '#eef0f5'; ctx.fillRect(x, y - size * 0.82, cw + 1, size * 1.08); }
-          ctx.fillStyle = t.url ? '#3d4cc8' : color;
-          ctx.fillText(ch, x, y);
-          if (t.under || t.url) { ctx.fillRect(x, y + 6, cw, 2.5); }
-          if (t.strike) { ctx.fillRect(x, y - size * 0.32, cw, 2.5); }
-        }
-        x += cw;
-      });
-    });
-    y += lineH;
+// 메모 한 개 배치. opts.header=false면 작품 머리말 생략(여러 개 이어 붙일 때), opts.footer=false면 바닥글 생략
+function noteLayout(item, note, env, photos, opts) {
+  opts = opts || {};
+  if (opts.header !== false) {
+    env.text([{ text: typeName(item.type) + ' 메모', bold: true }], 22, 34, '#9a9daa');
+    env.y += 6;
+    env.text([{ text: item.title || '', bold: true }], 46, 62, '#17181c');
+    if (item.creator) env.text([{ text: item.creator }], 26, 40, '#5b5e6b');
+    env.y += 14;
+    env.rule('#17181c', 3);
+    env.y += 30;
   }
-
-  function plainLine(text, size, lineH, color, bold, indent) {
-    drawTokens([{ text: text, bold: !!bold }], size, lineH, color, indent || 0);
+  env.ensure(50 + 44);
+  env.text([{ text: '📝 ' + (note.title || '제목 없음'), bold: true }], 34, 50, '#3d4cc8');
+  const meta = [];
+  if (opts.header !== false) {
+    if (item.rating > 0) meta.push('★'.repeat(item.rating));
+    if (item.startDate || item.endDate) meta.push((item.startDate ? fmtDate(item.startDate) : '?') + ' → ' + (item.endDate ? fmtDate(item.endDate) : '진행중'));
   }
-
-  // 헤더: 유형 라벨 + 작품 제목
-  if (draw) { ctx.fillStyle = '#9a9daa'; setF(true, 22); ctx.fillText(typeName(item.type) + ' 노트', PAD, y); }
-  y += 50;
-  plainLine(item.title || '', 46, 62, '#17181c', true);
-  if (item.creator) plainLine(item.creator, 26, 40, '#5b5e6b', false);
-  y += 12;
-  if (draw) { ctx.fillStyle = '#17181c'; ctx.fillRect(PAD, y, CW, 3); }
-  y += 44;
-
-  // 노트 제목 + 메타
-  plainLine('📝 ' + (note.title || '제목 없음'), 34, 50, '#3d4cc8', true);
-  const metaBits = [];
-  if (item.rating > 0) metaBits.push('★'.repeat(item.rating));
-  if (item.startDate || item.endDate) metaBits.push((item.startDate ? fmtDate(item.startDate) : '?') + ' → ' + (item.endDate ? fmtDate(item.endDate) : '진행중'));
-  if (metaBits.length) plainLine(metaBits.join('   ·   '), 24, 38, '#9a9daa', false);
-  y += 20;
-
-  // 본문
-  mdParse(note.content || '').forEach(b => {
-    if (b.t === 'h') {
-      const sz = [0, 40, 34, 30, 28][b.lv], lh = [0, 58, 52, 46, 42][b.lv];
-      y += [0, 16, 14, 10, 8][b.lv];
-      drawTokens(tokenizeInline(b.text, { bold: true }), sz, lh, b.lv >= 3 ? '#5b5e6b' : '#17181c', 0);
-    }
-    else if (b.t === 'hr') { y += 16; if (draw) { ctx.fillStyle = '#e9eaef'; ctx.fillRect(PAD, y, CW, 2); } y += 32; }
-    else if (b.t === 'ul' || b.t === 'ol') {
-      b.items.forEach((it, k) => {
-        if (draw) { ctx.fillStyle = '#3d4cc8'; setF(true, 28); ctx.fillText(b.t === 'ul' ? '•' : (b.start + k) + '.', PAD + 4, y); }
-        drawTokens(tokenizeInline(it), 28, 44, '#17181c', 44);
-      });
-    }
-    else if (b.t === 'quote') {
-      const startY = y;
-      b.lines.forEach(l => drawTokens(tokenizeInline(l), 28, 44, '#5b5e6b', 30));
-      if (draw) { ctx.fillStyle = '#d9dbe4'; ctx.fillRect(PAD, startY - 30, 6, y - startY - 10); }
-    }
-    else if (b.t === 'gap') { y += 26; }
-    else { drawTokens(tokenizeInline(b.text), 28, 44, '#17181c', 0); }
+  if (note.updatedAt) meta.push(fmtDateTime(note.updatedAt));
+  if (meta.length) env.text([{ text: meta.join('   ·   ') }], 22, 36, '#9a9daa');
+  env.y += 16;
+  env.md(note.content || '');
+  (photos || []).forEach(img => {
+    env.y += 22;
+    let w = Math.min(env.CW, Math.max(img.width, 200));
+    let hh = w * img.height / img.width;
+    if (hh > 1500) { w = w * 1500 / hh; hh = 1500; } // 비율 유지
+    env.image(img, w, hh);
   });
-
-  // 사진
-  photos.forEach(img => {
-    y += 24;
-    const ratio = img.height / img.width;
-    const w = Math.min(CW, Math.max(img.width, 200));
-    const hh = Math.min(w * ratio, 1500);
-    if (draw) ctx.drawImage(img, PAD, y, w, hh);
-    y += hh;
-  });
-
-  // 푸터
-  y += 48;
-  if (draw) { ctx.fillStyle = '#e9eaef'; ctx.fillRect(PAD, y, CW, 2); }
-  y += 34;
-  if (draw) {
-    ctx.fillStyle = '#9a9daa'; setF(false, 20);
-    ctx.textAlign = 'right';
-    ctx.fillText('CONTENTS ARCHIVE · ' + fmtToday(), W - PAD, y);
-    ctx.textAlign = 'left';
+  if (opts.footer !== false && !env.paged) {
+    env.y += 44;
+    env.rule('#e9eaef', 2);
+    env.y += 18;
+    if (env.draw) {
+      const c = env.ctx;
+      c.fillStyle = '#9a9daa'; env.font(false, 20);
+      c.textAlign = 'right';
+      c.fillText('CONTENTS ARCHIVE · ' + fmtToday(), env.W - env.PAD, env.y + 20);
+      c.textAlign = 'left';
+    }
+    env.y += 64;
   }
-  y += 64;
-  return y;
+  return env.y;
 }
-
-async function drawNoteToCanvas(item, note) {
-  const W = 1080;
-  const photos = [];
+async function loadNotePhotos(note) {
+  const out = [];
   for (const src of (note.images || [])) {
     const im = await loadImageEl(src);
-    if (im) photos.push(im);
+    if (im && im.width > 0) out.push(im);
   }
-  const mc = document.createElement('canvas');
-  mc.width = 10; mc.height = 10;
-  const totalH = layoutNoteCanvas(mc.getContext('2d'), item, note, photos, W, false);
-  const H = Math.min(Math.ceil(totalH), 14000);
-  const canvas = document.createElement('canvas');
-  canvas.width = W; canvas.height = H;
-  const ctx = canvas.getContext('2d');
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0, 0, W, H);
-  layoutNoteCanvas(ctx, item, note, photos, W, true);
-  return canvas;
-}
-
-function composeCanvasesVertically(list, gap) {
-  const W = Math.max.apply(null, list.map(c => c.width));
-  const H = list.reduce((s, c) => s + c.height, 0) + gap * (list.length - 1);
-  const out = document.createElement('canvas');
-  out.width = W;
-  out.height = Math.min(H, 16000);
-  const ctx = out.getContext('2d');
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0, 0, out.width, out.height);
-  let y = 0;
-  list.forEach(c => { ctx.drawImage(c, 0, y); y += c.height + gap; });
   return out;
+}
+function noteFoot(item) { return `〈${mmClip(item.title || '', 22)}〉 메모 · CONTENTS ARCHIVE`; }
+async function drawNoteImage(item, note) {
+  const photos = await loadNotePhotos(note);
+  return drawDocImage(env => noteLayout(item, note, env, photos));
+}
+async function drawNotePdf(pdf, item, note, counter) {
+  const photos = await loadNotePhotos(note);
+  return drawDocPdf(pdf, env => noteLayout(item, note, env, photos), noteFoot(item), counter);
+}
+// 여러 메모를 긴 이미지 1장으로 (머리말은 처음 한 번)
+async function drawNotesImage(item, notes) {
+  const photos = [];
+  for (const n of notes) photos.push(await loadNotePhotos(n));
+  return drawDocImage(env => {
+    notes.forEach((n, i) => {
+      if (i) { env.y += 30; env.rule('#d9dbe4', 2); env.y += 34; }
+      noteLayout(item, n, env, photos[i], { header: i === 0, footer: i === notes.length - 1 });
+    });
+    return env.y;
+  });
 }
 
 // 이미지 결과 모달: 길게 눌러 사진에 저장 (PWA에서 가장 확실한 방식)
@@ -5740,26 +5779,27 @@ async function shareImageResult() {
 // 노트 하나 내보내기 코어 (편집/읽기 모드 공용)
 async function exportNoteCore(item, note, format) {
   if (format === 'text') {
-    copyPlain(buildNoteText(item, note), '노트 텍스트가 클립보드에 복사됐어요');
+    copyPlain(buildNoteText(item, note), '메모 텍스트가 클립보드에 복사됐어요');
     return;
   }
   const safeName = (note.title || 'note').replace(/[\\/:*?"<>|]/g, '_').slice(0, 40);
   showToast(format === 'pdf' ? 'PDF 생성 중...' : format === 'word' ? 'Word 생성 중...' : '이미지 생성 중...');
   try {
     if (format === 'word') {
-      downloadWordDoc(buildNoteCardHTML(item, note, true), `${safeName}_노트`);
+      downloadWordDoc(buildNoteCardHTML(item, note, true), `${safeName}_메모`);
       showToast('Word 파일이 저장되었습니다');
       return;
     }
-    const canvas = await drawNoteToCanvas(item, note);
     if (format === 'image') {
-      shareCanvasImage(canvas, `${safeName}_노트.png`);
+      const out = await drawNoteImage(item, note);
+      shareCanvasImage(out.canvas, `${safeName}_메모.png`);
+      if (out.cut) setTimeout(() => showToast('너무 길어서 앞부분만 담았어요 · 전체는 PDF로 저장해 주세요'), 700);
     } else if (format === 'pdf') {
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-      canvasToPdf(canvas, pdf);
-      pdf.save(`${safeName}_노트.pdf`);
-      showToast('PDF가 저장되었습니다');
+      const n = await drawNotePdf(pdf, item, note);
+      pdf.save(`${safeName}_메모.pdf`);
+      showToast(n > 1 ? `PDF ${n}쪽으로 저장했어요` : 'PDF가 저장되었습니다');
     }
   } catch(e) {
     console.error(e);
@@ -5773,7 +5813,7 @@ async function exportNote(format) {
   const content = document.getElementById('noteContent').value.trim();
   const noteTitle = document.getElementById('noteTitleInput').value.trim() || '제목 없음';
   if (!content) {
-    showToast('노트 내용을 먼저 입력해주세요');
+    showToast('메모 내용을 먼저 입력해주세요');
     return;
   }
   await exportNoteCore(item, { title: noteTitle, content, images: [...noteEditingImages] }, format);
@@ -5788,12 +5828,12 @@ function openBulkExport(itemId) {
   const item = state.items.find(i => i.id === itemId);
   if (!item) return;
   const notes = (item.notes || []);
-  if (notes.length === 0) { showToast('내보낼 노트가 없어요'); return; }
+  if (notes.length === 0) { showToast('내보낼 메모가 없어요'); return; }
   bulkExportItemId = itemId;
   bulkExportFormat = 'pdf';
   bulkExportMode = 'merged';
   document.getElementById('bulkExportTitle').textContent = item.title;
-  document.getElementById('bulkExportCount').textContent = `노트 ${notes.length}개`;
+  document.getElementById('bulkExportCount').textContent = `메모 ${notes.length}개`;
   // reset pickers
   document.querySelectorAll('#bulkFormatPicker .status-option').forEach(o => o.classList.toggle('active', o.dataset.format === 'pdf'));
   document.querySelectorAll('#bulkModePicker .seg-option').forEach(o => o.classList.toggle('active', o.dataset.mode === 'merged'));
@@ -5834,19 +5874,19 @@ document.getElementById('bulkModePicker').addEventListener('click', (e) => {
 function updateBulkModeHint() {
   const hint = document.getElementById('bulkModeHint');
   if (bulkExportFormat === 'text') {
-    hint.textContent = '모든 노트를 이어붙여 클립보드에 복사해요. (묶는 방식과 무관)';
+    hint.textContent = '모든 메모를 이어붙여 클립보드에 복사해요. (묶는 방식과 무관)';
     return;
   }
   if (bulkExportMode === 'merged') {
     if (bulkExportFormat === 'image') {
-      hint.textContent = '모든 노트를 세로로 이어붙인 긴 이미지 1장으로 저장해요.';
+      hint.textContent = '모든 메모를 세로로 이어붙인 긴 이미지 1장으로 저장해요.';
     } else if (bulkExportFormat === 'word') {
-      hint.textContent = '모든 노트를 한 Word 문서에 페이지로 나눠 담아요.';
+      hint.textContent = '모든 메모를 한 Word 문서에 페이지로 나눠 담아요.';
     } else {
-      hint.textContent = '모든 노트를 한 PDF에 페이지로 나눠 담아요.';
+      hint.textContent = '모든 메모를 한 PDF에 페이지로 나눠 담아요.';
     }
   } else {
-    hint.textContent = '노트마다 파일을 따로 만들어 여러 개로 저장해요.';
+    hint.textContent = '메모마다 파일을 따로 만들어 여러 개로 저장해요.';
   }
 }
 
@@ -5854,7 +5894,7 @@ async function runBulkExport() {
   const item = state.items.find(i => i.id === bulkExportItemId);
   if (!item) return;
   const notes = (item.notes || []).sort((a,b) => (a.createdAt||0) - (b.createdAt||0));
-  if (notes.length === 0) { showToast('내보낼 노트가 없어요'); return; }
+  if (notes.length === 0) { showToast('내보낼 메모가 없어요'); return; }
 
   const btn = document.getElementById('bulkExportRunBtn');
   btn.disabled = true;
@@ -5864,7 +5904,7 @@ async function runBulkExport() {
   try {
     if (bulkExportFormat === 'text') {
       const txt = notes.map(n => buildNoteText(item, n)).join('\n\n──────────\n\n');
-      copyPlain(txt, `${notes.length}개 노트를 클립보드에 복사했어요`);
+      copyPlain(txt, `${notes.length}개 메모를 클립보드에 복사했어요`);
     } else if (bulkExportMode === 'separate') {
       await bulkExportSeparate(item, notes, safeBase);
     } else {
@@ -5891,8 +5931,8 @@ async function bulkExportMerged(item, notes, safeBase) {
       buildNoteCardHTML(item, n, i === 0) +
       (i < notes.length - 1 ? '<br clear="all" style="page-break-before:always">' : '')
     ).join('');
-    downloadWordDoc(body, `${safeBase}_노트모음`);
-    showToast(`Word 파일로 ${notes.length}개 노트를 저장했어요`);
+    downloadWordDoc(body, `${safeBase}_메모모음`);
+    showToast(`Word 파일로 ${notes.length}개 메모를 저장했어요`);
     return;
   }
 
@@ -5900,46 +5940,19 @@ async function bulkExportMerged(item, notes, safeBase) {
     showToast('PDF 생성 중...');
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-    for (let i = 0; i < notes.length; i++) {
-      const canvas = await drawNoteToCanvas(item, notes[i]);
-      if (i > 0) pdf.addPage();
-      canvasToPdfFresh(canvas, pdf);
-    }
-    pdf.save(`${safeBase}_노트모음.pdf`);
-    showToast(`PDF로 ${notes.length}개 노트를 저장했어요`);
+    const counter = { n: 0 };
+    for (let i = 0; i < notes.length; i++) await drawNotePdf(pdf, item, notes[i], counter); // 메모마다 새 쪽에서 시작
+    pdf.save(`${safeBase}_메모모음.pdf`);
+    showToast(`PDF로 ${notes.length}개 메모를 저장했어요`);
     return;
   }
 
   if (bulkExportFormat === 'image') {
     showToast('이미지 생성 중...');
-    // 노트별 캔버스를 세로로 합쳐 한 장으로
-    const cs = [];
-    for (const n of notes) cs.push(await drawNoteToCanvas(item, n));
-    const canvas = composeCanvasesVertically(cs, 40);
-    shareCanvasImage(canvas, `${safeBase}_노트모음.png`);
+    const out = await drawNotesImage(item, notes);
+    shareCanvasImage(out.canvas, `${safeBase}_메모모음.png`);
+    if (out.cut) setTimeout(() => showToast('너무 길어서 앞부분만 담았어요 · 전체는 PDF로 저장해 주세요'), 700);
     return;
-  }
-}
-
-// PDF: 현재 페이지 맨 위부터 이미지 배치 (여러 페이지 분할)
-function canvasToPdfFresh(canvas, pdf) {
-  const imgData = canvas.toDataURL('image/png');
-  const pdfWidth = 210;
-  const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-  const pageHeight = 297;
-  if (pdfHeight <= pageHeight) {
-    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-  } else {
-    let position = 0;
-    let remaining = pdfHeight;
-    let first = true;
-    while (remaining > 0) {
-      if (!first) pdf.addPage();
-      pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
-      remaining -= pageHeight;
-      position -= pageHeight;
-      first = false;
-    }
   }
 }
 
@@ -5947,7 +5960,7 @@ function canvasToPdfFresh(canvas, pdf) {
 async function bulkExportSeparate(item, notes, safeBase) {
   if (bulkExportFormat === 'word') {
     for (let i = 0; i < notes.length; i++) {
-      const nm = (notes[i].title || `노트${i+1}`).replace(/[\\/:*?"<>|]/g, '_').slice(0, 30);
+      const nm = (notes[i].title || `메모${i+1}`).replace(/[\\/:*?"<>|]/g, '_').slice(0, 30);
       downloadWordDoc(buildNoteCardHTML(item, notes[i], true), `${safeBase}_${i+1}_${nm}`);
       await new Promise(r => setTimeout(r, 400)); // 브라우저 다운로드 차단 방지
     }
@@ -5958,10 +5971,9 @@ async function bulkExportSeparate(item, notes, safeBase) {
     showToast('PDF 생성 중...');
     const { jsPDF } = window.jspdf;
     for (let i = 0; i < notes.length; i++) {
-      const canvas = await drawNoteToCanvas(item, notes[i]);
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-      canvasToPdfFresh(canvas, pdf);
-      const nm = (notes[i].title || `노트${i+1}`).replace(/[\\/:*?"<>|]/g, '_').slice(0, 30);
+      await drawNotePdf(pdf, item, notes[i]);
+      const nm = (notes[i].title || `메모${i+1}`).replace(/[\\/:*?"<>|]/g, '_').slice(0, 30);
       pdf.save(`${safeBase}_${i+1}_${nm}.pdf`);
       await new Promise(r => setTimeout(r, 400));
     }
@@ -5971,9 +5983,9 @@ async function bulkExportSeparate(item, notes, safeBase) {
   if (bulkExportFormat === 'image') {
     showToast('이미지 생성 중...');
     for (let i = 0; i < notes.length; i++) {
-      const canvas = await drawNoteToCanvas(item, notes[i]);
+      const canvas = (await drawNoteImage(item, notes[i])).canvas;
       const link = document.createElement('a');
-      const nm = (notes[i].title || `노트${i+1}`).replace(/[\\/:*?"<>|]/g, '_').slice(0, 30);
+      const nm = (notes[i].title || `메모${i+1}`).replace(/[\\/:*?"<>|]/g, '_').slice(0, 30);
       link.download = `${safeBase}_${i+1}_${nm}.png`;
       link.href = canvas.toDataURL('image/png');
       link.click();
@@ -5984,7 +5996,6 @@ async function bulkExportSeparate(item, notes, safeBase) {
   }
 }
 
-// Inline-style MD renderer for export (html2canvas needs inline styles to be safe)
 // ============ TEMPLATE MANAGER ============
 function openTemplateManager() {
   closeNoteModal();
@@ -6551,7 +6562,7 @@ function exportExcel() {
         '전체 EP': item.totalPodEp || '',
         '진행률(%)': getProgress(item) ?? '',
         '총평': item.memo || '',
-        '노트 개수': (item.notes || []).length,
+        '메모 개수': (item.notes || []).length,
         '링크': item.link || '',
         '등록일': item.createdAt ? new Date(item.createdAt).toISOString().slice(0,10) : '',
         '최종 수정': item.updatedAt ? new Date(item.updatedAt).toISOString().slice(0,10) : '',
@@ -6581,8 +6592,8 @@ function exportExcel() {
         noteRows.push({
           '콘텐츠 유형': typeName(item.type),
           '콘텐츠 제목': item.title,
-          '노트 제목': note.title || '제목 없음',
-          '노트 내용': note.content || '',
+          '메모 제목': note.title || '제목 없음',
+          '메모 내용': note.content || '',
           '작성일': note.createdAt ? new Date(note.createdAt).toISOString().slice(0,10) : '',
           '수정일': note.updatedAt ? new Date(note.updatedAt).toISOString().slice(0,10) : ''
         });
@@ -6606,7 +6617,7 @@ function exportExcel() {
       { '항목': '위시리스트', '값': state.items.filter(i => i.status === 'wishlist').length },
       { '항목': '중단', '값': state.items.filter(i => i.status === 'dropped').length },
       { '항목': '평균 별점', '값': rated.length > 0 ? (rated.reduce((s,i) => s+i.rating, 0)/rated.length).toFixed(2) : '-' },
-      { '항목': '전체 노트', '값': noteRows.length },
+      { '항목': '전체 메모', '값': noteRows.length },
     ];
 
     const wb = XLSX.utils.book_new();
@@ -6624,7 +6635,7 @@ function exportExcel() {
     if (noteRows.length > 0) {
       const ws2 = XLSX.utils.json_to_sheet(noteRows);
       ws2['!cols'] = [{wch:8},{wch:24},{wch:20},{wch:60},{wch:12},{wch:12}];
-      XLSX.utils.book_append_sheet(wb, ws2, '노트');
+      XLSX.utils.book_append_sheet(wb, ws2, '메모');
     }
 
     if (epRows.length > 0) {
@@ -6691,7 +6702,72 @@ document.getElementById('confirmBtn').addEventListener('click', () => {
 function closeConfirm() {
   document.getElementById('confirmModal').classList.remove('active');
   confirmCallback = null;
+  const btn = document.getElementById('confirmBtn');
+  btn.textContent = '삭제';
+  btn.className = 'btn btn-danger';
 }
+// 확인창 (버튼 글자 지정). cb 안에서 closeConfirm 불러야 함
+function askConfirm(title, desc, okLabel, cb) {
+  document.getElementById('confirmTitle').textContent = title;
+  document.getElementById('confirmDesc').textContent = desc;
+  document.getElementById('confirmBtn').textContent = okLabel || '삭제';
+  confirmCallback = cb;
+  document.getElementById('confirmModal').classList.add('active');
+}
+
+// ============ 자동 저장 · 내용 유실 방지 ============
+const autoSaveTimers = {};
+function scheduleAutoSave(key, fn, delay) {
+  clearTimeout(autoSaveTimers[key]);
+  autoSaveTimers[key] = setTimeout(() => { delete autoSaveTimers[key]; try { fn(); } catch (e) { console.error(e); } }, delay || 800);
+}
+function cancelAutoSave(key) { clearTimeout(autoSaveTimers[key]); delete autoSaveTimers[key]; }
+function nowHM() { const d = new Date(); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); }
+function setSaveState(id, text) { const el = document.getElementById(id); if (el) el.textContent = text; }
+function isModalOpen(id) { const m = document.getElementById(id); return !!(m && m.classList.contains('active')); }
+
+function autoSaveEp() {
+  if (!isModalOpen('epModal') || rec.epNum == null) return false;
+  const changed = saveEpRecord();
+  if (changed) setSaveState('epSaveState', `✓ 자동 저장됨 ${nowHM()}`);
+  return changed;
+}
+function autoSaveComment() {
+  const ta = document.getElementById('recComment');
+  const item = recItem();
+  if (!ta || !item || !isModalOpen('recordModal')) return false;
+  const v = ta.value.trim();
+  if (v === (item.memo || '')) return false;
+  item.memo = v;
+  recTouch(item);
+  setSaveState('recCommentState', `✓ 자동 저장됨 ${nowHM()}`);
+  return true;
+}
+function autoSaveNote() {
+  if (!isModalOpen('noteModal')) return false;
+  const changed = persistNote();
+  if (changed) setSaveState('noteSaveState', `✓ 자동 저장됨 ${nowHM()}`);
+  return changed;
+}
+
+document.addEventListener('input', e => {
+  const id = e.target && e.target.id;
+  if (id === 'recEpText') { setSaveState('epSaveState', '입력 중…'); scheduleAutoSave('ep', autoSaveEp); }
+  else if (id === 'recComment') { setSaveState('recCommentState', '입력 중…'); scheduleAutoSave('comment', autoSaveComment); }
+  else if (id === 'noteContent' || id === 'noteTitleInput') { setSaveState('noteSaveState', '입력 중…'); scheduleAutoSave('note', autoSaveNote, 1000); }
+});
+
+// 앱을 내리거나 닫을 때: 쓰던 내용 바로 저장 (iOS는 백그라운드 앱을 예고 없이 종료하기도 함)
+function flushAutoSaves() {
+  Object.keys(autoSaveTimers).forEach(cancelAutoSave);
+  try { autoSaveEp(); } catch (e) { console.error(e); }
+  try { autoSaveComment(); } catch (e) { console.error(e); }
+  try { autoSaveNote(); } catch (e) { console.error(e); }
+  try { if (isModalOpen('charModal') && charDirty()) persistChar(); } catch (e) { console.error(e); }
+  try { if (isModalOpen('relModal') && relDirty()) persistRel(); } catch (e) { console.error(e); }
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flushAutoSaves(); });
+window.addEventListener('pagehide', flushAutoSaves);
 
 // ============ JSON IMPORT/EXPORT ============
 function exportData() {
@@ -6836,7 +6912,7 @@ function cleanDuplicates() {
   const dup = countDuplicates();
   if (dup === 0) { showToast('중복된 기록이 없어요'); return; }
   document.getElementById('confirmTitle').textContent = '중복 기록을 정리할까요?';
-  document.getElementById('confirmDesc').textContent = `같은 유형·제목의 기록 ${dup}개가 발견됐어요. 더 최근 것만 남기고 합칩니다 (노트는 모두 보존).`;
+  document.getElementById('confirmDesc').textContent = `같은 유형·제목의 기록 ${dup}개가 발견됐어요. 더 최근 것만 남기고 합칩니다 (메모는 모두 보존).`;
   confirmCallback = () => {
     const before = state.items.length;
     state.items = dedupeItems(state.items);
@@ -6922,7 +6998,7 @@ document.querySelectorAll('.modal').forEach(modal => {
   modal.addEventListener('click', (e) => {
     if (e.target === modal) {
       if (modal.id === 'confirmModal') return;
-      const special = { epModal: () => closeEpEditor(), recordModal: closeRecord, charModal: closeCharEditor, relModal: closeRelEditor };
+      const special = { epModal: () => closeEpEditor(), recordModal: closeRecord, charModal: () => closeCharEditor(), relModal: () => closeRelEditor(), noteModal: closeNoteEditor, addModal: () => closeAddModal(), recExportModal: closeRecExport };
       if (special[modal.id]) { special[modal.id](); return; }
       modal.classList.remove('active');
       syncBodyScrollLock();
@@ -6947,6 +7023,7 @@ function getRecord(item) {
   r.chars.forEach(c => {
     if (typeof c.id !== 'string') c.id = String(c.id);
     if (typeof c.name !== 'string') c.name = String(c.name);
+    if (c.color != null && !mmValidColor(c.color)) delete c.color;
     if (c.group != null && typeof c.group !== 'string') c.group = String(c.group);
     if (c.desc != null && typeof c.desc !== 'string') c.desc = String(c.desc);
   });
@@ -6958,7 +7035,12 @@ function getRecord(item) {
     if (typeof x.a !== 'string') x.a = String(x.a);
     if (typeof x.b !== 'string') x.b = String(x.b);
     if (x.label != null && typeof x.label !== 'string') x.label = String(x.label);
+    if (x.color != null && !mmValidColor(x.color)) delete x.color;
   });
+  if (r.groupColors != null) {
+    if (typeof r.groupColors !== 'object' || Array.isArray(r.groupColors)) r.groupColors = {};
+    Object.keys(r.groupColors).forEach(k => { if (!mmValidColor(r.groupColors[k])) delete r.groupColors[k]; });
+  }
   if (!r.eps || typeof r.eps !== 'object' || Array.isArray(r.eps)) r.eps = {};
   Object.keys(r.eps).forEach(k => {
     const e = r.eps[k];
@@ -7020,6 +7102,8 @@ function openRecord(itemId, tab) {
 }
 
 function closeRecord() {
+  cancelAutoSave('comment');
+  autoSaveComment();
   document.getElementById('recordModal').classList.remove('active');
   document.body.style.overflow = '';
   const id = rec.itemId;
@@ -7028,7 +7112,12 @@ function closeRecord() {
   if (id && state.items.some(i => i.id === id)) setTimeout(() => openDetail(id), 120);
 }
 
-function setRecTab(k) { rec.tab = k; renderRecord(); }
+function setRecTab(k) {
+  cancelAutoSave('comment');
+  autoSaveComment(); // 총평 쓰다가 탭을 바꿔도 저장
+  rec.tab = k;
+  renderRecord();
+}
 
 function renderRecord() {
   const item = recItem();
@@ -7051,10 +7140,31 @@ function mmGroups(chars) {
   chars.forEach(c => { const g = (c.group || '').trim(); if (g && !gs.includes(g)) gs.push(g); });
   return gs;
 }
-function mmColor(c, groups) {
+const MM_SWATCHES = ['#3d4cc8', '#2a8bb0', '#2f8f6a', '#6b7a2a', '#e0a100', '#c4782a', '#b5483b', '#c2477f', '#7a5cc8', '#8a5a3c', '#5b5e6b', '#17181c'];
+function mmValidColor(c) { return typeof c === 'string' && /^#[0-9a-fA-F]{6}$/.test(c); }
+// 색 우선순위: 인물에 직접 고른 색 → 소속에 고른 색 → 소속별 자동 색 → 회색
+function mmColor(c, groups, gc) {
+  if (mmValidColor(c.color)) return c.color;
   const g = (c.group || '').trim();
+  if (g && gc && mmValidColor(gc[g])) return gc[g];
   return g ? MM_COLORS[groups.indexOf(g) % MM_COLORS.length] : '#5b5e6b';
 }
+function mmAutoColor(group, groups) {
+  const g = (group || '').trim();
+  if (!g) return '#5b5e6b';
+  const i = groups.indexOf(g);
+  return MM_COLORS[(i < 0 ? groups.length : i) % MM_COLORS.length];
+}
+// 밝은 색(노랑 등)은 글자용으로 어둡게
+function mmReadable(hex) {
+  const n = parseInt(hex.slice(1), 16);
+  const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+  const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  if (lum < 0.58) return hex;
+  const d = v => Math.round(v * 0.55);
+  return '#' + ((1 << 24) + (d(r) << 16) + (d(g) << 8) + d(b)).toString(16).slice(1);
+}
+function mmRelColor(x) { return mmValidColor(x.color) ? x.color : '#5b5e6b'; }
 function mmTint(hex, amt) {
   const n = parseInt(hex.slice(1), 16);
   const mix = v => Math.round(v + (255 - v) * amt);
@@ -7136,29 +7246,22 @@ function mmQuad(p, c, q, t) {
   return { x: u * u * p.x + 2 * u * t * c.x + t * t * q.x, y: u * u * p.y + 2 * u * t * c.y + t * t * q.y };
 }
 
-// 관계선: 2차 곡선. 중심을 지나는 선은 옆으로 비켜가게.
+// 관계선: 두 인물을 잇는 직선. 같은 두 사람 사이 관계가 여럿이면 나란히 옆으로 띄움.
 function mmRelGeom(pa, pb, offIdx) {
-  const mx = (pa.x + pb.x) / 2, my = (pa.y + pb.y) / 2;
   const dx = pb.x - pa.x, dy = pb.y - pa.y;
   const len = Math.hypot(dx, dy) || 1;
-  let nx = -dy / len, ny = dx / len;
-  const dm = Math.hypot(mx, my);
-  let bend;
-  if (dm > 45) {
-    if (nx * -mx + ny * -my < 0) { nx = -nx; ny = -ny; }
-    bend = Math.min(36, len * 0.14);
-  } else {
-    bend = 58;
-  }
-  bend += (offIdx || 0) * 30;
-  const apex = { x: mx + nx * bend, y: my + ny * bend };
-  const ctrl = { x: 2 * apex.x - mx, y: 2 * apex.y - my };
-  return { ctrl, apex, d: `M${pa.x.toFixed(1)},${pa.y.toFixed(1)} Q${ctrl.x.toFixed(1)},${ctrl.y.toFixed(1)} ${pb.x.toFixed(1)},${pb.y.toFixed(1)}` };
+  const nx = -dy / len, ny = dx / len;
+  const o = (offIdx || 0) * 9;
+  const a = { x: pa.x + nx * o, y: pa.y + ny * o };
+  const b = { x: pb.x + nx * o, y: pb.y + ny * o };
+  const mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+  return { a, b, ctrl: mid, apex: mid, d: `M${a.x.toFixed(1)},${a.y.toFixed(1)} L${b.x.toFixed(1)},${b.y.toFixed(1)}` };
 }
 
-// 곡선이 도착 인물 상자 테두리와 만나는 지점(화살표 자리)
-function mmArrowAt(pa, ctrl, pb, box) {
-  const inside = p => Math.abs(p.x - pb.x) <= box.w / 2 + 3 && Math.abs(p.y - pb.y) <= box.h / 2 + 3;
+// 선이 도착 인물 상자 테두리와 만나는 지점(화살표 자리). center = 도착 인물 상자 중심
+function mmArrowAt(pa, ctrl, pb, box, center) {
+  const c = center || pb;
+  const inside = p => Math.abs(p.x - c.x) <= box.w / 2 + 3 && Math.abs(p.y - c.y) <= box.h / 2 + 3;
   let lo = 0, hi = 1;
   for (let k = 0; k < 18; k++) { const mid = (lo + hi) / 2; if (inside(mmQuad(pa, ctrl, pb, mid))) hi = mid; else lo = mid; }
   const p = mmQuad(pa, ctrl, pb, lo);
@@ -7174,15 +7277,16 @@ function mmArrowPath(a) {
   return `M${a.x.toFixed(1)},${a.y.toFixed(1)} L${lx.toFixed(1)},${ly.toFixed(1)} L${rx.toFixed(1)},${ry.toFixed(1)} Z`;
 }
 
-// 같은 두 사람 사이 관계가 여럿이면 곡선을 엇갈리게
+// 같은 두 사람 사이 관계가 여럿이면 가운데를 기준으로 나란히 (방향이 반대여도 같은 쪽 기준)
 function mmRelOffsets(rels) {
-  const seen = {};
+  const groups = {};
+  rels.forEach(r => { const key = [r.a, r.b].sort().join('|'); (groups[key] = groups[key] || []).push(r); });
   const off = {};
-  rels.forEach(r => {
-    const key = [r.a, r.b].sort().join('|');
-    const k = seen[key] || 0;
-    seen[key] = k + 1;
-    off[r.id] = k === 0 ? 0 : (k % 2 ? 1 : -1) * Math.ceil(k / 2);
+  Object.values(groups).forEach(list => {
+    list.forEach((r, k) => {
+      const o = k - (list.length - 1) / 2;
+      off[r.id] = r.a < r.b ? o : -o;
+    });
   });
   return off;
 }
@@ -7201,19 +7305,30 @@ function mmScene(item) {
     const label = mmClip(x.label || '', 8);
     return Object.assign({ rel: x, label, lw: label ? Math.round(mmTextW(label, 11) + 14) : 0 }, g);
   });
-  // 이름표 자리: 곡선 위에서 인물 상자·중심·다른 이름표와 안 겹치는 곳
+  // 이름표 자리: 선 위에서 인물 상자·중심·다른 이름표와 안 겹치는 곳
   const taken = r.chars.map(c => { const p = pos[c.id], b = boxes[c.id]; return { x0: p.x - b.w / 2 - 3, x1: p.x + b.w / 2 + 3, y0: p.y - b.h / 2 - 3, y1: p.y + b.h / 2 + 3 }; });
   taken.push({ x0: -center.w / 2 - 3, x1: center.w / 2 + 3, y0: -center.h / 2 - 3, y1: center.h / 2 + 3 });
-  const hits = q => taken.some(o => q.x0 < o.x1 && q.x1 > o.x0 && q.y0 < o.y1 && q.y1 > o.y0);
+  // 겹치는 넓이 합 (0이면 안 겹침)
+  const overlap = q => taken.reduce((s, o) => s + Math.max(0, Math.min(q.x1, o.x1) - Math.max(q.x0, o.x0)) * Math.max(0, Math.min(q.y1, o.y1) - Math.max(q.y0, o.y0)), 0);
   rels.forEach(g => {
     g.lp = g.apex;
     if (!g.label) return;
-    const pa = pos[g.rel.a], pb = pos[g.rel.b];
-    for (const t of [0.5, 0.42, 0.58, 0.34, 0.66, 0.26, 0.74]) {
-      const p = t === 0.5 ? g.apex : mmQuad(pa, g.ctrl, pb, t);
-      const q = { x0: p.x - g.lw / 2, x1: p.x + g.lw / 2, y0: p.y - 11, y1: p.y + 11 };
-      if (!hits(q)) { g.lp = p; break; }
+    // 1순위: 선 위 여러 지점 / 2순위: 선 바로 옆으로 살짝 비켜서 / 다 겹치면 가장 덜 겹치는 곳
+    const len = Math.hypot(g.b.x - g.a.x, g.b.y - g.a.y) || 1;
+    const nx = -(g.b.y - g.a.y) / len, ny = (g.b.x - g.a.x) / len;
+    const ts = [0.5, 0.42, 0.58, 0.34, 0.66, 0.26, 0.74];
+    const cands = [];
+    [0, 16, -16, 28, -28].forEach(s => ts.forEach(t => {
+      const p = mmQuad(g.a, g.ctrl, g.b, t);
+      cands.push({ x: p.x + nx * s, y: p.y + ny * s });
+    }));
+    let best = null, bestScore = Infinity;
+    for (const p of cands) {
+      const sc = overlap({ x0: p.x - g.lw / 2, x1: p.x + g.lw / 2, y0: p.y - 11, y1: p.y + 11 });
+      if (sc === 0) { best = p; break; }
+      if (sc < bestScore) { bestScore = sc; best = p; }
     }
+    if (best) g.lp = best;
     taken.push({ x0: g.lp.x - g.lw / 2, x1: g.lp.x + g.lw / 2, y0: g.lp.y - 11, y1: g.lp.y + 11 });
   });
   // 보이는 범위
@@ -7229,38 +7344,39 @@ function mmScene(item) {
   });
   const pad = 22;
   const vb = { x: Math.floor(x0 - pad), y: Math.floor(y0 - pad), w: Math.ceil(x1 - x0 + pad * 2), h: Math.ceil(y1 - y0 + pad * 2) };
-  return { r, groups, pos, boxes, center, rels, vb };
+  return { r, groups, gc: r.groupColors || {}, pos, boxes, center, rels, vb };
 }
 
 function mmNodeSVG(c, sc) {
-  const p = sc.pos[c.id], b = sc.boxes[c.id], col = mmColor(c, sc.groups);
+  const p = sc.pos[c.id], b = sc.boxes[c.id], col = mmColor(c, sc.groups, sc.gc);
   return `<g class="mm-node" id="mm-n-${c.id}" data-cid="${c.id}" transform="translate(${p.x},${p.y})">
-    <rect x="${-b.w / 2}" y="${-b.h / 2}" width="${b.w}" height="${b.h}" rx="12" fill="${mmTint(col, 0.88)}" stroke="${col}" stroke-width="1.8"/>
+    <rect x="${-b.w / 2}" y="${-b.h / 2}" width="${b.w}" height="${b.h}" rx="12" fill="${mmTint(col, 0.86)}" stroke="${col}" stroke-width="2"/>
     <text y="${b.sub ? -3 : 5}" text-anchor="middle" class="mm-name">${escapeHTML(b.name)}</text>
-    ${b.sub ? `<text y="13" text-anchor="middle" class="mm-sub" fill="${col}">${escapeHTML(b.sub)}</text>` : ''}
+    ${b.sub ? `<text y="13" text-anchor="middle" class="mm-sub" fill="${mmReadable(col)}">${escapeHTML(b.sub)}</text>` : ''}
   </g>`;
 }
 
 function mmSVG(item) {
   const sc = mmScene(item);
-  const { r, groups, pos, center, vb } = sc;
+  const { r, groups, gc, pos, center, vb } = sc;
   const branches = r.chars.map(c => {
     const p = pos[c.id];
-    return `<line id="mm-b-${c.id}" x1="0" y1="0" x2="${p.x}" y2="${p.y}" stroke="${mmColor(c, groups)}" stroke-opacity="0.32" stroke-width="2.5" stroke-linecap="round"/>`;
+    return `<line id="mm-b-${c.id}" x1="0" y1="0" x2="${p.x}" y2="${p.y}" stroke="${mmColor(c, groups, gc)}" stroke-opacity="0.32" stroke-width="2.5" stroke-linecap="round"/>`;
   }).join('');
   const relLines = sc.rels.map(g =>
-    `<path id="mm-r-${g.rel.id}" d="${g.d}" fill="none" stroke="#5b5e6b" stroke-width="1.6"/>`
+    `<path id="mm-r-${g.rel.id}" d="${g.d}" fill="none" stroke="${mmRelColor(g.rel)}" stroke-width="${g.rel.color ? 2.2 : 1.6}" stroke-linecap="round"/>`
   ).join('');
   const arrows = sc.rels.filter(g => g.rel.dir).map(g => {
-    const a = mmArrowAt(pos[g.rel.a], g.ctrl, pos[g.rel.b], sc.boxes[g.rel.b]);
-    return `<path id="mm-a-${g.rel.id}" d="${mmArrowPath(a)}" fill="#5b5e6b"/>`;
+    const a = mmArrowAt(g.a, g.ctrl, g.b, sc.boxes[g.rel.b], pos[g.rel.b]);
+    return `<path id="mm-a-${g.rel.id}" d="${mmArrowPath(a)}" fill="${mmRelColor(g.rel)}"/>`;
   }).join('');
-  const labels = sc.rels.filter(g => g.label).map(g =>
-    `<g id="mm-l-${g.rel.id}" class="mm-label" data-rid="${g.rel.id}" transform="translate(${g.lp.x.toFixed(1)},${g.lp.y.toFixed(1)})">
-      <rect x="${-g.lw / 2}" y="-10" width="${g.lw}" height="20" rx="10" fill="#ffffff" stroke="#d9dbe4"/>
-      <text y="4" text-anchor="middle" class="mm-rel">${escapeHTML(g.label)}</text>
-    </g>`
-  ).join('');
+  const labels = sc.rels.filter(g => g.label).map(g => {
+    const rc = mmRelColor(g.rel);
+    return `<g id="mm-l-${g.rel.id}" class="mm-label" data-rid="${g.rel.id}" transform="translate(${g.lp.x.toFixed(1)},${g.lp.y.toFixed(1)})">
+      <rect x="${-g.lw / 2}" y="-10" width="${g.lw}" height="20" rx="10" fill="#ffffff" stroke="${g.rel.color ? mmTint(rc, 0.5) : '#d9dbe4'}"/>
+      <text y="4" text-anchor="middle" class="mm-rel" style="fill:${mmReadable(rc)}">${escapeHTML(g.label)}</text>
+    </g>`;
+  }).join('');
   const centerNode = `<g class="mm-center">
     <rect x="${-center.w / 2}" y="${-center.h / 2}" width="${center.w}" height="${center.h}" rx="18" fill="#17181c"/>
     <text y="5" text-anchor="middle" class="mm-title">${escapeHTML(center.title)}</text>
@@ -7299,7 +7415,7 @@ function mmRedrawEdges() {
     const lab = document.getElementById('mm-l-' + x.id);
     if (lab) lab.setAttribute('transform', `translate(${g.apex.x.toFixed(1)},${g.apex.y.toFixed(1)})`);
     const ar = document.getElementById('mm-a-' + x.id);
-    if (ar) ar.setAttribute('d', mmArrowPath(mmArrowAt(pos[x.a], g.ctrl, pos[x.b], mmNodeBox(r.chars.find(c => c.id === x.b) || { name: '' }))));
+    if (ar) ar.setAttribute('d', mmArrowPath(mmArrowAt(g.a, g.ctrl, g.b, mmNodeBox(r.chars.find(c => c.id === x.b) || { name: '' }), pos[x.b])));
   });
 }
 
@@ -7389,23 +7505,46 @@ function renderRecChars() {
       <button type="button" class="plan-mini-btn" onclick="copyRecChars()" ${r.chars.length ? '' : 'disabled'}>📋 복사</button>
     </div>
     <div class="mm-wrap" id="mmWrap">${mmSVG(item)}</div>
-    <div class="mm-hint">${r.chars.length ? `${who}을 끌어서 옮기고, 탭하면 수정해요` : `+ ${who}로 시작해보세요. 소속을 적으면 같은 색으로 묶여요`}</div>
+    <div class="mm-hint">${r.chars.length ? `${who}을 끌어서 옮기고, 탭하면 수정·색 변경을 해요` : `+ ${who}로 시작해보세요. 소속을 적으면 같은 색으로 묶여요`}</div>
     ${r.chars.length ? `<div class="rec-sub-title">${who} ${r.chars.length}</div>
     <div class="rec-list">${r.chars.map(c => {
-      const col = mmColor(c, groups);
+      const col = mmColor(c, groups, r.groupColors);
       return `<button type="button" class="rec-row" onclick="openCharEditor('${c.id}')">
         <span class="rec-dot" style="background:${col}"></span>
         <span class="rec-row-body">
-          <span class="rec-row-title">${escapeHTML(c.name)}${c.group ? `<span class="rec-chip" style="color:${col};background:${mmTint(col, 0.88)}">${escapeHTML(c.group)}</span>` : ''}</span>
+          <span class="rec-row-title">${escapeHTML(c.name)}${c.group ? `<span class="rec-chip" style="color:${mmReadable(col)};background:${mmTint(col, 0.86)}">${escapeHTML(c.group)}</span>` : ''}</span>
           ${c.desc ? `<span class="rec-row-desc md-view">${renderMarkdown(c.desc)}</span>` : ''}
         </span>
       </button>`;
     }).join('')}</div>` : ''}
     ${r.rels.length ? `<div class="rec-sub-title">관계 ${r.rels.length}</div>
     <div class="rec-list">${r.rels.map(x => `<button type="button" class="rec-row" onclick="openRelEditor('${x.id}')">
+        <span class="rec-line" style="background:${mmRelColor(x)}"></span>
         <span class="rec-row-body"><span class="rec-row-title">${escapeHTML(nameOf(x.a))} <span class="rec-arrow">${x.dir ? '→' : '↔'}</span> ${escapeHTML(nameOf(x.b))}${x.label ? `<span class="rec-chip">${escapeHTML(x.label)}</span>` : ''}</span></span>
       </button>`).join('')}</div>` : ''}`;
   mmSizeSvg();
+}
+
+// 색 고르기 (자동/기본 · 12색 · 직접 고르기)
+function mmSwatchesHTML(kind, selected, autoLabel, autoColor) {
+  const sel = mmValidColor(selected) ? selected.toLowerCase() : '';
+  const custom = !!sel && !MM_SWATCHES.includes(sel);
+  return `<button type="button" class="mm-sw auto ${sel ? '' : 'on'}" data-c="" onclick="pickMmColor('${kind}','')"><i style="background:${autoColor}"></i>${autoLabel}</button>`
+    + MM_SWATCHES.map(c => `<button type="button" class="mm-sw ${sel === c ? 'on' : ''}" data-c="${c}" style="background:${c}" onclick="pickMmColor('${kind}','${c}')" aria-label="색 ${c}"></button>`).join('')
+    + `<label class="mm-sw custom ${custom ? 'on' : ''}" data-c="custom" style="${custom ? 'background:' + sel : ''}" title="직접 고르기" aria-label="직접 고르기"><span>🎨</span><input type="color" value="${custom ? sel : '#3d4cc8'}" oninput="pickMmColor('${kind}', this.value)" onchange="pickMmColor('${kind}', this.value)"></label>`;
+}
+function pickMmColor(kind, c) {
+  const v = mmValidColor(c) ? c.toLowerCase() : '';
+  if (kind === 'ch') rec.charColor = v; else rec.relColor = v;
+  const box = document.getElementById(kind === 'ch' ? 'chColors' : 'relColors');
+  if (!box) return;
+  const custom = !!v && !MM_SWATCHES.includes(v);
+  box.querySelectorAll('.mm-sw').forEach(el => {
+    const d = el.dataset.c;
+    el.classList.toggle('on', d === 'custom' ? custom : d === v);
+  });
+  const cl = box.querySelector('.mm-sw.custom');
+  if (cl) cl.style.background = custom ? v : '';
 }
 
 // 인물 편집
@@ -7422,27 +7561,85 @@ function openCharEditor(cid) {
   document.getElementById('chDesc').value = c ? (c.desc || '') : '';
   setMdPreview('chDesc', false);
   document.getElementById('chGroupChips').innerHTML = mmGroups(r.chars).map(g =>
-    `<button type="button" class="plan-mini-btn" onclick="document.getElementById('chGroup').value=this.textContent">${escapeHTML(g)}</button>`
+    `<button type="button" class="plan-mini-btn" onclick="document.getElementById('chGroup').value=this.textContent; syncChGroupApply()">${escapeHTML(g)}</button>`
   ).join('');
   document.getElementById('chDeleteBtn').style.display = c ? '' : 'none';
+  // 색
+  const groups = mmGroups(r.chars);
+  const gc = r.groupColors || {};
+  const g = c ? (c.group || '').trim() : '';
+  const own = c && mmValidColor(c.color) ? c.color : '';
+  const groupCol = g && mmValidColor(gc[g]) ? gc[g] : '';
+  rec.charColor = (own || groupCol || '').toLowerCase();
+  document.getElementById('chColors').innerHTML = mmSwatchesHTML('ch', rec.charColor, '자동', mmAutoColor(g, groups));
+  document.getElementById('chGroupApply').checked = !own;
+  syncChGroupApply();
+  rec.charSnap = charFormState();
   document.getElementById('charModal').classList.add('active');
 }
-function closeCharEditor() { document.getElementById('charModal').classList.remove('active'); }
+function syncChGroupApply() {
+  const g = document.getElementById('chGroup').value.trim();
+  document.getElementById('chGroupApplyRow').style.display = g ? '' : 'none';
+  document.getElementById('chGroupApplyText').textContent = `'${g}' 소속 모두 이 색으로`;
+  // '자동'을 고르면 어떤 색이 될지 미리 보여주기
+  const item = recItem();
+  const dot = document.querySelector('#chColors .mm-sw.auto i');
+  if (!item || !dot) return;
+  const r = getRecord(item), gc = r.groupColors || {};
+  const apply = document.getElementById('chGroupApply').checked;
+  dot.style.background = g && !apply && mmValidColor(gc[g]) ? gc[g] : mmAutoColor(g, mmGroups(r.chars));
+}
+function charFormState() {
+  return JSON.stringify([document.getElementById('chName').value.trim(), document.getElementById('chGroup').value.trim(),
+    document.getElementById('chDesc').value.trim(), rec.charColor || '', document.getElementById('chGroupApply').checked]);
+}
+function charDirty() { return isModalOpen('charModal') && rec.charSnap != null && charFormState() !== rec.charSnap; }
+function closeCharEditor(force) {
+  if (!force && charDirty()) {
+    askConfirm('저장하지 않고 닫을까요?', '입력한 인물 정보가 사라져요.', '닫기', () => { closeConfirm(); closeCharEditor(true); });
+    return;
+  }
+  rec.charSnap = null;
+  document.getElementById('charModal').classList.remove('active');
+  if (isModalOpen('recordModal') && rec.tab === 'chars') renderRecChars(); // 백그라운드 자동 저장분도 바로 보이게
+}
 
 function saveChar() {
   const item = recItem();
   if (!item) return;
-  const r = getRecord(item);
   const name = document.getElementById('chName').value.trim();
   if (!name) { showToast('이름을 입력하세요'); return; }
+  const isNew = !rec.charId;
+  persistChar();
+  closeCharEditor(true);
+  renderRecChars();
+  showToast(isNew ? '추가했어요' : '수정했어요');
+}
+// 인물 저장 (창은 그대로). 새 인물이면 id 기억 → 다시 저장해도 중복 안 생김
+function persistChar() {
+  const item = recItem();
+  if (!item) return false;
+  const r = getRecord(item);
+  const name = document.getElementById('chName').value.trim();
+  if (!name) return false;
   const data = { name, group: document.getElementById('chGroup').value.trim(), desc: document.getElementById('chDesc').value.trim() };
   const c = rec.charId ? r.chars.find(x => x.id === rec.charId) : null;
+  let target = c;
   if (c) Object.assign(c, data);
-  else r.chars.push(Object.assign({ id: uid() }, data));
+  else { target = Object.assign({ id: uid() }, data); r.chars.push(target); }
+  // 색: 소속 전체에 적용하거나, 이 인물에만
+  const col = mmValidColor(rec.charColor) ? rec.charColor : '';
+  if (data.group && document.getElementById('chGroupApply').checked) {
+    if (!r.groupColors || typeof r.groupColors !== 'object') r.groupColors = {};
+    if (col) r.groupColors[data.group] = col; else delete r.groupColors[data.group];
+    r.chars.forEach(x => { if ((x.group || '').trim() === data.group) delete x.color; });
+  } else {
+    if (col) target.color = col; else delete target.color;
+  }
   recTouch(item);
-  closeCharEditor();
-  renderRecChars();
-  showToast(c ? '수정했어요' : '추가했어요');
+  rec.charId = target.id;
+  rec.charSnap = charFormState();
+  return true;
 }
 
 function deleteChar() {
@@ -7452,7 +7649,7 @@ function deleteChar() {
   const c = r.chars.find(x => x.id === rec.charId);
   if (!c) return;
   const relCount = r.rels.filter(x => x.a === c.id || x.b === c.id).length;
-  closeCharEditor();
+  closeCharEditor(true);
   document.getElementById('confirmTitle').textContent = `${c.name}을(를) 지울까요?`;
   document.getElementById('confirmDesc').textContent = relCount ? `이 인물과 연결된 관계 ${relCount}개도 함께 지워져요.` : '관계도에서 사라져요.';
   confirmCallback = () => {
@@ -7485,9 +7682,25 @@ function openRelEditor(rid) {
     `<button type="button" class="plan-mini-btn" onclick="document.getElementById('relLabel').value=this.textContent">${t}</button>`
   ).join('');
   document.getElementById('relDeleteBtn').style.display = x ? '' : 'none';
+  rec.relColor = x && mmValidColor(x.color) ? x.color.toLowerCase() : '';
+  document.getElementById('relColors').innerHTML = mmSwatchesHTML('rel', rec.relColor, '기본', '#5b5e6b');
+  rec.relSnap = relFormState();
   document.getElementById('relModal').classList.add('active');
 }
-function closeRelEditor() { document.getElementById('relModal').classList.remove('active'); }
+function relFormState() {
+  return JSON.stringify([document.getElementById('relA').value, document.getElementById('relB').value,
+    document.getElementById('relLabel').value.trim(), !!rec.relDir, rec.relColor || '']);
+}
+function relDirty() { return isModalOpen('relModal') && rec.relSnap != null && relFormState() !== rec.relSnap; }
+function closeRelEditor(force) {
+  if (!force && relDirty()) {
+    askConfirm('저장하지 않고 닫을까요?', '입력한 관계가 사라져요.', '닫기', () => { closeConfirm(); closeRelEditor(true); });
+    return;
+  }
+  rec.relSnap = null;
+  document.getElementById('relModal').classList.remove('active');
+  if (isModalOpen('recordModal') && rec.tab === 'chars') renderRecChars();
+}
 function setRelDir(d) { rec.relDir = d; syncRelDir(); }
 function syncRelDir() {
   document.querySelectorAll('#relDirPicker .seg-option').forEach(o => o.classList.toggle('active', (o.dataset.dir === '1') === !!rec.relDir));
@@ -7500,17 +7713,30 @@ function swapRel() {
 function saveRel() {
   const item = recItem();
   if (!item) return;
-  const r = getRecord(item);
   const a = document.getElementById('relA').value, b = document.getElementById('relB').value;
   if (!a || !b || a === b) { showToast('서로 다른 두 사람을 고르세요'); return; }
+  const isNew = !rec.relId;
+  persistRel();
+  closeRelEditor(true);
+  renderRecChars();
+  showToast(isNew ? '추가했어요' : '수정했어요');
+}
+function persistRel() {
+  const item = recItem();
+  if (!item) return false;
+  const r = getRecord(item);
+  const a = document.getElementById('relA').value, b = document.getElementById('relB').value;
+  if (!a || !b || a === b) return false;
   const data = { a, b, label: document.getElementById('relLabel').value.trim(), dir: !!rec.relDir };
   const x = rec.relId ? r.rels.find(q => q.id === rec.relId) : null;
+  let target = x;
   if (x) Object.assign(x, data);
-  else r.rels.push(Object.assign({ id: uid() }, data));
+  else { target = Object.assign({ id: uid() }, data); r.rels.push(target); }
+  if (mmValidColor(rec.relColor)) target.color = rec.relColor; else delete target.color;
   recTouch(item);
-  closeRelEditor();
-  renderRecChars();
-  showToast(x ? '수정했어요' : '추가했어요');
+  rec.relId = target.id;
+  rec.relSnap = relFormState();
+  return true;
 }
 
 function deleteRel() {
@@ -7519,7 +7745,7 @@ function deleteRel() {
   const r = getRecord(item);
   r.rels = r.rels.filter(q => q.id !== rec.relId);
   recTouch(item);
-  closeRelEditor();
+  closeRelEditor(true);
   renderRecChars();
   showToast('삭제했어요');
 }
@@ -7554,31 +7780,35 @@ function mmRoundRect(ctx, x, y, w, h, r) {
   ctx.arcTo(x, y, x + w, y, r);
   ctx.closePath();
 }
-function mmDrawCanvas(item) {
+function mmDrawCanvas(item, opts) {
+  opts = opts || {};
   const sc = mmScene(item);
   const { r, groups, pos, boxes, center, vb } = sc;
-  const S = 2;
+  const S = opts.scale || 2;
   const FONT = "-apple-system, 'Pretendard Variable', Pretendard, sans-serif";
-  const head = 64;
+  const head = opts.noHeader ? 0 : 64;
   const canvas = document.createElement('canvas');
-  canvas.width = Math.max(vb.w, 360) * S;
-  canvas.height = (vb.h + head) * S;
+  canvas.width = Math.round(Math.max(vb.w, 360) * S);
+  canvas.height = Math.round((vb.h + head) * S);
   const ctx = canvas.getContext('2d');
   ctx.scale(S, S);
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = '#17181c';
-  ctx.font = `700 18px ${FONT}`;
   ctx.textAlign = 'left';
-  ctx.fillText(`${bracketTitle(item)} 인물 관계도`, 20, 34);
-  ctx.fillStyle = '#9a9daa';
-  ctx.font = `400 11px ${FONT}`;
-  ctx.fillText('CONTENTS ARCHIVE · ' + fmtToday(), 20, 52);
+  if (!opts.noHeader) {
+    ctx.fillStyle = '#17181c';
+    ctx.font = `700 18px ${FONT}`;
+    ctx.fillText(`${bracketTitle(item)} 인물 관계도`, 20, 34);
+    ctx.fillStyle = '#9a9daa';
+    ctx.font = `400 11px ${FONT}`;
+    ctx.fillText('CONTENTS ARCHIVE · ' + fmtToday(), 20, 52);
+  }
   const ox = (Math.max(vb.w, 360) - vb.w) / 2;
   ctx.translate(ox - vb.x, head - vb.y);
+  const gc = sc.gc;
   r.chars.forEach(c => {
     const p = pos[c.id];
-    ctx.strokeStyle = mmColor(c, groups);
+    ctx.strokeStyle = mmColor(c, groups, gc);
     ctx.globalAlpha = 0.32;
     ctx.lineWidth = 2.5;
     ctx.lineCap = 'round';
@@ -7586,9 +7816,8 @@ function mmDrawCanvas(item) {
     ctx.globalAlpha = 1;
   });
   sc.rels.forEach(g => {
-    const a = pos[g.rel.a], b = pos[g.rel.b];
-    ctx.strokeStyle = '#5b5e6b'; ctx.lineWidth = 1.6;
-    ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.quadraticCurveTo(g.ctrl.x, g.ctrl.y, b.x, b.y); ctx.stroke();
+    ctx.strokeStyle = mmRelColor(g.rel); ctx.lineWidth = g.rel.color ? 2.2 : 1.6; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(g.a.x, g.a.y); ctx.lineTo(g.b.x, g.b.y); ctx.stroke();
   });
   ctx.textAlign = 'center';
   mmRoundRect(ctx, -center.w / 2, -center.h / 2, center.w, center.h, 18);
@@ -7596,30 +7825,31 @@ function mmDrawCanvas(item) {
   ctx.fillStyle = '#ffffff'; ctx.font = `700 15px ${FONT}`;
   ctx.fillText(center.title, 0, 5);
   r.chars.forEach(c => {
-    const p = pos[c.id], b = boxes[c.id], col = mmColor(c, groups);
+    const p = pos[c.id], b = boxes[c.id], col = mmColor(c, groups, gc);
     mmRoundRect(ctx, p.x - b.w / 2, p.y - b.h / 2, b.w, b.h, 12);
-    ctx.fillStyle = mmTint(col, 0.88); ctx.fill();
-    ctx.strokeStyle = col; ctx.lineWidth = 1.8; ctx.stroke();
+    ctx.fillStyle = mmTint(col, 0.86); ctx.fill();
+    ctx.strokeStyle = col; ctx.lineWidth = 2; ctx.stroke();
     ctx.fillStyle = '#17181c'; ctx.font = `700 14px ${FONT}`;
     ctx.fillText(b.name, p.x, p.y + (b.sub ? -3 : 5));
-    if (b.sub) { ctx.fillStyle = col; ctx.font = `600 11px ${FONT}`; ctx.fillText(b.sub, p.x, p.y + 13); }
+    if (b.sub) { ctx.fillStyle = mmReadable(col); ctx.font = `600 11px ${FONT}`; ctx.fillText(b.sub, p.x, p.y + 13); }
   });
   sc.rels.forEach(g => {
     if (!g.rel.dir) return;
-    const ar = mmArrowAt(pos[g.rel.a], g.ctrl, pos[g.rel.b], boxes[g.rel.b]);
+    const ar = mmArrowAt(g.a, g.ctrl, g.b, boxes[g.rel.b], pos[g.rel.b]);
     const s = 9, w = 5.5;
     const bx = ar.x - s * Math.cos(ar.ang), by = ar.y - s * Math.sin(ar.ang);
-    ctx.fillStyle = '#5b5e6b';
+    ctx.fillStyle = mmRelColor(g.rel);
     ctx.beginPath(); ctx.moveTo(ar.x, ar.y);
     ctx.lineTo(bx + w * Math.sin(ar.ang), by - w * Math.cos(ar.ang));
     ctx.lineTo(bx - w * Math.sin(ar.ang), by + w * Math.cos(ar.ang));
     ctx.closePath(); ctx.fill();
   });
   sc.rels.filter(g => g.label).forEach(g => {
+    const rc = mmRelColor(g.rel);
     mmRoundRect(ctx, g.lp.x - g.lw / 2, g.lp.y - 10, g.lw, 20, 10);
     ctx.fillStyle = '#ffffff'; ctx.fill();
-    ctx.strokeStyle = '#d9dbe4'; ctx.lineWidth = 1; ctx.stroke();
-    ctx.fillStyle = '#5b5e6b'; ctx.font = `600 11px ${FONT}`;
+    ctx.strokeStyle = g.rel.color ? mmTint(rc, 0.5) : '#d9dbe4'; ctx.lineWidth = 1; ctx.stroke();
+    ctx.fillStyle = mmReadable(rc); ctx.font = `600 11px ${FONT}`;
     ctx.fillText(g.label, g.lp.x, g.lp.y + 4);
   });
   return canvas;
@@ -7705,6 +7935,7 @@ function openEpEditor(n) {
   document.getElementById('epNextBtn').disabled = !!total && n >= total;
   document.getElementById('epNextBtn').textContent = !total || n < total ? `${recEpLabel(item, n + 1)} ›` : '›';
   document.getElementById('epDeleteBtn').style.display = e ? '' : 'none';
+  setSaveState('epSaveState', '쓰는 동안 자동으로 저장돼요');
   document.getElementById('epModal').classList.add('active');
 }
 
@@ -7723,6 +7954,7 @@ function saveEpRecord() {
 }
 
 function closeEpEditor(skipSave) {
+  cancelAutoSave('ep');
   const changed = skipSave ? false : saveEpRecord();
   document.getElementById('epModal').classList.remove('active');
   rec.epNum = null;
@@ -7732,6 +7964,7 @@ function closeEpEditor(skipSave) {
 function moveEp(d) {
   const n = rec.epNum + d;
   if (n < 1) return;
+  cancelAutoSave('ep');
   const changed = saveEpRecord();
   if (changed) showToast('저장했어요');
   openEpEditor(n);
@@ -7752,6 +7985,7 @@ function deleteEpRecord() {
   document.getElementById('confirmTitle').textContent = `${recEpLabel(item, n)} 기록을 지울까요?`;
   document.getElementById('confirmDesc').textContent = '이 회차에 쓴 내용이 사라져요.';
   confirmCallback = () => {
+    cancelAutoSave('ep');
     delete getRecord(item).eps[n];
     recTouch(item);
     closeConfirm();
@@ -7789,6 +8023,7 @@ function renderRecComment() {
       ${mdToolsHTML('recComment')}
       <textarea class="form-textarea md-ta" id="recComment" placeholder="다 보고 난 뒤의 전체적인 감상을 남겨보세요" style="min-height: 180px;"></textarea>
       <div class="md-view md-pv-box" id="recComment_pv" style="display:none;" onclick="setMdPreview('recComment', false)"></div>
+      <div class="rec-autosave" id="recCommentState">쓰는 동안 자동으로 저장돼요</div>
     </div>
     <button type="button" class="btn btn-primary" onclick="saveRecComment()" style="width: 100%; margin-top: 12px;">총평 저장</button>
     <div class="mm-hint" style="margin-top: 10px;">완료할 때 뜨는 리뷰 창에 쓴 내용도 여기에 들어가요</div>`;
@@ -7805,6 +8040,7 @@ function setRecRating(n) {
 function saveRecComment() {
   const item = recItem();
   if (!item) return;
+  cancelAutoSave('comment');
   item.memo = document.getElementById('recComment').value.trim();
   recTouch(item);
   setMdPreview('recComment', !!item.memo);
@@ -7817,17 +8053,438 @@ function copyRecComment() {
 }
 
 // ---------- 전체 ----------
-function recordFullText(item) {
+function recordFullText(item, sec) {
   const parts = [`${bracketTitle(item)} 기록장`];
   const tabs = recTabs(item).map(t => t.k);
-  if (tabs.includes('chars')) { const t = recCharsText(item); if (t) parts.push(t); }
-  if (tabs.includes('eps')) { const t = recEpsText(item); if (t) parts.push('[회차 기록]\n' + t); }
-  if (item.memo || item.rating) parts.push(`[총평]${item.rating ? ' ' + '★'.repeat(item.rating) : ''}\n${stripMarkdownText(item.memo || '')}`.trim());
+  const want = k => !sec || !!sec[k];
+  if (tabs.includes('chars') && want('chars')) { const t = recCharsText(item); if (t) parts.push(t); }
+  if (tabs.includes('eps') && want('eps')) { const t = recEpsText(item); if (t) parts.push('[회차 기록]\n' + t); }
+  if (want('comment') && (item.memo || item.rating)) parts.push(`[총평]${item.rating ? ' ' + '★'.repeat(item.rating) : ''}\n${stripMarkdownText(item.memo || '')}`.trim());
   return parts.join('\n\n');
 }
 function copyRecordAll() {
   const item = recItem();
   if (item) copyPlain(recordFullText(item), '기록장 전체를 복사했어요');
+}
+
+// ---------- 기록장 내보내기 (PDF·Word·이미지·텍스트) ----------
+let recExport = { sec: {}, format: 'pdf' };
+const REC_W = 1080, REC_PAD = 64, REC_PAGE_H = Math.round(1080 * 297 / 210);
+const REC_FONT = "-apple-system, 'Pretendard Variable', Pretendard, sans-serif";
+
+function recExportInfo(item) {
+  const r = getRecord(item);
+  const tabs = recTabs(item).map(t => t.k);
+  const isPod = item.type === 'podcast';
+  const epN = Object.keys(r.eps).length;
+  const cm = [];
+  if (item.rating > 0) cm.push('★'.repeat(item.rating));
+  if (item.memo) cm.push('코멘트');
+  return {
+    chars: { on: tabs.includes('chars'), has: r.chars.length > 0, name: isPod ? '출연자' : '인물 관계도', sub: `${isPod ? '출연자' : '인물'} ${r.chars.length} · 관계 ${r.rels.length}` },
+    eps: { on: tabs.includes('eps'), has: epN > 0, name: '회차 기록', sub: `${epN}개 회차` },
+    comment: { on: true, has: cm.length > 0, name: '총평', sub: cm.join(' · ') }
+  };
+}
+
+function openRecExport() {
+  const item = recItem();
+  if (!item) return;
+  const info = recExportInfo(item);
+  const keys = Object.keys(info).filter(k => info[k].on);
+  if (!keys.some(k => info[k].has)) { showToast('아직 내보낼 기록이 없어요'); return; }
+  recExport.sec = {};
+  keys.forEach(k => { recExport.sec[k] = info[k].has; });
+  document.getElementById('recExportTitle').textContent = `${bracketTitle(item)} 기록장`;
+  document.getElementById('recExportSecs').innerHTML = keys.map(k => {
+    const s = info[k];
+    return `<label class="rec-x-row ${s.has ? '' : 'off'}">
+      <input type="checkbox" data-sec="${k}" ${recExport.sec[k] ? 'checked' : ''} ${s.has ? '' : 'disabled'} onchange="recExport.sec['${k}'] = this.checked">
+      <span class="rec-x-name">${s.name}</span>
+      <span class="rec-x-sub">${s.has ? escapeHTML(s.sub) : '아직 없음'}</span>
+    </label>`;
+  }).join('');
+  setRecExportFormat('pdf');
+  document.getElementById('recExportModal').classList.add('active');
+  syncBodyScrollLock();
+}
+function closeRecExport() {
+  document.getElementById('recExportModal').classList.remove('active');
+  syncBodyScrollLock();
+}
+function setRecExportFormat(f) {
+  recExport.format = f;
+  document.querySelectorAll('#recExportFormat .status-option').forEach(o => o.classList.toggle('active', o.dataset.format === f));
+  document.getElementById('recExportHint').textContent = {
+    pdf: 'A4 쪽으로 나눠 담아요 (글이 쪽 사이에서 안 잘려요)',
+    word: 'Word 문서(.doc)로 저장해요. 관계도 그림과 인물·관계 목록이 같이 들어가요.',
+    image: '세로로 긴 이미지 1장으로 만들어요. 길게 눌러 사진에 저장할 수 있어요.',
+    text: '고른 내용을 글자로 클립보드에 복사해요.'
+  }[f] || '';
+}
+
+async function runRecExport() {
+  const item = recItem();
+  if (!item) return;
+  const sec = Object.assign({}, recExport.sec);
+  if (!sec.chars && !sec.eps && !sec.comment) { showToast('담을 내용을 하나 이상 골라주세요'); return; }
+  const fmt = recExport.format;
+  const safe = (item.title || 'record').replace(/[\\/:*?"<>|]/g, '_').slice(0, 40);
+  if (fmt === 'text') {
+    copyPlain(recordFullText(item, sec), '기록장을 복사했어요');
+    closeRecExport();
+    return;
+  }
+  const btn = document.getElementById('recExportRunBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>';
+  await new Promise(r => setTimeout(r, 30)); // 스피너가 먼저 보이게
+  try {
+    if (fmt === 'word') {
+      downloadWordDoc(buildRecordWordHTML(item, sec), `${safe}_기록장`);
+      showToast('Word 파일이 저장되었습니다');
+    } else if (fmt === 'pdf') {
+      showToast('PDF 생성 중...');
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+      const n = drawRecordPdf(pdf, item, sec);
+      pdf.save(`${safe}_기록장.pdf`);
+      showToast(`PDF ${n}쪽으로 저장했어요`);
+    } else {
+      showToast('이미지 생성 중...');
+      const out = drawRecordImage(item, sec);
+      shareCanvasImage(out.canvas, `${safe}_기록장.png`);
+      if (out.cut) setTimeout(() => showToast('너무 길어서 앞부분만 담았어요 · 전체는 PDF로 저장해 주세요'), 700);
+    }
+  } catch (e) {
+    console.error(e);
+    showToast('내보내기 실패: ' + (e && e.message ? e.message : '알 수 없는 오류'));
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '내보내기';
+    closeRecExport();
+  }
+}
+
+// 그리기 도구: y는 '다음 줄의 윗선'. PDF 모드면 자리가 모자랄 때 다음 쪽으로 넘김
+function recEnv(mode, k, totalH, onPage) {
+  const W = REC_W, PAD = REC_PAD, CW = W - PAD * 2;
+  const env = { mode, W, PAD, CW, y: PAD, draw: mode !== 'measure', paged: mode === 'pdf', cur: null };
+  let pageNo = 0;
+  const mk = h => {
+    if (env.cur && onPage) onPage(env.cur, pageNo++);
+    const c = document.createElement('canvas');
+    c.width = Math.round(W * k); c.height = Math.round(h * k);
+    const x = c.getContext('2d');
+    x.scale(k, k);
+    x.fillStyle = '#ffffff'; x.fillRect(0, 0, W, h);
+    env.cur = { c, x };
+    env.ctx = x;
+    env.canvas = c;
+  };
+  if (mode === 'measure') { const c = document.createElement('canvas'); c.width = 10; c.height = 10; env.ctx = c.getContext('2d'); }
+  else mk(mode === 'pdf' ? REC_PAGE_H : totalH);
+  env.bottom = env.paged ? REC_PAGE_H - 92 : Infinity;
+  env.finish = () => { if (env.cur && onPage) onPage(env.cur, pageNo++); env.cur = null; return pageNo; };
+  env.ensure = h => {
+    if (!env.paged || env.y + h <= env.bottom || env.y <= PAD + 1) return;
+    mk(REC_PAGE_H);
+    env.y = PAD;
+  };
+  env.font = (bold, size, italic, code) => {
+    env.ctx.font = (italic ? 'italic ' : '') + (bold ? '700 ' : '400 ') + size + 'px ' + (code ? "Menlo, 'Courier New', monospace" : REC_FONT);
+  };
+  // 한 문단 (글자 단위 자동 줄바꿈). opt: indent, bullet(+bulletX, bulletColor), swatch{kind,color,x}, bar(+barX)
+  env.text = (tokens, size, lineH, color, opt) => {
+    opt = opt || {};
+    const left = PAD + (opt.indent || 0), right = PAD + CW;
+    let x = left, first = true, base = 0;
+    const startLine = () => {
+      env.ensure(lineH);
+      base = env.y + lineH / 2 + size * 0.36;
+      if (env.draw) {
+        const c = env.ctx;
+        if (opt.bar) { c.fillStyle = '#d9dbe4'; c.fillRect(PAD + (opt.barX || 0), env.y + 2, 6, lineH - 4); }
+        if (first && opt.bullet) { c.fillStyle = opt.bulletColor || '#3d4cc8'; env.font(true, size); c.fillText(opt.bullet, PAD + (opt.bulletX || 0), base); }
+        if (first && opt.swatch) {
+          c.fillStyle = opt.swatch.color;
+          const cy = base - size * 0.34, sx = PAD + (opt.swatch.x || 0);
+          if (opt.swatch.kind === 'bar') { c.fillRect(sx, cy - 3, 22, 6); }
+          else { c.beginPath(); c.arc(sx + 10, cy, 9, 0, Math.PI * 2); c.fill(); }
+        }
+      }
+      first = false;
+    };
+    startLine();
+    tokens.forEach(t => {
+      Array.from(t.text || '').forEach(ch => {
+        const sz = t.code ? size * 0.9 : size;
+        env.font(t.bold, sz, t.italic, t.code);
+        const cw = env.ctx.measureText(ch).width;
+        if (x + cw > right && x > left) {
+          env.y += lineH; x = left; startLine();
+          env.font(t.bold, sz, t.italic, t.code); // 새 쪽으로 넘어가면 글꼴이 초기화되므로 다시
+          if (ch === ' ') return;
+        }
+        if (env.draw) {
+          const c = env.ctx;
+          if (t.mark) { c.fillStyle = '#fdf3c8'; c.fillRect(x, base - size * 0.82, cw + 1, size * 1.08); }
+          if (t.code) { c.fillStyle = '#eef0f5'; c.fillRect(x, base - size * 0.82, cw + 1, size * 1.08); }
+          c.fillStyle = t.url ? '#3d4cc8' : (t.color || color);
+          c.fillText(ch, x, base);
+          if (t.under || t.url) c.fillRect(x, base + 6, cw, 2.5);
+          if (t.strike) c.fillRect(x, base - size * 0.32, cw, 2.5);
+        }
+        x += cw;
+      });
+    });
+    env.y += lineH;
+  };
+  env.rule = (color, th) => {
+    env.ensure(th + 4);
+    if (env.draw) { env.ctx.fillStyle = color; env.ctx.fillRect(PAD, env.y, CW, th); }
+    env.y += th;
+  };
+  env.image = (img, w, h) => {
+    const maxH = env.paged ? env.bottom - PAD : Infinity;
+    if (h > maxH) { w = w * maxH / h; h = maxH; }
+    env.ensure(h);
+    if (env.draw) env.ctx.drawImage(img, PAD + (CW - w) / 2, env.y, w, h);
+    env.y += h;
+  };
+  // 마크다운 본문 (화면과 같은 규칙)
+  env.md = (md, ind, color) => {
+    ind = ind || 0;
+    const col = color || '#17181c';
+    mdParse(md || '').forEach(b => {
+      if (b.t === 'h') {
+        const sz = [0, 40, 34, 30, 28][b.lv], lh = [0, 58, 52, 46, 42][b.lv];
+        env.y += [0, 16, 14, 10, 8][b.lv];
+        env.ensure(lh + 44); // 제목만 쪽 끝에 홀로 남지 않게
+        env.text(tokenizeInline(b.text, { bold: true }), sz, lh, b.lv >= 3 ? '#5b5e6b' : '#17181c', { indent: ind });
+      } else if (b.t === 'hr') {
+        env.y += 14;
+        env.ensure(4);
+        if (env.draw) { env.ctx.fillStyle = '#e9eaef'; env.ctx.fillRect(PAD + ind, env.y, CW - ind, 2); }
+        env.y += 30;
+      } else if (b.t === 'ul' || b.t === 'ol') {
+        b.items.forEach((it, i) => env.text(tokenizeInline(it), 28, 44, col, { indent: ind + 44, bullet: b.t === 'ul' ? '•' : (b.start + i) + '.', bulletX: ind + 4 }));
+      } else if (b.t === 'quote') {
+        b.lines.forEach(l => env.text(tokenizeInline(l), 28, 44, '#5b5e6b', { indent: ind + 30, bar: true, barX: ind }));
+      } else if (b.t === 'gap') {
+        env.y += 22;
+      } else {
+        env.text(tokenizeInline(b.text), 28, 44, col, { indent: ind });
+      }
+    });
+  };
+  return env;
+}
+
+// 관계도 그림 (기록장 문서용, 머리글 없이)
+function recMapImage(item, k) {
+  const r = getRecord(item);
+  if (!r.chars.length) return null;
+  const vb = mmScene(item).vb;
+  const base = Math.max(vb.w, 360);
+  const w = Math.min(REC_W - REC_PAD * 2, base * 2.2);
+  const c = mmDrawCanvas(item, { noHeader: true, scale: (w / base) * k });
+  return { c, w, h: vb.h * w / base };
+}
+
+// 기록장 전체 배치. 끝난 y(전체 높이)를 돌려줌
+function recLayout(item, sec, env, map) {
+  const r = getRecord(item);
+  const isPod = item.type === 'podcast';
+  // 머리말
+  env.text([{ text: typeName(item.type) + ' 기록장', bold: true }], 22, 34, '#9a9daa');
+  env.y += 6;
+  env.text([{ text: item.title || '', bold: true }], 46, 62, '#17181c');
+  if (item.creator) env.text([{ text: item.creator }], 26, 40, '#5b5e6b');
+  const meta = [];
+  if (item.rating > 0) meta.push(starString(item.rating));
+  if (item.startDate || item.endDate) meta.push(`${item.startDate ? fmtDate(item.startDate) : '?'} → ${item.endDate ? fmtDate(item.endDate) : '진행중'}`);
+  if (meta.length) env.text([{ text: meta.join('   ·   ') }], 24, 38, '#9a9daa');
+  env.y += 14;
+  env.rule('#17181c', 3);
+  env.y += 26;
+
+  const section = title => {
+    env.y += 20;
+    env.ensure(52 + 110);
+    if (env.draw) { env.ctx.fillStyle = '#3d4cc8'; env.ctx.fillRect(env.PAD, env.y + 10, 8, 32); }
+    env.text([{ text: title, bold: true }], 34, 52, '#17181c', { indent: 24 });
+    env.y += 14;
+  };
+
+  if (sec.chars && r.chars.length) {
+    section(isPod ? '출연자' : '인물 관계도');
+    if (map) { env.image(map.c, map.w, map.h); env.y += 28; }
+    const groups = mmGroups(r.chars), gc = r.groupColors || {};
+    env.ensure(42 + 4 + 46 + 44); // 소제목만 쪽 끝에 남지 않게
+    env.text([{ text: `${isPod ? '출연자' : '등장인물'} ${r.chars.length}`, bold: true }], 26, 42, '#9a9daa');
+    env.y += 4;
+    r.chars.forEach(c => {
+      const col = mmColor(c, groups, gc);
+      const toks = [{ text: c.name, bold: true }];
+      if (c.group) toks.push({ text: '  ' + c.group, bold: true, color: mmReadable(col) });
+      env.ensure(46 + (c.desc && c.desc.trim() ? 44 : 0));
+      env.text(toks, 28, 46, '#17181c', { indent: 36, swatch: { kind: 'dot', color: col, x: 0 } });
+      if (c.desc && c.desc.trim()) env.md(c.desc, 36, '#5b5e6b');
+      env.y += 6;
+    });
+    if (r.rels.length) {
+      env.y += 18;
+      env.ensure(42 + 4 + 46);
+      env.text([{ text: `관계 ${r.rels.length}`, bold: true }], 26, 42, '#9a9daa');
+      env.y += 4;
+      const nameOf = id => (r.chars.find(x => x.id === id) || { name: '(삭제됨)' }).name;
+      r.rels.forEach(x => {
+        const rc = mmRelColor(x);
+        const toks = [{ text: nameOf(x.a), bold: true }, { text: x.dir ? '  →  ' : '  ↔  ', color: '#9a9daa' }, { text: nameOf(x.b), bold: true }];
+        if (x.label) toks.push({ text: '    ' + x.label, bold: true, color: mmReadable(rc) });
+        env.text(toks, 28, 46, '#17181c', { indent: 36, swatch: { kind: 'bar', color: rc, x: 0 } });
+      });
+    }
+  }
+
+  if (sec.eps) {
+    const nums = Object.keys(r.eps).map(Number).filter(n => n > 0).sort((a, b) => a - b);
+    if (nums.length) {
+      section('회차 기록');
+      nums.forEach((n, i) => {
+        if (i) { env.y += 12; env.rule('#e9eaef', 2); env.y += 20; }
+        env.ensure(52 + 44);
+        const lab = recEpLabel(item, n);
+        if (env.draw) {
+          env.font(true, 26);
+          const lw = env.ctx.measureText(lab).width + 36;
+          env.ctx.fillStyle = '#eceefb';
+          mmRoundRect(env.ctx, env.PAD, env.y + 4, lw, 44, 22); env.ctx.fill();
+          env.ctx.fillStyle = '#3d4cc8';
+          env.ctx.fillText(lab, env.PAD + 18, env.y + 35);
+        }
+        env.y += 60;
+        env.md(r.eps[n].text);
+      });
+    }
+  }
+
+  if (sec.comment && (item.memo || item.rating > 0)) {
+    section('총평');
+    if (item.rating > 0) env.text([{ text: starString(item.rating) }], 32, 50, '#e0a100');
+    if (item.memo) env.md(item.memo);
+  }
+
+  // 이미지: 끝에 바닥글 (PDF는 쪽마다 따로)
+  if (!env.paged) {
+    env.y += 44;
+    env.rule('#e9eaef', 2);
+    env.y += 18;
+    if (env.draw) {
+      const c = env.ctx;
+      c.fillStyle = '#9a9daa'; env.font(false, 20);
+      c.textAlign = 'right';
+      c.fillText('CONTENTS ARCHIVE · ' + fmtToday(), env.W - env.PAD, env.y + 20);
+      c.textAlign = 'left';
+    }
+    env.y += 64;
+  }
+  return env.y;
+}
+
+// 긴 이미지 1장. layout(env)는 끝난 높이를 돌려줌. iOS 캔버스 한계를 넘으면 줄이고, 그래도 길면 앞부분만
+function drawDocImage(layout) {
+  const MAX = 15000;
+  const H = Math.ceil(layout(recEnv('measure', 1)));
+  let k = 1;
+  if (H > MAX) k = Math.max(0.5, MAX / H);
+  const totalH = Math.min(H, Math.floor(MAX / k));
+  const env = recEnv('image', k, totalH);
+  layout(env);
+  return { canvas: env.canvas, cut: totalH < H };
+}
+function drawRecordImage(item, sec) {
+  return drawDocImage(env => recLayout(item, sec, env, sec.chars ? recMapImage(item, env.k) : null));
+}
+
+// PDF: A4 한 쪽씩 그려서 바로 넣고 메모리 반납. counter = { n } 로 여러 문서를 한 PDF에 이어 붙임
+function drawDocPdf(pdf, layout, foot, counter) {
+  counter = counter || { n: 0 };
+  const env = recEnv('pdf', 1.4, 0, p => {
+    const x = p.x;
+    x.fillStyle = '#e9eaef'; x.fillRect(REC_PAD, REC_PAGE_H - 70, REC_W - REC_PAD * 2, 2);
+    x.fillStyle = '#9a9daa'; x.font = `400 18px ${REC_FONT}`;
+    x.textAlign = 'left'; x.fillText(foot, REC_PAD, REC_PAGE_H - 38);
+    x.textAlign = 'right'; x.fillText(String(counter.n + 1), REC_W - REC_PAD, REC_PAGE_H - 38);
+    x.textAlign = 'left';
+    if (counter.n > 0) pdf.addPage();
+    pdf.addImage(p.c.toDataURL('image/jpeg', 0.86), 'JPEG', 0, 0, 210, 297);
+    counter.n++;
+    p.c.width = 1; p.c.height = 1; // 메모리 바로 반납
+  });
+  layout(env);
+  return env.finish();
+}
+function drawRecordPdf(pdf, item, sec) {
+  const map = sec.chars ? recMapImage(item, 1.4) : null;
+  const foot = `〈${mmClip(item.title || '', 22)}〉 기록장 · CONTENTS ARCHIVE`;
+  return drawDocPdf(pdf, env => recLayout(item, sec, env, map), foot);
+}
+
+// Word(.doc): 관계도 그림 + 목록 + 회차 + 총평
+function buildRecordWordHTML(item, sec) {
+  const r = getRecord(item);
+  const isPod = item.type === 'podcast';
+  const meta = [];
+  if (item.rating > 0) meta.push(`<span style="color:#c87f3f;letter-spacing:1px;">${starString(item.rating)}</span>`);
+  if (item.startDate || item.endDate) meta.push(`${item.startDate ? fmtDate(item.startDate) : '?'} → ${item.endDate ? fmtDate(item.endDate) : '진행중'}`);
+  const sh = t => `<h2 style="color:#3d4cc8;border-left:5px solid #3d4cc8;padding-left:8px;margin:20pt 0 8pt;">${t}</h2>`;
+  let h = `<div style="font-size:9pt;color:#9e9a93;font-weight:bold;letter-spacing:1px;">${typeName(item.type)} 기록장</div>
+    <h1 style="margin:2pt 0;">${escapeHTML(item.title || '')}</h1>
+    ${item.creator ? `<div style="color:#5e5b56;">${escapeHTML(item.creator)}</div>` : ''}
+    ${meta.length ? `<div style="color:#5e5b56;font-size:10pt;margin-top:4pt;">${meta.join(' &nbsp;·&nbsp; ')}</div>` : ''}
+    <hr style="border:0;border-top:2px solid #1c1b1a;margin:10pt 0 12pt;">`;
+  if (sec.chars && r.chars.length) {
+    h += sh(isPod ? '출연자' : '인물 관계도');
+    try {
+      const vb = mmScene(item).vb, base = Math.max(vb.w, 360);
+      const w = Math.round(Math.min(600, base * 1.6)), hh = Math.round(vb.h * w / base);
+      const url = mmDrawCanvas(item, { noHeader: true, scale: 2 * w / base }).toDataURL('image/png');
+      h += `<p style="text-align:center;"><img src="${url}" width="${w}" height="${hh}" alt="인물 관계도"></p>`;
+    } catch (e) { /* 그림이 안 되면 목록만 */ }
+    const groups = mmGroups(r.chars), gc = r.groupColors || {};
+    h += `<h3 style="color:#5e5b56;margin:12pt 0 4pt;">${isPod ? '출연자' : '등장인물'} ${r.chars.length}</h3>`;
+    r.chars.forEach(c => {
+      const col = mmColor(c, groups, gc);
+      h += `<p style="margin:4pt 0 2pt;"><span style="color:${col};">●</span> <b>${escapeHTML(c.name)}</b>${c.group ? ` &nbsp;<span style="color:${mmReadable(col)};font-weight:bold;">${escapeHTML(c.group)}</span>` : ''}</p>`;
+      if (c.desc && c.desc.trim()) h += `<div style="margin-left:16pt;color:#5e5b56;">${renderMarkdownForExport(c.desc)}</div>`;
+    });
+    if (r.rels.length) {
+      const nameOf = id => (r.chars.find(x => x.id === id) || { name: '(삭제됨)' }).name;
+      h += `<h3 style="color:#5e5b56;margin:12pt 0 4pt;">관계 ${r.rels.length}</h3>`;
+      r.rels.forEach(x => {
+        const rc = mmRelColor(x);
+        h += `<p style="margin:3pt 0;"><span style="color:${rc};font-weight:bold;">━</span> <b>${escapeHTML(nameOf(x.a))}</b> ${x.dir ? '→' : '↔'} <b>${escapeHTML(nameOf(x.b))}</b>${x.label ? ` &nbsp;<span style="color:${mmReadable(rc)};font-weight:bold;">${escapeHTML(x.label)}</span>` : ''}</p>`;
+      });
+    }
+  }
+  if (sec.eps) {
+    const nums = Object.keys(r.eps).map(Number).filter(n => n > 0).sort((a, b) => a - b);
+    if (nums.length) {
+      h += sh('회차 기록');
+      nums.forEach(n => {
+        h += `<h3 style="color:#3d4cc8;margin:14pt 0 4pt;">${recEpLabel(item, n)}</h3><div>${renderMarkdownForExport(r.eps[n].text)}</div>`;
+      });
+    }
+  }
+  if (sec.comment && (item.memo || item.rating > 0)) {
+    h += sh('총평');
+    if (item.rating > 0) h += `<p style="color:#c87f3f;font-size:14pt;letter-spacing:2px;margin:0 0 6pt;">${starString(item.rating)}</p>`;
+    if (item.memo) h += `<div>${renderMarkdownForExport(item.memo)}</div>`;
+  }
+  h += `<div style="margin-top:28pt;border-top:1px solid #e8e6e1;padding-top:6pt;font-size:8pt;color:#9e9a93;text-align:right;">CONTENTS ARCHIVE · ${fmtToday()}</div>`;
+  return h;
 }
 
 // 검색용 글자
@@ -7849,7 +8506,8 @@ function mergeRecords(a, b) {
   const byId = (x, y) => { const m = new Map(); (x || []).forEach(o => m.set(o.id, o)); (y || []).forEach(o => m.set(o.id, o)); return [...m.values()]; };
   const eps = Object.assign({}, A.eps || {});
   Object.entries(B.eps || {}).forEach(([k, v]) => { if (!eps[k] || (v && (v.updatedAt || 0) >= (eps[k].updatedAt || 0))) eps[k] = v; });
-  return { chars: byId(A.chars, B.chars), rels: byId(A.rels, B.rels), eps, manual: !!(A.manual || B.manual) };
+  const groupColors = Object.assign({}, A.groupColors || {}, B.groupColors || {});
+  return { chars: byId(A.chars, B.chars), rels: byId(A.rels, B.rels), eps, manual: !!(A.manual || B.manual), groupColors };
 }
 
 document.addEventListener('pointerdown', mmPointerDown);
