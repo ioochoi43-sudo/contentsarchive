@@ -1225,8 +1225,7 @@
     padding: 14px;
     background: var(--bg-elev);
     border: 1px solid var(--line);
-    border-top: none;
-    border-radius: 0 0 8px 8px;
+    border-radius: 10px;
     color: var(--ink);
     font-family: var(--sans);
     font-size: 14px;
@@ -1282,6 +1281,118 @@
   .md-preview h3 { font-size: 15px; font-weight: 700; margin: 14px 0 6px; color: var(--ink-dim); }
   .md-preview h3:first-child { margin-top: 0; }
   .md-preview hr { border: none; border-top: 1px solid var(--line); margin: 16px 0; }
+  .md-preview strong, .md-view strong { font-weight: 700; }
+  .md-preview em, .md-view em { font-style: italic; }
+  .md-preview u, .md-view u { text-decoration: underline; }
+  .md-preview del, .md-view del { text-decoration: line-through; color: var(--ink-mute); }
+  .md-preview mark, .md-view mark { background: var(--highlight); color: inherit; padding: 0 3px; border-radius: 3px; }
+  .md-preview code, .md-view code { font-family: ui-monospace, Menlo, monospace; font-size: 0.88em; background: var(--bg-soft); border: 1px solid var(--line); padding: 1px 5px; border-radius: 5px; }
+  .md-preview blockquote, .md-view blockquote { margin: 6px 0; padding-left: 12px; border-left: 3px solid var(--line); color: var(--ink-dim); }
+  .md-preview h4 { font-size: 14px; font-weight: 700; margin: 12px 0 4px; color: var(--ink-dim); }
+  .md-link { color: var(--accent); text-decoration: underline; word-break: break-all; }
+  .md-view { font-size: 14px; line-height: 1.6; color: var(--ink); word-break: break-word; }
+  .md-view > :first-child { margin-top: 0; }
+  .md-view h1 { font-size: 19px; font-weight: 700; letter-spacing: -0.02em; margin: 12px 0 6px; }
+  .md-view h2 { font-size: 17px; font-weight: 700; letter-spacing: -0.02em; margin: 12px 0 5px; }
+  .md-view h3 { font-size: 15px; font-weight: 700; margin: 10px 0 4px; color: var(--ink-dim); }
+  .md-view h4 { font-size: 14px; font-weight: 700; margin: 8px 0 3px; color: var(--ink-dim); }
+  .md-view p { margin: 0; }
+  .md-view ul, .md-view ol { margin: 4px 0 4px 20px; }
+  .md-view li { margin: 2px 0; }
+  .md-view hr { border: none; border-top: 1px solid var(--line); margin: 12px 0; }
+  .md-empty { color: var(--ink-mute); }
+
+  /* 서식 버튼 */
+  .md-tools {
+    display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none;
+    padding: 8px 0; margin-bottom: 4px;
+    position: sticky; top: 61px; z-index: 1; background: var(--bg-elev);
+  }
+  .md-tools::-webkit-scrollbar { display: none; }
+  .md-tools { -webkit-mask-image: linear-gradient(90deg, #000 86%, transparent); mask-image: linear-gradient(90deg, #000 86%, transparent); padding-right: 52px; }
+  .mdt {
+    flex-shrink: 0; height: 34px; min-width: 36px; padding: 0 11px;
+    border-radius: 9px; border: 1px solid var(--line); background: var(--bg-soft);
+    font-size: 13px; font-weight: 650; color: var(--ink-dim); font-family: var(--sans);
+    cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+    -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent;
+  }
+  .mdt:active { background: var(--line); }
+  .mdt.b { font-weight: 800; color: var(--ink); }
+  .mdt.i { font-style: italic; font-family: Georgia, 'Times New Roman', serif; font-size: 15px; }
+  .mdt.u { text-decoration: underline; }
+  .mdt.s { text-decoration: line-through; }
+  .mdt.c { font-family: ui-monospace, Menlo, monospace; font-size: 12px; }
+  .mdt.mk { background: #fff08a; color: #6b5300; border-color: #efe07c; }
+  .md-field-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; }
+  .md-pv-btn { border: none; background: none; color: var(--accent); font-size: 12px; font-weight: 700; cursor: pointer; font-family: var(--sans); padding: 6px 0; }
+  .md-pv-box { border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; min-height: 80px; cursor: text; background: var(--bg-elev); }
+
+  /* 작품 기록장 */
+  .rec-card {
+    background: var(--bg-elev); border: 1px solid var(--line-soft);
+    box-shadow: 0 2px 14px rgba(23,24,28,0.06);
+    border-radius: 18px; padding: 16px; margin: 18px 0; cursor: pointer;
+  }
+  .rec-card:active { transform: scale(0.99); }
+  .rec-card-head { display: flex; justify-content: space-between; align-items: center; }
+  .rec-card-title { font-size: 16px; font-weight: 700; letter-spacing: -0.02em; color: var(--ink); }
+  .rec-card-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .rec-card-chips span { font-size: 11px; font-weight: 600; color: var(--ink-dim); background: var(--bg-soft); border-radius: 100px; padding: 4px 10px; }
+  .rec-card-comment { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line-soft); }
+  .rec-card-label { font-size: 11px; color: var(--ink-mute); font-weight: 600; margin-bottom: 4px; }
+  .rec-tabs { display: flex; gap: 6px; padding: 12px 20px 0; }
+  .rec-tab {
+    flex: 1; padding: 10px 4px; border-radius: 12px; border: none; background: var(--bg-soft);
+    font-size: 13px; font-weight: 700; color: var(--ink-dim); font-family: var(--sans); cursor: pointer;
+  }
+  .rec-tab.active { background: var(--ink); color: #fff; }
+  .rec-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+  .plan-mini-btn:disabled { opacity: 0.4; cursor: default; }
+  .mm-wrap { background: var(--bg-soft); border-radius: 16px; overflow: auto; -webkit-overflow-scrolling: touch; min-height: 120px; }
+  .mm-wrap svg { display: block; margin: 0 auto; overflow: visible; }
+  .mm-node { cursor: grab; touch-action: none; }
+  .mm-node.dragging rect { stroke-width: 3; }
+  .mm-name { font-size: 14px; font-weight: 700; fill: #17181c; font-family: var(--sans); pointer-events: none; }
+  .mm-sub { font-size: 11px; font-weight: 600; font-family: var(--sans); pointer-events: none; }
+  .mm-rel { font-size: 11px; font-weight: 600; fill: #5b5e6b; font-family: var(--sans); }
+  .mm-title { font-size: 15px; font-weight: 700; fill: #fff; font-family: var(--sans); }
+  .mm-hint { font-size: 11px; color: var(--ink-mute); margin: 8px 2px 4px; text-align: center; }
+  .rec-sub-title { font-size: 13px; font-weight: 700; color: var(--ink); margin: 18px 0 8px; }
+  .rec-list { display: flex; flex-direction: column; gap: 6px; }
+  .rec-row {
+    display: flex; gap: 10px; align-items: flex-start; width: 100%; text-align: left;
+    padding: 11px 12px; border: 1px solid var(--line); border-radius: 12px;
+    background: var(--bg-elev); cursor: pointer; font-family: var(--sans);
+  }
+  .rec-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+  .rec-row-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+  .rec-row-title { font-size: 14px; font-weight: 700; color: var(--ink); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .rec-row-desc { font-size: 12.5px; color: var(--ink-dim); max-height: 4.8em; overflow: hidden; }
+  .rec-row-desc.md-view { font-size: 12.5px; }
+  .rec-chip { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 100px; background: var(--bg-soft); color: var(--ink-dim); }
+  .rec-arrow { color: var(--accent); }
+  .rec-ep-row {
+    display: flex; align-items: center; gap: 10px; width: 100%;
+    padding: 11px 12px; border: 1px solid var(--line-soft); border-radius: 12px;
+    background: var(--bg-soft); cursor: pointer; text-align: left; font-family: var(--sans);
+  }
+  .rec-ep-row.has { background: var(--bg-elev); border-color: var(--line); }
+  .rec-ep-num { font-size: 13px; font-weight: 700; color: var(--ink); min-width: 42px; font-variant-numeric: tabular-nums; }
+  .rec-ep-text { flex: 1; min-width: 0; font-size: 13px; color: var(--ink-mute); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .rec-ep-row.has .rec-ep-text { color: var(--ink); }
+  .rec-ep-seen { font-size: 11px; font-weight: 700; color: #2f8f6a; background: #e3f3ec; border-radius: 100px; padding: 2px 8px; flex-shrink: 0; }
+  .ep-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .ep-nav { display: flex; gap: 8px; margin-top: 16px; }
+  .ep-nav .btn:disabled { opacity: 0.35; }
+  .ep-del { display: block; margin: 14px auto 0; background: none; border: none; color: #c4543a; font-size: 12px; font-weight: 600; cursor: pointer; font-family: var(--sans); }
+  .rec-stars { display: flex; gap: 4px; }
+  .rec-star { font-size: 30px; line-height: 1; border: none; background: none; color: var(--line); cursor: pointer; padding: 0 2px; }
+  .rec-star.on { color: #f2b230; }
+  .rel-pick { display: flex; gap: 8px; align-items: center; }
+  .rel-pick select { flex: 1; min-width: 0; }
+  .rel-pick .plan-nav-btn { flex-shrink: 0; font-size: 18px; }
+
   .md-preview .md-bold { font-weight: 700; }
   .md-preview .md-italic { font-style: italic; }
   .md-preview .md-under { text-decoration: underline; }
@@ -2312,7 +2423,7 @@
     </div>
 
     <div id="versionText" style="text-align: center; margin-top: 40px; font-size: 11px; color: var(--ink-mute); letter-spacing: 0.04em; font-weight: 500;">
-      v4.2 · 데이터는 브라우저에 저장됩니다
+      v4.3 · 데이터는 브라우저에 저장됩니다
     </div>
   </section>
 </main>
@@ -2486,9 +2597,12 @@
           </div>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">한줄 메모</label>
-          <textarea class="form-textarea" id="fMemo" placeholder="짧은 감상이나 메모"></textarea>
+        <div class="form-group md-field">
+          <div class="md-field-head"><label class="form-label" style="margin:0;">총평 · 코멘트</label><button type="button" class="md-pv-btn" id="fMemo_pvbtn" onclick="toggleMdPreview('fMemo')">미리보기</button></div>
+          <div class="md-tools-slot" data-for="fMemo"></div>
+          <textarea class="form-textarea md-ta" id="fMemo" placeholder="전체적인 감상 — 서식 버튼으로 꾸밀 수 있어요"></textarea>
+          <div class="md-view md-pv-box" id="fMemo_pv" style="display:none;" onclick="setMdPreview('fMemo', false)"></div>
+          <div style="font-size: 11px; color: var(--ink-mute); margin-top: 6px;">인물 관계도·회차 기록은 저장 후 상세 화면의 📒 작품 기록장에서 써요</div>
         </div>
 
         <div class="btn-row">
@@ -2563,8 +2677,8 @@
 
       <div class="md-help">
         <div class="md-help-title">📝 마크다운 문법</div>
-        <code>**굵게**</code> <code>//기울임//</code> <code>__밑줄__</code> <code>~~취소선~~</code> <code>==형광펜==</code><br>
-        <code># 제목1</code> <code>## 제목2</code> <code>### 제목3</code> <code>-----</code>
+        <code>**굵게**</code> <code>*기울임*</code> <code>__밑줄__</code> <code>~~취소선~~</code> <code>==하이라이트==</code> <code>`코드`</code><br>
+        <code># 제목</code>~<code>#### 제목</code> <code>- 목록</code> <code>1. 번호</code> <code>&gt; 인용</code> <code>---</code> · 글자를 고르고 버튼을 누르면 적용, 다시 누르면 해제
       </div>
 
       <div class="form-group">
@@ -2578,20 +2692,7 @@
       </div>
 
       <div id="editorPane">
-        <div class="md-toolbar">
-          <button class="md-btn md-btn-b" type="button" onclick="wrapSel('**','**')" title="굵게">B</button>
-          <button class="md-btn md-btn-i" type="button" onclick="wrapSel('//','//')" title="기울임">I</button>
-          <button class="md-btn md-btn-u" type="button" onclick="wrapSel('__','__')" title="밑줄">U</button>
-          <button class="md-btn md-btn-s" type="button" onclick="wrapSel('~~','~~')" title="취소선">S</button>
-          <button class="md-btn md-btn-hl" type="button" onclick="wrapSel('==','==')" title="형광펜">H</button>
-          <div class="md-divider"></div>
-          <button class="md-btn" type="button" onclick="insertLine('# ')" title="제목 1">H1</button>
-          <button class="md-btn" type="button" onclick="insertLine('## ')" title="제목 2">H2</button>
-          <button class="md-btn" type="button" onclick="insertLine('### ')" title="제목 3">H3</button>
-          <div class="md-divider"></div>
-          <button class="md-btn" type="button" onclick="insertLine('- ')" title="목록">•</button>
-          <button class="md-btn" type="button" onclick="insertText('\n-----\n')" title="구분선">―</button>
-        </div>
+        <div class="md-tools-slot" data-for="noteContent"></div>
         <textarea class="note-textarea" id="noteContent" placeholder="자유롭게 기록해보세요..."></textarea>
         <div class="form-group" style="margin-top: 12px;">
           <label class="form-label">사진 첨부 <span style="font-weight:400;color:var(--ink-mute);">— 자동으로 압축돼요</span></label>
@@ -2682,6 +2783,7 @@
 
       <div class="form-group">
         <label class="form-label">템플릿 내용 (마크다운 지원)</label>
+        <div class="md-tools-slot" data-for="templateContent"></div>
         <textarea class="note-textarea" id="templateContent" placeholder="## 한 줄 요약&#10;&#10;&#10;## 인상 깊었던 부분&#10;..." style="border-radius: 8px; border-top: 1px solid var(--line); min-height: 200px;"></textarea>
       </div>
 
@@ -2721,6 +2823,115 @@
       <div style="font-size: 12px; color: var(--ink-mute); margin-bottom: 12px;">↑↓ 순서 변경 · ✎ 수정 · × 삭제</div>
       <button class="btn btn-primary" onclick="openCountryEditor()" style="width: 100%; margin-bottom: 16px;">+ 새 국가 추가</button>
       <div id="countryManagerList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- RECORD MODAL (작품 기록장) -->
+<div class="modal" id="recordModal">
+  <div class="modal-content">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title" id="recordTitle" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">기록장</div>
+      <button type="button" class="plan-mini-btn" onclick="copyRecordAll()" style="margin-right:8px;">📋 전체</button>
+      <button class="modal-close" onclick="closeRecord()">×</button>
+    </div>
+    <div class="rec-tabs" id="recordTabs"></div>
+    <div class="modal-body" id="recordBody" style="padding-top: 14px;"></div>
+  </div>
+</div>
+
+<!-- CHARACTER EDITOR -->
+<div class="modal" id="charModal" style="z-index: 250;">
+  <div class="modal-content">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title" id="charModalTitle">인물 추가</div>
+      <button class="modal-close" onclick="closeCharEditor()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">이름</label>
+        <input type="text" class="form-input" id="chName" placeholder="예: 차하윤">
+      </div>
+      <div class="form-group">
+        <label class="form-label">소속 · 그룹 <span style="font-weight:400;color:var(--ink-mute);">— 같은 소속은 같은 색으로 묶여요</span></label>
+        <input type="text" class="form-input" id="chGroup" placeholder="예: 검찰, 가족, 주인공">
+        <div class="plan-quick" id="chGroupChips" style="margin-top: 8px;"></div>
+      </div>
+      <div class="md-field">
+        <div class="md-field-head"><label class="form-label" style="margin:0;">설명</label><button type="button" class="md-pv-btn" id="chDesc_pvbtn" onclick="toggleMdPreview('chDesc')">미리보기</button></div>
+        <div class="md-tools-slot" data-for="chDesc"></div>
+        <textarea class="form-textarea md-ta" id="chDesc" placeholder="성격, 직업, 비밀, 떡밥…"></textarea>
+        <div class="md-view md-pv-box" id="chDesc_pv" style="display:none;" onclick="setMdPreview('chDesc', false)"></div>
+      </div>
+      <div class="btn-row">
+        <button type="button" class="btn btn-danger" id="chDeleteBtn" onclick="deleteChar()">삭제</button>
+        <button type="button" class="btn btn-primary" onclick="saveChar()">저장</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RELATION EDITOR -->
+<div class="modal" id="relModal" style="z-index: 250;">
+  <div class="modal-content">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title" id="relModalTitle">관계 추가</div>
+      <button class="modal-close" onclick="closeRelEditor()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">누가 · 누구와</label>
+        <div class="rel-pick">
+          <select class="form-input" id="relA"></select>
+          <button type="button" class="plan-nav-btn" onclick="swapRel()" aria-label="서로 바꾸기">⇄</button>
+          <select class="form-input" id="relB"></select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">관계</label>
+        <input type="text" class="form-input" id="relLabel" placeholder="예: 연인, 라이벌, 동업자">
+        <div class="plan-quick" id="relChips" style="margin-top: 8px;"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">방향</label>
+        <div class="seg-picker" id="relDirPicker">
+          <button type="button" class="seg-option active" data-dir="0" onclick="setRelDir(false)">↔ 서로</button>
+          <button type="button" class="seg-option" data-dir="1" onclick="setRelDir(true)">→ 한쪽 (짝사랑 등)</button>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button type="button" class="btn btn-danger" id="relDeleteBtn" onclick="deleteRel()">삭제</button>
+        <button type="button" class="btn btn-primary" onclick="saveRel()">저장</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EPISODE RECORD EDITOR -->
+<div class="modal" id="epModal" style="z-index: 250;">
+  <div class="modal-content">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title" id="epModalTitle" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">회차 기록</div>
+      <button class="modal-close" onclick="closeEpEditor()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="ep-top"><span id="epStatus"></span><button type="button" class="plan-mini-btn" onclick="insertEpTemplate()">📋 기본 틀</button></div>
+      <div class="md-field">
+        <div class="md-field-head"><label class="form-label" style="margin:0;">기록</label><button type="button" class="md-pv-btn" id="recEpText_pvbtn" onclick="toggleMdPreview('recEpText')">미리보기</button></div>
+        <div class="md-tools-slot" data-for="recEpText"></div>
+        <textarea class="form-textarea md-ta" id="recEpText" placeholder="이 회차에서 있었던 일, 인상 깊은 장면, 떡밥…" style="min-height: 220px;"></textarea>
+        <div class="md-view md-pv-box" id="recEpText_pv" style="display:none; min-height: 160px;" onclick="setMdPreview('recEpText', false)"></div>
+      </div>
+      <div class="ep-nav">
+        <button type="button" class="btn" id="epPrevBtn" onclick="moveEp(-1)">‹</button>
+        <button type="button" class="btn btn-primary" onclick="closeEpEditor()">저장</button>
+        <button type="button" class="btn" id="epNextBtn" onclick="moveEp(1)">›</button>
+      </div>
+      <button type="button" class="ep-del" id="epDeleteBtn" onclick="deleteEpRecord()">이 회차 기록 지우기</button>
     </div>
   </div>
 </div>
@@ -2868,8 +3079,8 @@
       </div>
     </div>
     <div class="form-group">
-      <label class="form-label">한줄 리뷰</label>
-      <textarea class="form-textarea" id="doneReviewText" placeholder="짧은 감상을 남겨보세요" style="min-height: 70px;"></textarea>
+      <label class="form-label">총평 <span style="font-weight:400;">— 한 줄이어도 좋아요</span></label>
+      <textarea class="form-textarea" id="doneReviewText" placeholder="다 보고 난 감상을 남겨보세요" style="min-height: 70px;"></textarea>
     </div>
     <div class="btn-row" style="margin-top: 12px;">
       <button class="btn" onclick="skipDoneReview()">나중에</button>
@@ -2995,7 +3206,7 @@
 <div id="exportRender" style="position: fixed; left: -9999px; top: 0; width: 600px; background: white; padding: 40px; font-family: 'Pretendard Variable', Pretendard, sans-serif; color: #1c1b1a;"></div>
 
 <!-- CONFIRM MODAL -->
-<div class="modal confirm-modal" id="confirmModal">
+<div class="modal confirm-modal" id="confirmModal" style="z-index: 320;">
   <div class="confirm-content">
     <div class="confirm-title" id="confirmTitle">정말 삭제할까요?</div>
     <div class="confirm-desc" id="confirmDesc">이 작업은 되돌릴 수 없습니다.</div>
@@ -3046,9 +3257,14 @@ const DEFAULT_OTT = [
 ];
 
 // ============ VERSION ============
-const APP_VERSION = '4.2';
+const APP_VERSION = '4.3';
 const VERSION_KEY = 'contentsArchive_seenVersion';
 const VERSION_NOTES = {
+  '4.3': [
+    '📒 작품 기록장 — 인물 관계도(마인드맵) · 회차별 기록 · 총평',
+    '한줄 메모가 총평이 됐어요 (기존 메모는 그대로 총평에 들어가요)',
+    '마크다운 서식 버튼: 제목·굵게·기울임·하이라이트·코드·목록·인용·구분선, 다시 누르면 해제'
+  ],
   '4.2': [
     '계획 복사를 작품별로 하나씩 — 주간은 월~일을 합쳐서 〈제목〉 3~19화처럼',
     '계획 줄마다 📋 복사 버튼',
@@ -3152,6 +3368,7 @@ function load() {
           delete item.ott;
         }
         if (item.country === undefined) item.country = null;
+        if (item.record) getRecord(item);
         if (item.type === 'drama' || item.type === 'anime') {
           if (!Array.isArray(item.epWatched)) item.epWatched = [];
           if (typeof item.epSeqMode !== 'boolean') item.epSeqMode = true; // 기존 동작(순차) 유지
@@ -3284,19 +3501,6 @@ function fmtDateTime(ts) {
   if (!ts) return '';
   const d = new Date(ts);
   return `${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-}
-
-// 마크다운 기호를 걷어낸 순수 텍스트
-function stripMarkdownText(md) {
-  return (md || '')
-    .replace(/^#{1,3}\s*/gm, '')
-    .replace(/^>\s?/gm, '')
-    .replace(/^-{5,}\s*$/gm, '─────')
-    .replace(/\*\*(.+?)\*\*/g, '$1')
-    .replace(/\/\/(.+?)\/\//g, '$1')
-    .replace(/__(.+?)__/g, '$1')
-    .replace(/~~(.+?)~~/g, '$1')
-    .replace(/==(.+?)==/g, '$1');
 }
 
 function buildNoteText(item, note) {
@@ -3439,96 +3643,372 @@ function updateDateClearVisibility(fieldId) {
 
 // ============ MARKDOWN RENDERER ============
 // Custom MD parser supporting //italic//, __underline__, ==highlight==, plus standard
-function renderMarkdown(md) {
-  if (!md) return '';
-  // Escape HTML first
-  let text = escapeHTML(md);
+// ============ MARKDOWN (화면·Word·이미지·텍스트 복사 공용) ============
+// 제목 # ~ ####, **굵게**, *기울임* (//기울임// 도 됨), __밑줄__, ~~취소선~~, ==하이라이트==, `코드`,
+// - 목록, 1. 번호 목록, > 인용, --- 구분선. 빈 줄은 줄 간격.
+const MD_INLINE_RE = /(`([^`\n]+)`)|(https?:\/\/[^\s<>"']+)|(\*\*\*([^*\n](?:[^\n]*?[^*\n])?)\*\*\*)|(\*\*(.+?)\*\*)|(==(.+?)==)|(~~(.+?)~~)|(__(.+?)__)|(\/\/(.+?)\/\/)|(\*([^*\s](?:[^*\n]*?[^*\s])?)\*)/;
 
-  // Block-level: split into lines
-  const lines = text.split('\n');
-  const blocks = [];
-  let listBuffer = [];
-  let listType = null; // 'ul' or 'ol'
-
-  function flushList() {
-    if (listBuffer.length === 0) return;
-    const tag = listType;
-    blocks.push(`<${tag}>` + listBuffer.map(item => `<li>${processInline(item)}</li>`).join('') + `</${tag}>`);
-    listBuffer = [];
-    listType = null;
+function mdTokens(text, base) {
+  base = base || {};
+  const out = [];
+  const s = String(text == null ? '' : text);
+  const re = new RegExp(MD_INLINE_RE.source, 'g');
+  let pos = 0, m;
+  while ((m = re.exec(s)) !== null) {
+    if (m.index > pos) out.push(Object.assign({}, base, { text: s.slice(pos, m.index) }));
+    let used = m[0].length;
+    const sub = (inner, flags) => { mdTokens(inner, Object.assign({}, base, flags)).forEach(t => out.push(t)); };
+    if (m[1]) out.push(Object.assign({}, base, { text: m[2], code: true }));
+    else if (m[3]) {
+      const url = m[3].replace(/[.,!?;:)\]}]+$/, '');
+      used = url.length;
+      out.push(Object.assign({}, base, { text: url, url }));
+    }
+    else if (m[4]) sub(m[5], { bold: true, italic: true });
+    else if (m[6]) sub(m[7], { bold: true });
+    else if (m[8]) sub(m[9], { mark: true });
+    else if (m[10]) sub(m[11], { strike: true });
+    else if (m[12]) sub(m[13], { under: true });
+    else if (m[14]) sub(m[15], { italic: true });
+    else if (m[16]) sub(m[17], { italic: true });
+    pos = m.index + Math.max(used, 1);
+    re.lastIndex = pos;
   }
-
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    const trimmed = line.trim();
-
-    // Horizontal rule: ----- (5 or more dashes alone)
-    if (/^-{5,}\s*$/.test(trimmed)) {
-      flushList();
-      blocks.push('<hr>');
-      continue;
-    }
-
-    // Headings
-    let m;
-    if ((m = trimmed.match(/^### (.+)/))) { flushList(); blocks.push(`<h3>${processInline(m[1])}</h3>`); continue; }
-    if ((m = trimmed.match(/^## (.+)/))) { flushList(); blocks.push(`<h2>${processInline(m[1])}</h2>`); continue; }
-    if ((m = trimmed.match(/^# (.+)/))) { flushList(); blocks.push(`<h1>${processInline(m[1])}</h1>`); continue; }
-
-    // Unordered list
-    if ((m = trimmed.match(/^[-*] (.+)/))) {
-      if (listType && listType !== 'ul') flushList();
-      listType = 'ul';
-      listBuffer.push(m[1]);
-      continue;
-    }
-    // Ordered list
-    if ((m = trimmed.match(/^\d+\. (.+)/))) {
-      if (listType && listType !== 'ol') flushList();
-      listType = 'ol';
-      listBuffer.push(m[1]);
-      continue;
-    }
-
-    flushList();
-
-    // Empty line
-    if (trimmed === '') {
-      blocks.push('<br>');
-      continue;
-    }
-
-    // Blockquote
-    if ((m = trimmed.match(/^&gt; (.+)/))) {
-      blocks.push(`<p style="border-left: 3px solid var(--line); padding-left: 12px; color: var(--ink-dim); margin: 8px 0;">${processInline(m[1])}</p>`);
-      continue;
-    }
-
-    // Regular paragraph
-    blocks.push(`<p>${processInline(line)}</p>`);
-  }
-  flushList();
-  return blocks.join('');
+  if (pos < s.length) out.push(Object.assign({}, base, { text: s.slice(pos) }));
+  return out;
 }
 
-function processInline(text) {
-  // Protect URLs first so // in https:// doesn't get parsed as italic
-  const urlPlaceholders = [];
-  text = text.replace(/https?:\/\/[^\s<]+/g, (m) => {
-    urlPlaceholders.push(m);
-    return `\u0000URL${urlPlaceholders.length - 1}\u0000`;
+function mdPlain(text) { return mdTokens(text).map(t => t.text).join(''); }
+
+// 줄 단위 블록으로 나누기
+function mdParse(md) {
+  const lines = String(md == null ? '' : md).replace(/\r\n?/g, '\n').split('\n');
+  const blocks = [];
+  let list = null, quote = null;
+  const flushList = () => { if (list) { blocks.push(list); list = null; } };
+  const flushQuote = () => { if (quote) { blocks.push(quote); quote = null; } };
+  for (const line of lines) {
+    let m;
+    if (/^\s*(-{3,}|\*{3,})\s*$/.test(line)) { flushList(); flushQuote(); blocks.push({ t: 'hr' }); continue; }
+    if ((m = line.match(/^\s*(#{1,4})\s+(.*)$/))) { flushList(); flushQuote(); blocks.push({ t: 'h', lv: m[1].length, text: m[2].trim() }); continue; }
+    if ((m = line.match(/^\s*[-*+]\s+(.*)$/))) {
+      flushQuote();
+      if (!list || list.t !== 'ul') { flushList(); list = { t: 'ul', items: [] }; }
+      list.items.push(m[1]);
+      continue;
+    }
+    if ((m = line.match(/^\s*(\d+)[.)]\s+(.*)$/))) {
+      flushQuote();
+      if (!list || list.t !== 'ol') { flushList(); list = { t: 'ol', start: parseInt(m[1], 10) || 1, items: [] }; }
+      list.items.push(m[2]);
+      continue;
+    }
+    if ((m = line.match(/^\s*>\s?(.*)$/))) {
+      flushList();
+      if (!quote) quote = { t: 'quote', lines: [] };
+      quote.lines.push(m[1]);
+      continue;
+    }
+    flushList(); flushQuote();
+    if (line.trim() === '') { blocks.push({ t: 'gap' }); continue; }
+    blocks.push({ t: 'p', text: line });
+  }
+  flushList(); flushQuote();
+  return blocks;
+}
+
+const MD_EXPORT_STYLE = {
+  code: 'font-family: Menlo, Consolas, monospace; font-size: 0.9em; background: #f1f2f6; padding: 1px 5px; border-radius: 4px;',
+  mark: 'background: #fff3a6; padding: 0 3px; border-radius: 2px;',
+  strike: 'text-decoration: line-through; color: #9a9daa;',
+  under: 'text-decoration: underline;',
+  italic: 'font-style: italic;',
+  bold: 'font-weight: 700;',
+  link: 'color: #3d4cc8; text-decoration: underline;'
+};
+
+function mdInlineHTML(text, styled) {
+  return mdTokens(text).map(t => {
+    let h = escapeHTML(t.text);
+    if (t.url) {
+      return `<a href="${escapeHTML(t.url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()"${styled ? ` style="${MD_EXPORT_STYLE.link}"` : ' class="md-link"'}>${h}</a>`;
+    }
+    const wrap = (tag, key) => { h = styled ? `<span style="${MD_EXPORT_STYLE[key]}">${h}</span>` : `<${tag}>${h}</${tag}>`; };
+    if (t.code) wrap('code', 'code');
+    if (t.mark) wrap('mark', 'mark');
+    if (t.strike) wrap('del', 'strike');
+    if (t.under) wrap('u', 'under');
+    if (t.italic) wrap('em', 'italic');
+    if (t.bold) wrap('strong', 'bold');
+    return h;
+  }).join('');
+}
+
+function mdBlocksHTML(md, styled) {
+  if (!md) return '';
+  const S = styled ? {
+    h1: 'font-size: 22px; font-weight: 700; letter-spacing: -0.02em; margin: 20px 0 10px; padding-bottom: 6px; border-bottom: 2px solid #e9eaef;',
+    h2: 'font-size: 18px; font-weight: 700; letter-spacing: -0.02em; margin: 18px 0 8px;',
+    h3: 'font-size: 15px; font-weight: 700; margin: 14px 0 6px; color: #5b5e6b;',
+    h4: 'font-size: 14px; font-weight: 700; margin: 12px 0 4px; color: #5b5e6b;',
+    hr: 'border: none; border-top: 1px solid #e9eaef; margin: 16px 0;',
+    list: 'margin: 4px 0 4px 22px;',
+    li: 'margin: 3px 0;',
+    quote: 'border-left: 3px solid #d9dbe4; padding-left: 12px; color: #5b5e6b; margin: 8px 0;',
+    p: 'margin: 0; line-height: 1.55;'
+  } : null;
+  const at = k => (S ? ` style="${S[k]}"` : '');
+  return mdParse(md).map(b => {
+    switch (b.t) {
+      case 'h': return `<h${b.lv}${at('h' + b.lv)}>${mdInlineHTML(b.text, styled)}</h${b.lv}>`;
+      case 'hr': return `<hr${at('hr')}>`;
+      case 'ul': return `<ul${at('list')}>${b.items.map(i => `<li${at('li')}>${mdInlineHTML(i, styled)}</li>`).join('')}</ul>`;
+      case 'ol': return `<ol${b.start !== 1 ? ` start="${b.start}"` : ''}${at('list')}>${b.items.map(i => `<li${at('li')}>${mdInlineHTML(i, styled)}</li>`).join('')}</ol>`;
+      case 'quote': return `<blockquote${at('quote')}>${b.lines.map(l => mdInlineHTML(l, styled)).join('<br>')}</blockquote>`;
+      case 'gap': return '<br>';
+      default: return `<p${at('p')}>${mdInlineHTML(b.text, styled)}</p>`;
+    }
+  }).join('');
+}
+
+function renderMarkdown(md) { return mdBlocksHTML(md, false); }
+function renderMarkdownForExport(md) { return mdBlocksHTML(md, true); }
+
+// 기호를 걷어낸 순수 텍스트 (클립보드 복사용)
+function stripMarkdownText(md) {
+  const out = [];
+  mdParse(md).forEach(b => {
+    if (b.t === 'h') out.push(mdPlain(b.text));
+    else if (b.t === 'hr') out.push('─────');
+    else if (b.t === 'ul') b.items.forEach(i => out.push('• ' + mdPlain(i)));
+    else if (b.t === 'ol') b.items.forEach((i, k) => out.push(`${b.start + k}. ` + mdPlain(i)));
+    else if (b.t === 'quote') b.lines.forEach(l => out.push(mdPlain(l)));
+    else if (b.t === 'gap') out.push('');
+    else out.push(mdPlain(b.text));
   });
+  return out.join('\n');
+}
 
-  // Non-greedy matching so nested combinations work
-  text = text.replace(/~~(.+?)~~/g, '<span class="md-strike">$1</span>');
-  text = text.replace(/==(.+?)==/g, '<span class="md-highlight">$1</span>');
-  text = text.replace(/\*\*(.+?)\*\*/g, '<span class="md-bold">$1</span>');
-  text = text.replace(/__(.+?)__/g, '<span class="md-under">$1</span>');
-  text = text.replace(/\/\/([^\n]+?)\/\//g, '<span class="md-italic">$1</span>');
+// 목록 미리보기용 한 줄
+function mdPreviewLine(md, max) {
+  const s = stripMarkdownText(md).replace(/─────/g, ' ').replace(/\s+/g, ' ').trim();
+  return max && s.length > max ? s.slice(0, max) + '…' : s;
+}
 
-  // Restore URLs
-  text = text.replace(/\u0000URL(\d+)\u0000/g, (_, i) => urlPlaceholders[parseInt(i)]);
-  return text;
+// 캔버스 이미지용 (기존 이름 유지)
+function tokenizeInline(text, base) { return mdTokens(text, base); }
+
+// ============ 서식 버튼 ============
+const MD_TOOLS = [
+  { k: 'h1', n: 'H1', t: 'line', v: '# ', title: '대제목' },
+  { k: 'h2', n: 'H2', t: 'line', v: '## ', title: '중제목' },
+  { k: 'h3', n: 'H3', t: 'line', v: '### ', title: '소제목' },
+  { k: 'b', n: 'B', t: 'wrap', v: '**', cls: 'b', title: '굵게' },
+  { k: 'i', n: 'I', t: 'wrap', v: '*', cls: 'i', title: '기울임' },
+  { k: 'u', n: 'U', t: 'wrap', v: '__', cls: 'u', title: '밑줄' },
+  { k: 'mark', n: '하이라이트', t: 'wrap', v: '==', cls: 'mk', title: '하이라이트' },
+  { k: 's', n: 'S', t: 'wrap', v: '~~', cls: 's', title: '취소선' },
+  { k: 'code', n: '코드', t: 'wrap', v: '`', cls: 'c', title: '코드' },
+  { k: 'ul', n: '• 목록', t: 'line', v: '- ', title: '목록' },
+  { k: 'ol', n: '1. 번호', t: 'line', v: '1. ', title: '번호 목록' },
+  { k: 'quote', n: '❝ 인용', t: 'line', v: '> ', title: '인용' },
+  { k: 'hr', n: '— 구분선', t: 'insert', v: '---', title: '구분선' }
+];
+const MD_WRAP_MARKS = ['**', '==', '~~', '__', '//', '`', '*'];
+
+function mdToolsHTML(targetId) {
+  return `<div class="md-tools" data-for="${targetId}">` + MD_TOOLS.map(t =>
+    `<button type="button" class="mdt ${t.cls || ''}" data-k="${t.k}" title="${t.title}" aria-label="${t.title}" tabindex="-1">${t.n}</button>`
+  ).join('') + '</div>';
+}
+
+// 같은 기호가 정확히 바깥 한 겹을 감싸는지 (중간에 닫히면 아님)
+function mdMarkClosesAtEnd(s, m) {
+  if (m === '*') {
+    for (let i = 1; i < s.length; i++) {
+      if (s[i] === '*' && s[i - 1] !== '*' && s[i + 1] !== '*') return i === s.length - 1;
+      if (s[i] === '*' && i === s.length - 1) return true;
+    }
+    return false;
+  }
+  return s.indexOf(m, m.length) === s.length - m.length;
+}
+
+// "**==글자==**" → layers ['**','=='], inner '글자'
+function mdPeel(str) {
+  const layers = [];
+  let s = str;
+  for (let g = 0; g < 4; g++) {
+    const m = MD_WRAP_MARKS.find(k => s.length > 2 * k.length && s.startsWith(k) && s.endsWith(k) && mdMarkClosesAtEnd(s, k));
+    if (!m) break;
+    layers.push(m);
+    s = s.slice(m.length, s.length - m.length);
+  }
+  return { layers, inner: s };
+}
+
+// 선택 영역 바깥을 감싼 기호들 (안쪽부터)
+function mdOuterLayers(v, a, b) {
+  const layers = [];
+  let L = a, R = b;
+  for (let g = 0; g < 4; g++) {
+    const m = MD_WRAP_MARKS.find(k => L - k.length >= 0 && v.slice(L - k.length, L) === k && v.slice(R, R + k.length) === k);
+    if (!m) break;
+    layers.push({ m, L: L - m.length, R });
+    L -= m.length; R += m.length;
+  }
+  return layers;
+}
+
+function mdWrap(ta, mark) {
+  const v = ta.value;
+  let a = ta.selectionStart, b = ta.selectionEnd;
+  const sel = v.slice(a, b);
+  // 1) 선택한 글자 자체에 기호가 붙어 있으면 그 겹만 벗기기
+  const peel = mdPeel(sel);
+  const idx = peel.layers.indexOf(mark);
+  if (sel && idx >= 0) {
+    const rest = peel.layers.filter((_, i) => i !== idx);
+    const ns = rest.join('') + peel.inner + rest.slice().reverse().join('');
+    ta.value = v.slice(0, a) + ns + v.slice(b);
+    ta.setSelectionRange(a, a + ns.length);
+    return;
+  }
+  // 2) 선택 바깥에 같은 기호가 있으면 벗기기
+  const hit = mdOuterLayers(v, a, b).find(o => o.m === mark);
+  if (hit) {
+    const n = mark.length;
+    ta.value = v.slice(0, hit.L) + v.slice(hit.L + n, hit.R) + v.slice(hit.R + n);
+    ta.setSelectionRange(a - n, b - n);
+    return;
+  }
+  // 3) 감싸기 (양끝 공백은 바깥에 두기)
+  if (sel.trim()) {
+    a += sel.length - sel.replace(/^\s+/, '').length;
+    b -= sel.length - sel.replace(/\s+$/, '').length;
+  }
+  const inner = v.slice(a, b);
+  ta.value = v.slice(0, a) + mark + inner + mark + v.slice(b);
+  ta.setSelectionRange(a + mark.length, b + mark.length);
+}
+
+function mdLine(ta, prefix) {
+  const v = ta.value;
+  const selS = ta.selectionStart;
+  let selE = ta.selectionEnd;
+  if (selE > selS && v[selE - 1] === '\n') selE--;
+  const start = v.lastIndexOf('\n', selS - 1) + 1;
+  let end = v.indexOf('\n', selE);
+  if (end < 0) end = v.length;
+  const lines = v.slice(start, end).split('\n');
+  const escRe = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const re = prefix === '1. ' ? /^\d+[.)]\s+/ : new RegExp('^' + escRe(prefix));
+  const only = lines.length === 1;
+  // 글자가 없는 줄에서도 적용 → 먼저 눌러 두고 이어서 쓸 수 있게
+  const has = only ? re.test(lines[0]) : lines.every(l => !l.trim() || re.test(l));
+  let n = 0;
+  const out = lines.map(l => {
+    if (!l.trim() && !only) return l;
+    if (has) return l.replace(re, '');
+    const bare = l.replace(/^(#{1,4}\s+|[-*+]\s+|\d+[.)]\s+|>\s?)/, '');
+    n++;
+    return (prefix === '1. ' ? n + '. ' : prefix) + bare;
+  });
+  const txt = out.join('\n');
+  ta.value = v.slice(0, start) + txt + v.slice(end);
+  if (only) {
+    const pos = Math.max(start, Math.min(start + txt.length, selS + (txt.length - lines[0].length)));
+    const caret = lines[0].trim() ? pos : start + txt.length;
+    ta.setSelectionRange(caret, caret);
+  } else {
+    ta.setSelectionRange(start, start + txt.length);
+  }
+}
+
+function mdInsertHr(ta) {
+  const v = ta.value, a = ta.selectionStart, b = ta.selectionEnd;
+  const before = a === 0 || v[a - 1] === '\n' ? '' : '\n';
+  const after = v[b] === '\n' ? '' : '\n';
+  const ins = before + '---' + after;
+  ta.value = v.slice(0, a) + ins + v.slice(b);
+  const c = a + ins.length;
+  ta.setSelectionRange(c, c);
+}
+
+function applyMdTool(targetId, key) {
+  const ta = document.getElementById(targetId);
+  const tool = MD_TOOLS.find(t => t.k === key);
+  if (!ta || !tool) return;
+  if (document.activeElement !== ta) {
+    try { ta.focus({ preventScroll: true }); } catch (e) { ta.focus(); }
+  }
+  if (tool.t === 'wrap') mdWrap(ta, tool.v);
+  else if (tool.t === 'line') mdLine(ta, tool.v);
+  else mdInsertHr(ta);
+  ta.dispatchEvent(new Event('input', { bubbles: true }));
+}
+
+// 버튼이 입력칸 포커스(키보드·선택한 글자)를 뺏지 않게
+let mdTouch = null;
+function runMdButton(btn) {
+  const bar = btn.closest('.md-tools');
+  if (bar) applyMdTool(bar.dataset.for, btn.dataset.k);
+}
+document.addEventListener('mousedown', e => { if (e.target.closest && e.target.closest('.mdt')) e.preventDefault(); });
+document.addEventListener('touchstart', e => {
+  const b = e.target.closest && e.target.closest('.mdt');
+  if (!b) { mdTouch = null; return; }
+  const t = e.touches[0];
+  mdTouch = { b, x: t.clientX, y: t.clientY, moved: false };
+}, { passive: true });
+document.addEventListener('touchmove', e => {
+  if (!mdTouch) return;
+  const t = e.touches[0];
+  if (Math.abs(t.clientX - mdTouch.x) > 8 || Math.abs(t.clientY - mdTouch.y) > 8) mdTouch.moved = true;
+}, { passive: true });
+document.addEventListener('touchend', e => {
+  if (!mdTouch) return;
+  const { b, moved } = mdTouch;
+  mdTouch = null;
+  if (moved) return;
+  e.preventDefault();
+  runMdButton(b);
+}, { passive: false });
+document.addEventListener('click', e => {
+  const b = e.target.closest && e.target.closest('.mdt');
+  if (!b) return;
+  e.preventDefault();
+  runMdButton(b);
+});
+
+// 편집 ↔ 미리보기 (id_pv, id_pvbtn 규칙)
+function setMdPreview(id, on) {
+  const ta = document.getElementById(id);
+  const pv = document.getElementById(id + '_pv');
+  const btn = document.getElementById(id + '_pvbtn');
+  const bar = document.querySelector(`.md-tools[data-for="${id}"]`);
+  if (!ta || !pv) return;
+  if (on) {
+    pv.innerHTML = renderMarkdown(ta.value) || '<span class="md-empty">아직 내용이 없어요</span>';
+    pv.style.display = '';
+    ta.style.display = 'none';
+    if (bar) bar.style.display = 'none';
+    if (btn) btn.textContent = '✎ 편집';
+  } else {
+    pv.style.display = 'none';
+    ta.style.display = '';
+    if (bar) bar.style.display = '';
+    if (btn) btn.textContent = '미리보기';
+  }
+}
+function toggleMdPreview(id) {
+  const pv = document.getElementById(id + '_pv');
+  setMdPreview(id, !pv || pv.style.display === 'none');
+}
+function mdFillToolbars(root) {
+  (root || document).querySelectorAll('.md-tools-slot[data-for]').forEach(slot => {
+    slot.outerHTML = mdToolsHTML(slot.dataset.for);
+  });
 }
 
 // ============ YOUTUBE IMPORT ============
@@ -3771,7 +4251,7 @@ function renderAll() {
   const q = (state.searchQuery || '').trim().toLowerCase();
   if (q) {
     items = items.filter(i => {
-      const hay = [i.title, i.creator, i.cast, i.memo, i.platform,
+      const hay = [i.title, i.creator, i.cast, i.memo, i.platform, recordSearchText(i),
         ...(i.otts || []).map(id => { const o = getOttById(id); return o ? o.name : ''; }),
         (() => { const c = i.country ? getCountryById(i.country) : null; return c ? c.name : ''; })(),
         ...(i.notes || []).map(n => (n.title || '') + ' ' + (n.content || ''))
@@ -4255,6 +4735,7 @@ function resetForm() {
   state.selectedStatus = 'watching';
   state.selectedOtts = [];
   state.selectedCountry = null;
+  setMdPreview('fMemo', false);
   state.ytThumb = null;
   state.selectedThumbFit = 'cover';
   document.querySelectorAll('#thumbFitPicker .seg-option').forEach(o => o.classList.toggle('active', o.dataset.fit === 'cover'));
@@ -4285,6 +4766,7 @@ function fillForm(item) {
   document.getElementById('fStartDate').value = item.startDate || '';
   document.getElementById('fEndDate').value = item.endDate || '';
   document.getElementById('fMemo').value = item.memo || '';
+  setMdPreview('fMemo', false);
   state.selectedRating = item.rating || 0;
   state.selectedType = item.type || 'youtube';
   state.selectedStatus = item.status || 'watching';
@@ -4441,7 +4923,7 @@ function openDetail(id) {
     ${notes.length === 0
       ? `<div style="color: var(--ink-mute); font-size: 12px; padding: 16px; text-align: center; background: var(--bg-soft); border-radius: 8px;">아직 노트가 없어요. 새 노트를 만들어보세요.</div>`
       : notes.map(n => {
-          const preview = (n.content || '').replace(/[#*_~=/`-]/g, '').trim().slice(0, 80);
+          const preview = mdPreviewLine(n.content || '', 80);
           const photoBadge = (Array.isArray(n.images) && n.images.length > 0) ? ` <span style="color: var(--accent); font-size: 11px;">📷${n.images.length}</span>` : '';
           return `<div class="note-item" onclick="openNoteRead('${item.id}', '${n.id}')">
             <div class="note-item-title">
@@ -4481,10 +4963,10 @@ function openDetail(id) {
     ${episodesHTML}
 
     ${item.type === 'youtube' && item.link ? `<div class="detail-section"><div class="detail-label">링크</div><a href="${escapeHTML(item.link)}" target="_blank" rel="noopener" class="card-link" style="margin-top: 4px;">▶ 영상 열기</a></div>` : ''}
-    ${item.memo ? `<div class="detail-section"><div class="detail-label">한줄 메모</div><div class="detail-value" style="white-space: pre-wrap;">${escapeHTML(item.memo)}</div></div>` : ''}
+    ${recordCardHTML(item)}
 
     ${(() => {
-      const hasProgress = (item.type === 'drama' && item.totalEp > 0) || (item.type === 'podcast');
+      const hasProgress = ((item.type === 'drama' || item.type === 'anime') && item.totalEp > 0) || (item.type === 'podcast');
       const titleOnly = buildCopyText(item, false);
       const withProg = buildCopyText(item, true);
       return `<div class="detail-section">
@@ -4913,40 +5395,6 @@ function insertTemplate(templateId) {
   showToast(`"${tmpl.name}" 삽입됨`);
 }
 
-function wrapSel(before, after) {
-  const ta = document.getElementById('noteContent');
-  const start = ta.selectionStart;
-  const end = ta.selectionEnd;
-  const sel = ta.value.substring(start, end);
-  const text = ta.value;
-  ta.value = text.substring(0, start) + before + sel + after + text.substring(end);
-  ta.focus();
-  if (sel) {
-    ta.setSelectionRange(start + before.length, start + before.length + sel.length);
-  } else {
-    ta.setSelectionRange(start + before.length, start + before.length);
-  }
-}
-
-function insertLine(prefix) {
-  const ta = document.getElementById('noteContent');
-  const start = ta.selectionStart;
-  const text = ta.value;
-  // Find line start
-  let lineStart = text.lastIndexOf('\n', start - 1) + 1;
-  ta.value = text.substring(0, lineStart) + prefix + text.substring(lineStart);
-  ta.focus();
-  ta.setSelectionRange(start + prefix.length, start + prefix.length);
-}
-
-function insertText(text) {
-  const ta = document.getElementById('noteContent');
-  const start = ta.selectionStart;
-  ta.value = ta.value.substring(0, start) + text + ta.value.substring(start);
-  ta.focus();
-  ta.setSelectionRange(start + text.length, start + text.length);
-}
-
 function saveNote() {
   const item = state.items.find(i => i.id === state.noteEditingItemId);
   if (!item) return;
@@ -5098,25 +5546,6 @@ function canvasToPdf(canvas, pdf) {
 }
 
 // ===== 캔버스 직접 렌더링 (외부 라이브러리 불필요 — PWA에서 확실히 동작) =====
-function tokenizeInline(text, base) {
-  base = base || {};
-  const tokens = [];
-  const re = /(\*\*(.+?)\*\*)|(\/\/(.+?)\/\/)|(__(.+?)__)|(~~(.+?)~~)|(==(.+?)==)/;
-  let rest = String(text);
-  while (rest.length > 0) {
-    const m = rest.match(re);
-    if (!m) { tokens.push(Object.assign({}, base, { text: rest })); break; }
-    if (m.index > 0) tokens.push(Object.assign({}, base, { text: rest.slice(0, m.index) }));
-    if (m[2] !== undefined) tokens.push.apply(tokens, tokenizeInline(m[2], Object.assign({}, base, { bold: true })));
-    else if (m[4] !== undefined) tokens.push.apply(tokens, tokenizeInline(m[4], base));
-    else if (m[6] !== undefined) tokens.push.apply(tokens, tokenizeInline(m[6], Object.assign({}, base, { underline: true })));
-    else if (m[8] !== undefined) tokens.push.apply(tokens, tokenizeInline(m[8], Object.assign({}, base, { strike: true })));
-    else if (m[10] !== undefined) tokens.push.apply(tokens, tokenizeInline(m[10], Object.assign({}, base, { highlight: true })));
-    rest = rest.slice(m.index + m[0].length);
-  }
-  return tokens;
-}
-
 function loadImageEl(src) {
   return new Promise((resolve) => {
     const img = new Image();
@@ -5131,7 +5560,7 @@ function layoutNoteCanvas(ctx, item, note, photos, W, draw) {
   const CW = W - PAD * 2;
   let y = PAD + 24;
   const FONT = "-apple-system, 'Pretendard Variable', Pretendard, sans-serif";
-  const setF = (bold, size) => { ctx.font = (bold ? '700 ' : '400 ') + size + 'px ' + FONT; };
+  const setF = (bold, size, italic, code) => { ctx.font = (italic ? 'italic ' : '') + (bold ? '700 ' : '400 ') + size + 'px ' + (code ? "Menlo, 'Courier New', monospace" : FONT); };
 
   function drawTokens(tokens, size, lineH, color, indent) {
     indent = indent || 0;
@@ -5140,14 +5569,15 @@ function layoutNoteCanvas(ctx, item, note, photos, W, draw) {
     tokens.forEach(t => {
       const chars = Array.from(t.text || '');
       chars.forEach(ch => {
-        setF(t.bold, size);
+        setF(t.bold, t.code ? size * 0.9 : size, t.italic, t.code);
         const cw = ctx.measureText(ch).width;
         if (x + cw > PAD + CW) { x = PAD + indent; y += lineH; }
         if (draw) {
-          if (t.highlight) { ctx.fillStyle = '#fdf3c8'; ctx.fillRect(x, y - size * 0.82, cw + 1, size * 1.08); }
-          ctx.fillStyle = color;
+          if (t.mark) { ctx.fillStyle = '#fdf3c8'; ctx.fillRect(x, y - size * 0.82, cw + 1, size * 1.08); }
+          if (t.code) { ctx.fillStyle = '#eef0f5'; ctx.fillRect(x, y - size * 0.82, cw + 1, size * 1.08); }
+          ctx.fillStyle = t.url ? '#3d4cc8' : color;
           ctx.fillText(ch, x, y);
-          if (t.underline) { ctx.fillRect(x, y + 6, cw, 2.5); }
+          if (t.under || t.url) { ctx.fillRect(x, y + 6, cw, 2.5); }
           if (t.strike) { ctx.fillRect(x, y - size * 0.32, cw, 2.5); }
         }
         x += cw;
@@ -5178,23 +5608,26 @@ function layoutNoteCanvas(ctx, item, note, photos, W, draw) {
   y += 20;
 
   // 본문
-  const lines = String(note.content || '').split('\n');
-  lines.forEach(line => {
-    if (/^###\s+/.test(line)) { y += 10; plainLine(line.replace(/^###\s+/, ''), 30, 46, '#17181c', true); }
-    else if (/^##\s+/.test(line)) { y += 14; plainLine(line.replace(/^##\s+/, ''), 34, 52, '#17181c', true); }
-    else if (/^#\s+/.test(line)) { y += 16; plainLine(line.replace(/^#\s+/, ''), 40, 58, '#17181c', true); }
-    else if (/^-{5,}\s*$/.test(line)) { y += 16; if (draw) { ctx.fillStyle = '#e9eaef'; ctx.fillRect(PAD, y, CW, 2); } y += 32; }
-    else if (/^-\s+/.test(line)) {
-      if (draw) { ctx.fillStyle = '#3d4cc8'; setF(true, 28); ctx.fillText('•', PAD + 6, y); }
-      drawTokens(tokenizeInline(line.replace(/^-\s+/, '')), 28, 44, '#17181c', 40);
+  mdParse(note.content || '').forEach(b => {
+    if (b.t === 'h') {
+      const sz = [0, 40, 34, 30, 28][b.lv], lh = [0, 58, 52, 46, 42][b.lv];
+      y += [0, 16, 14, 10, 8][b.lv];
+      drawTokens(tokenizeInline(b.text, { bold: true }), sz, lh, b.lv >= 3 ? '#5b5e6b' : '#17181c', 0);
     }
-    else if (/^>\s?/.test(line)) {
+    else if (b.t === 'hr') { y += 16; if (draw) { ctx.fillStyle = '#e9eaef'; ctx.fillRect(PAD, y, CW, 2); } y += 32; }
+    else if (b.t === 'ul' || b.t === 'ol') {
+      b.items.forEach((it, k) => {
+        if (draw) { ctx.fillStyle = '#3d4cc8'; setF(true, 28); ctx.fillText(b.t === 'ul' ? '•' : (b.start + k) + '.', PAD + 4, y); }
+        drawTokens(tokenizeInline(it), 28, 44, '#17181c', 44);
+      });
+    }
+    else if (b.t === 'quote') {
       const startY = y;
-      drawTokens(tokenizeInline(line.replace(/^>\s?/, '')), 28, 44, '#5b5e6b', 30);
-      if (draw) { ctx.fillStyle = '#d9dbe4'; ctx.fillRect(PAD, startY - 30, 6, y - startY + 4); }
+      b.lines.forEach(l => drawTokens(tokenizeInline(l), 28, 44, '#5b5e6b', 30));
+      if (draw) { ctx.fillStyle = '#d9dbe4'; ctx.fillRect(PAD, startY - 30, 6, y - startY - 10); }
     }
-    else if (line.trim() === '') { y += 26; }
-    else { drawTokens(tokenizeInline(line), 28, 44, '#17181c', 0); }
+    else if (b.t === 'gap') { y += 26; }
+    else { drawTokens(tokenizeInline(b.text), 28, 44, '#17181c', 0); }
   });
 
   // 사진
@@ -5269,9 +5702,13 @@ function shareCanvasImage(canvas, filename) {
   document.body.style.overflow = 'hidden';
 }
 
+function syncBodyScrollLock() {
+  document.body.style.overflow = document.querySelector('.modal.active') ? 'hidden' : '';
+}
+
 function closeImageResult() {
   document.getElementById('imageResultModal').classList.remove('active');
-  document.body.style.overflow = '';
+  syncBodyScrollLock();
   document.getElementById('imageResultImg').src = '';
   imageResultFile = null;
   imageResultDataUrl = null;
@@ -5548,53 +5985,6 @@ async function bulkExportSeparate(item, notes, safeBase) {
 }
 
 // Inline-style MD renderer for export (html2canvas needs inline styles to be safe)
-function renderMarkdownForExport(md) {
-  if (!md) return '';
-  let text = escapeHTML(md);
-  const lines = text.split('\n');
-  const blocks = [];
-  let listBuffer = [];
-  let listType = null;
-
-  function processInlineExport(t) {
-    // Protect URLs
-    const urls = [];
-    t = t.replace(/https?:\/\/[^\s<]+/g, (m) => { urls.push(m); return `\u0000U${urls.length-1}\u0000`; });
-    t = t.replace(/~~(.+?)~~/g, '<span style="text-decoration: line-through; color: #9e9a93;">$1</span>');
-    t = t.replace(/==(.+?)==/g, '<span style="background: #fff3a6; padding: 0 3px; border-radius: 2px;">$1</span>');
-    t = t.replace(/\*\*(.+?)\*\*/g, '<span style="font-weight: 700;">$1</span>');
-    t = t.replace(/__(.+?)__/g, '<span style="text-decoration: underline;">$1</span>');
-    t = t.replace(/\/\/([^\n]+?)\/\//g, '<span style="font-style: italic;">$1</span>');
-    t = t.replace(/\u0000U(\d+)\u0000/g, (_, i) => urls[parseInt(i)]);
-    return t;
-  }
-
-  function flushList() {
-    if (listBuffer.length === 0) return;
-    const tag = listType;
-    blocks.push(`<${tag} style="margin: 4px 0 4px 22px;">` + listBuffer.map(item => `<li style="margin: 3px 0;">${processInlineExport(item)}</li>`).join('') + `</${tag}>`);
-    listBuffer = [];
-    listType = null;
-  }
-
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (/^-{5,}\s*$/.test(trimmed)) { flushList(); blocks.push('<hr style="border: none; border-top: 1px solid #e8e6e1; margin: 16px 0;">'); continue; }
-    let m;
-    if ((m = trimmed.match(/^### (.+)/))) { flushList(); blocks.push(`<h3 style="font-size: 15px; font-weight: 700; margin: 14px 0 6px; color: #5e5b56;">${processInlineExport(m[1])}</h3>`); continue; }
-    if ((m = trimmed.match(/^## (.+)/))) { flushList(); blocks.push(`<h2 style="font-size: 18px; font-weight: 700; letter-spacing: -0.02em; margin: 18px 0 8px;">${processInlineExport(m[1])}</h2>`); continue; }
-    if ((m = trimmed.match(/^# (.+)/))) { flushList(); blocks.push(`<h1 style="font-size: 22px; font-weight: 700; letter-spacing: -0.02em; margin: 20px 0 10px; padding-bottom: 6px; border-bottom: 2px solid #e8e6e1;">${processInlineExport(m[1])}</h1>`); continue; }
-    if ((m = trimmed.match(/^[-*] (.+)/))) { if (listType && listType !== 'ul') flushList(); listType = 'ul'; listBuffer.push(m[1]); continue; }
-    if ((m = trimmed.match(/^\d+\. (.+)/))) { if (listType && listType !== 'ol') flushList(); listType = 'ol'; listBuffer.push(m[1]); continue; }
-    flushList();
-    if (trimmed === '') { blocks.push('<br>'); continue; }
-    if ((m = trimmed.match(/^&gt; (.+)/))) { blocks.push(`<p style="border-left: 3px solid #e8e6e1; padding-left: 12px; color: #5e5b56; margin: 8px 0;">${processInlineExport(m[1])}</p>`); continue; }
-    blocks.push(`<p style="margin: 0; line-height: 1.55;">${processInlineExport(line)}</p>`);
-  }
-  flushList();
-  return blocks.join('');
-}
-
 // ============ TEMPLATE MANAGER ============
 function openTemplateManager() {
   closeNoteModal();
@@ -6160,12 +6550,28 @@ function exportExcel() {
         '현재 EP': item.currentPodEp || '',
         '전체 EP': item.totalPodEp || '',
         '진행률(%)': getProgress(item) ?? '',
-        '한줄 메모': item.memo || '',
+        '총평': item.memo || '',
         '노트 개수': (item.notes || []).length,
         '링크': item.link || '',
         '등록일': item.createdAt ? new Date(item.createdAt).toISOString().slice(0,10) : '',
-        '최종 수정': item.updatedAt ? new Date(item.updatedAt).toISOString().slice(0,10) : ''
+        '최종 수정': item.updatedAt ? new Date(item.updatedAt).toISOString().slice(0,10) : '',
+        '등장인물': ((peekRecord(item) || {}).chars || []).map(c => c.name + (c.group ? `(${c.group})` : '')).join(', ')
       };
+    });
+
+    // 회차 기록 시트
+    const epRows = [];
+    state.items.forEach(item => {
+      const eps = (peekRecord(item) || {}).eps || {};
+      Object.keys(eps).map(Number).filter(n => n > 0).sort((a, b) => a - b).forEach(n => {
+        epRows.push({
+          '콘텐츠 유형': typeName(item.type),
+          '콘텐츠 제목': item.title,
+          '회차': recEpLabel(item, n),
+          '기록': stripMarkdownText(eps[n].text || ''),
+          '수정일': eps[n].updatedAt ? new Date(eps[n].updatedAt).toISOString().slice(0,10) : ''
+        });
+      });
     });
 
     // 2. Notes sheet
@@ -6219,6 +6625,12 @@ function exportExcel() {
       const ws2 = XLSX.utils.json_to_sheet(noteRows);
       ws2['!cols'] = [{wch:8},{wch:24},{wch:20},{wch:60},{wch:12},{wch:12}];
       XLSX.utils.book_append_sheet(wb, ws2, '노트');
+    }
+
+    if (epRows.length > 0) {
+      const wsE = XLSX.utils.json_to_sheet(epRows);
+      wsE['!cols'] = [{wch:8},{wch:24},{wch:8},{wch:70},{wch:12}];
+      XLSX.utils.book_append_sheet(wb, wsE, '회차 기록');
     }
 
     const ws3 = XLSX.utils.json_to_sheet(byType);
@@ -6391,6 +6803,9 @@ function mergeTwoItems(a, b) {
   const nm = new Map((older.notes || []).map(n => [n.id, n]));
   (newer.notes || []).forEach(n => nm.set(n.id, n));
   newer.notes = [...nm.values()].sort((x, y) => (y.updatedAt || 0) - (x.updatedAt || 0));
+  const mr = mergeRecords(older, newer);
+  if (mr) newer.record = mr;
+  if (!newer.memo && older.memo) newer.memo = older.memo;
   return newer;
 }
 
@@ -6507,11 +6922,937 @@ document.querySelectorAll('.modal').forEach(modal => {
   modal.addEventListener('click', (e) => {
     if (e.target === modal) {
       if (modal.id === 'confirmModal') return;
+      const special = { epModal: () => closeEpEditor(), recordModal: closeRecord, charModal: closeCharEditor, relModal: closeRelEditor };
+      if (special[modal.id]) { special[modal.id](); return; }
       modal.classList.remove('active');
-      document.body.style.overflow = '';
+      syncBodyScrollLock();
     }
   });
 });
+
+// ============ 작품 기록장 (인물 관계도 · 회차 기록 · 총평) ============
+// item.record = { chars:[{id,name,group,desc,x,y}], rels:[{id,a,b,label,dir}], eps:{ '3': {text, updatedAt} }, manual }
+// 총평은 item.memo (예전 '한줄 메모'와 같은 칸)
+let rec = { itemId: null, tab: null, epFilter: 'all', epNum: null, epOrig: '' };
+let mmPos = {};
+let mmDrag = null;
+
+// 기록장 데이터를 꺼내면서 이상한 값(손상된 백업 등)은 정리. 정상 데이터는 그대로 둠.
+function getRecord(item) {
+  if (!item.record || typeof item.record !== 'object' || Array.isArray(item.record)) item.record = {};
+  const r = item.record;
+  if (!Array.isArray(r.chars)) r.chars = [];
+  const okChar = c => c && typeof c === 'object' && c.id != null && c.id !== '' && c.name != null && String(c.name).trim() !== '';
+  if (!r.chars.every(okChar)) r.chars = r.chars.filter(okChar);
+  r.chars.forEach(c => {
+    if (typeof c.id !== 'string') c.id = String(c.id);
+    if (typeof c.name !== 'string') c.name = String(c.name);
+    if (c.group != null && typeof c.group !== 'string') c.group = String(c.group);
+    if (c.desc != null && typeof c.desc !== 'string') c.desc = String(c.desc);
+  });
+  if (!Array.isArray(r.rels)) r.rels = [];
+  const ids = new Set(r.chars.map(c => c.id));
+  const okRel = x => x && typeof x === 'object' && x.id != null && ids.has(String(x.a)) && ids.has(String(x.b)) && String(x.a) !== String(x.b);
+  if (!r.rels.every(okRel)) r.rels = r.rels.filter(okRel);
+  r.rels.forEach(x => {
+    if (typeof x.a !== 'string') x.a = String(x.a);
+    if (typeof x.b !== 'string') x.b = String(x.b);
+    if (x.label != null && typeof x.label !== 'string') x.label = String(x.label);
+  });
+  if (!r.eps || typeof r.eps !== 'object' || Array.isArray(r.eps)) r.eps = {};
+  Object.keys(r.eps).forEach(k => {
+    const e = r.eps[k];
+    if (!/^[1-9]\d*$/.test(k) || !e || typeof e !== 'object' || e.text == null) { delete r.eps[k]; return; }
+    if (typeof e.text !== 'string') e.text = String(e.text);
+  });
+  return r;
+}
+// 있을 때만 꺼내기 (화면 표시·검색용 — 없는 기록장을 새로 만들지 않음)
+function peekRecord(item) { return item && item.record ? getRecord(item) : null; }
+function recItem() { return state.items.find(i => i.id === rec.itemId); }
+function recEpisodic(item) { return item.type === 'drama' || item.type === 'anime' || item.type === 'podcast'; }
+function recEpTotal(item) { return item.type === 'podcast' ? (item.totalPodEp || 0) : (item.totalEp || 0); }
+function recEpLabel(item, n) { return item.type === 'podcast' ? `EP${n}` : `${n}화`; }
+function recTabs(item) {
+  const t = [];
+  if (item.type !== 'youtube') t.push({ k: 'chars', n: item.type === 'podcast' ? '출연자' : '인물 관계도' });
+  if (recEpisodic(item)) t.push({ k: 'eps', n: '회차 기록' });
+  t.push({ k: 'comment', n: '총평' });
+  return t;
+}
+function recTouch(item) { item.updatedAt = Date.now(); save(true); }
+
+// 상세 화면의 기록장 카드
+function recordCardHTML(item) {
+  const r = peekRecord(item) || { chars: [], rels: [], eps: {} };
+  const tabs = recTabs(item).map(t => t.k);
+  const chips = [];
+  if (tabs.includes('chars')) chips.push(`${item.type === 'podcast' ? '출연자' : '인물'} ${r.chars.length}`, `관계 ${r.rels.length}`);
+  if (tabs.includes('eps')) {
+    const n = Object.keys(r.eps).length, tot = recEpTotal(item);
+    chips.push(`회차 기록 ${n}${tot ? '/' + tot : ''}`);
+  }
+  chips.push(item.memo ? '총평 ✓' : '총평 없음');
+  return `<div class="rec-card" onclick="openRecord('${item.id}')">
+    <div class="rec-card-head">
+      <span class="rec-card-title">📒 작품 기록장</span>
+      <span class="entry-arrow">›</span>
+    </div>
+    <div class="rec-card-chips">${chips.map(c => `<span>${escapeHTML(c)}</span>`).join('')}</div>
+    ${item.memo ? `<div class="rec-card-comment"><div class="rec-card-label">총평</div><div class="md-view">${renderMarkdown(item.memo)}</div></div>` : ''}
+  </div>`;
+}
+
+function openRecord(itemId, tab) {
+  const item = state.items.find(i => i.id === itemId);
+  if (!item) return;
+  getRecord(item);
+  const tabs = recTabs(item).map(t => t.k);
+  rec.itemId = itemId;
+  rec.tab = tab && tabs.includes(tab) ? tab : (rec.tab && tabs.includes(rec.tab) ? rec.tab : tabs[0]);
+  rec.epFilter = 'all';
+  closeDetailModal();
+  setTimeout(() => {
+    document.getElementById('recordModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+    renderRecord();
+  }, 150);
+}
+
+function closeRecord() {
+  document.getElementById('recordModal').classList.remove('active');
+  document.body.style.overflow = '';
+  const id = rec.itemId;
+  rec.itemId = null;
+  render();
+  if (id && state.items.some(i => i.id === id)) setTimeout(() => openDetail(id), 120);
+}
+
+function setRecTab(k) { rec.tab = k; renderRecord(); }
+
+function renderRecord() {
+  const item = recItem();
+  if (!item) return;
+  document.getElementById('recordTitle').textContent = `${bracketTitle(item)} 기록장`;
+  document.getElementById('recordTabs').innerHTML = recTabs(item).map(t =>
+    `<button type="button" class="rec-tab ${rec.tab === t.k ? 'active' : ''}" onclick="setRecTab('${t.k}')">${t.n}</button>`
+  ).join('');
+  if (rec.tab === 'chars') renderRecChars();
+  else if (rec.tab === 'eps') renderRecEps();
+  else renderRecComment();
+}
+
+// ---------- 인물 관계도 ----------
+const MM_COLORS = ['#3d4cc8', '#c2477f', '#2f8f6a', '#c4782a', '#7a5cc8', '#2a8bb0', '#b5483b', '#6b7a2a'];
+const MM_REL_CHIPS = ['연인', '부부', '가족', '부모·자식', '형제·자매', '친구', '동료', '라이벌', '짝사랑', '적대'];
+
+function mmGroups(chars) {
+  const gs = [];
+  chars.forEach(c => { const g = (c.group || '').trim(); if (g && !gs.includes(g)) gs.push(g); });
+  return gs;
+}
+function mmColor(c, groups) {
+  const g = (c.group || '').trim();
+  return g ? MM_COLORS[groups.indexOf(g) % MM_COLORS.length] : '#5b5e6b';
+}
+function mmTint(hex, amt) {
+  const n = parseInt(hex.slice(1), 16);
+  const mix = v => Math.round(v + (255 - v) * amt);
+  const r = mix((n >> 16) & 255), g = mix((n >> 8) & 255), b = mix(n & 255);
+  return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+}
+function mmTextW(s, size) {
+  let w = 0;
+  for (const ch of String(s || '')) w += /[ᄀ-ᇿ㄰-㆏가-힯一-鿿぀-ヿ]/.test(ch) ? size * 1.0 : (/[A-Z0-9]/.test(ch) ? size * 0.66 : size * 0.56);
+  return w;
+}
+function mmClip(s, n) { s = String(s || ''); return s.length > n ? s.slice(0, n) + '…' : s; }
+function mmSub(c) {
+  const g = (c.group || '').trim();
+  if (g) return mmClip(g, 10);
+  const d = mdPreviewLine(c.desc || '', 0);
+  return d ? mmClip(d, 10) : '';
+}
+function mmNodeBox(c) {
+  const name = mmClip(c.name, 10);
+  const sub = mmSub(c);
+  const w = Math.max(64, Math.min(150, Math.max(mmTextW(name, 14), mmTextW(sub, 11)) + 28));
+  return { w: Math.round(w), h: sub ? 44 : 32, name, sub };
+}
+
+function mmAutoPositions(chars) {
+  const groups = mmGroups(chars);
+  const gi = c => { const g = (c.group || '').trim(); return g ? groups.indexOf(g) : groups.length; };
+  const order = chars.map((c, i) => ({ c, i })).sort((p, q) => gi(p.c) - gi(q.c) || p.i - q.i).map(p => p.c);
+  const n = order.length;
+  if (n === 0) return {};
+  const boxes = order.map(c => mmNodeBox(c));
+  const place = R => {
+    const rx = R * 0.82, ry = R * 1.12;
+    return order.map((c, i) => {
+      const ang = -Math.PI / 2 + i * 2 * Math.PI / n;
+      return { x: Math.round(rx * Math.cos(ang)), y: Math.round(ry * Math.sin(ang)) };
+    });
+  };
+  // 이웃한 인물 상자가 겹치지 않을 때까지 원을 키움
+  const clear = pts => {
+    for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) {
+      const gx = Math.abs(pts[i].x - pts[j].x) - (boxes[i].w + boxes[j].w) / 2;
+      const gy = Math.abs(pts[i].y - pts[j].y) - (boxes[i].h + boxes[j].h) / 2;
+      if (gx < 16 && gy < 16) return false;
+    }
+    return true;
+  };
+  let R = Math.max(n <= 3 ? 125 : 150, (n * 118) / (2 * Math.PI));
+  let pts = place(R);
+  for (let k = 0; k < 40 && !clear(pts); k++) { R *= 1.07; pts = place(R); }
+  const pos = {};
+  order.forEach((c, i) => { pos[c.id] = pts[i]; });
+  return pos;
+}
+
+// 저장된 위치(수동 배치) 우선, 없으면 자동. 수동 배치 중 새 인물은 빈 자리로.
+function mmPositions(item) {
+  const r = getRecord(item);
+  const auto = mmAutoPositions(r.chars);
+  const pos = {};
+  const placed = r.chars.filter(c => typeof c.x === 'number' && typeof c.y === 'number');
+  r.chars.forEach(c => {
+    if (typeof c.x === 'number' && typeof c.y === 'number') { pos[c.id] = { x: c.x, y: c.y }; return; }
+    if (!placed.length) { pos[c.id] = auto[c.id]; return; }
+    const cands = Object.values(auto);
+    let best = auto[c.id], bestD = -1;
+    cands.forEach(p => {
+      const d = Math.min(...Object.values(pos).concat(placed.map(q => ({ x: q.x, y: q.y }))).map(q => Math.hypot(q.x - p.x, q.y - p.y)));
+      if (d > bestD) { bestD = d; best = p; }
+    });
+    pos[c.id] = { x: best.x, y: best.y };
+  });
+  return pos;
+}
+
+function mmQuad(p, c, q, t) {
+  const u = 1 - t;
+  return { x: u * u * p.x + 2 * u * t * c.x + t * t * q.x, y: u * u * p.y + 2 * u * t * c.y + t * t * q.y };
+}
+
+// 관계선: 2차 곡선. 중심을 지나는 선은 옆으로 비켜가게.
+function mmRelGeom(pa, pb, offIdx) {
+  const mx = (pa.x + pb.x) / 2, my = (pa.y + pb.y) / 2;
+  const dx = pb.x - pa.x, dy = pb.y - pa.y;
+  const len = Math.hypot(dx, dy) || 1;
+  let nx = -dy / len, ny = dx / len;
+  const dm = Math.hypot(mx, my);
+  let bend;
+  if (dm > 45) {
+    if (nx * -mx + ny * -my < 0) { nx = -nx; ny = -ny; }
+    bend = Math.min(36, len * 0.14);
+  } else {
+    bend = 58;
+  }
+  bend += (offIdx || 0) * 30;
+  const apex = { x: mx + nx * bend, y: my + ny * bend };
+  const ctrl = { x: 2 * apex.x - mx, y: 2 * apex.y - my };
+  return { ctrl, apex, d: `M${pa.x.toFixed(1)},${pa.y.toFixed(1)} Q${ctrl.x.toFixed(1)},${ctrl.y.toFixed(1)} ${pb.x.toFixed(1)},${pb.y.toFixed(1)}` };
+}
+
+// 곡선이 도착 인물 상자 테두리와 만나는 지점(화살표 자리)
+function mmArrowAt(pa, ctrl, pb, box) {
+  const inside = p => Math.abs(p.x - pb.x) <= box.w / 2 + 3 && Math.abs(p.y - pb.y) <= box.h / 2 + 3;
+  let lo = 0, hi = 1;
+  for (let k = 0; k < 18; k++) { const mid = (lo + hi) / 2; if (inside(mmQuad(pa, ctrl, pb, mid))) hi = mid; else lo = mid; }
+  const p = mmQuad(pa, ctrl, pb, lo);
+  const p2 = mmQuad(pa, ctrl, pb, Math.max(0, lo - 0.02));
+  const ang = Math.atan2(p.y - p2.y, p.x - p2.x);
+  return { x: p.x, y: p.y, ang };
+}
+function mmArrowPath(a) {
+  const s = 9, w = 5.5;
+  const bx = a.x - s * Math.cos(a.ang), by = a.y - s * Math.sin(a.ang);
+  const lx = bx + w * Math.sin(a.ang), ly = by - w * Math.cos(a.ang);
+  const rx = bx - w * Math.sin(a.ang), ry = by + w * Math.cos(a.ang);
+  return `M${a.x.toFixed(1)},${a.y.toFixed(1)} L${lx.toFixed(1)},${ly.toFixed(1)} L${rx.toFixed(1)},${ry.toFixed(1)} Z`;
+}
+
+// 같은 두 사람 사이 관계가 여럿이면 곡선을 엇갈리게
+function mmRelOffsets(rels) {
+  const seen = {};
+  const off = {};
+  rels.forEach(r => {
+    const key = [r.a, r.b].sort().join('|');
+    const k = seen[key] || 0;
+    seen[key] = k + 1;
+    off[r.id] = k === 0 ? 0 : (k % 2 ? 1 : -1) * Math.ceil(k / 2);
+  });
+  return off;
+}
+
+function mmScene(item) {
+  const r = getRecord(item);
+  const groups = mmGroups(r.chars);
+  const pos = mmPos = Object.assign({}, mmPositions(item));
+  const boxes = {};
+  r.chars.forEach(c => { boxes[c.id] = mmNodeBox(c); });
+  const title = mmClip(item.title, 12);
+  const center = { w: Math.round(Math.max(80, mmTextW(title, 15) + 30)), h: 36, title };
+  const off = mmRelOffsets(r.rels);
+  const rels = r.rels.filter(x => pos[x.a] && pos[x.b] && x.a !== x.b).map(x => {
+    const g = mmRelGeom(pos[x.a], pos[x.b], off[x.id]);
+    const label = mmClip(x.label || '', 8);
+    return Object.assign({ rel: x, label, lw: label ? Math.round(mmTextW(label, 11) + 14) : 0 }, g);
+  });
+  // 이름표 자리: 곡선 위에서 인물 상자·중심·다른 이름표와 안 겹치는 곳
+  const taken = r.chars.map(c => { const p = pos[c.id], b = boxes[c.id]; return { x0: p.x - b.w / 2 - 3, x1: p.x + b.w / 2 + 3, y0: p.y - b.h / 2 - 3, y1: p.y + b.h / 2 + 3 }; });
+  taken.push({ x0: -center.w / 2 - 3, x1: center.w / 2 + 3, y0: -center.h / 2 - 3, y1: center.h / 2 + 3 });
+  const hits = q => taken.some(o => q.x0 < o.x1 && q.x1 > o.x0 && q.y0 < o.y1 && q.y1 > o.y0);
+  rels.forEach(g => {
+    g.lp = g.apex;
+    if (!g.label) return;
+    const pa = pos[g.rel.a], pb = pos[g.rel.b];
+    for (const t of [0.5, 0.42, 0.58, 0.34, 0.66, 0.26, 0.74]) {
+      const p = t === 0.5 ? g.apex : mmQuad(pa, g.ctrl, pb, t);
+      const q = { x0: p.x - g.lw / 2, x1: p.x + g.lw / 2, y0: p.y - 11, y1: p.y + 11 };
+      if (!hits(q)) { g.lp = p; break; }
+    }
+    taken.push({ x0: g.lp.x - g.lw / 2, x1: g.lp.x + g.lw / 2, y0: g.lp.y - 11, y1: g.lp.y + 11 });
+  });
+  // 보이는 범위
+  let x0 = -center.w / 2, x1 = center.w / 2, y0 = -center.h / 2, y1 = center.h / 2;
+  r.chars.forEach(c => {
+    const p = pos[c.id], b = boxes[c.id];
+    x0 = Math.min(x0, p.x - b.w / 2); x1 = Math.max(x1, p.x + b.w / 2);
+    y0 = Math.min(y0, p.y - b.h / 2); y1 = Math.max(y1, p.y + b.h / 2);
+  });
+  rels.forEach(g => {
+    x0 = Math.min(x0, g.lp.x - g.lw / 2); x1 = Math.max(x1, g.lp.x + g.lw / 2);
+    y0 = Math.min(y0, g.lp.y - 11); y1 = Math.max(y1, g.lp.y + 11);
+  });
+  const pad = 22;
+  const vb = { x: Math.floor(x0 - pad), y: Math.floor(y0 - pad), w: Math.ceil(x1 - x0 + pad * 2), h: Math.ceil(y1 - y0 + pad * 2) };
+  return { r, groups, pos, boxes, center, rels, vb };
+}
+
+function mmNodeSVG(c, sc) {
+  const p = sc.pos[c.id], b = sc.boxes[c.id], col = mmColor(c, sc.groups);
+  return `<g class="mm-node" id="mm-n-${c.id}" data-cid="${c.id}" transform="translate(${p.x},${p.y})">
+    <rect x="${-b.w / 2}" y="${-b.h / 2}" width="${b.w}" height="${b.h}" rx="12" fill="${mmTint(col, 0.88)}" stroke="${col}" stroke-width="1.8"/>
+    <text y="${b.sub ? -3 : 5}" text-anchor="middle" class="mm-name">${escapeHTML(b.name)}</text>
+    ${b.sub ? `<text y="13" text-anchor="middle" class="mm-sub" fill="${col}">${escapeHTML(b.sub)}</text>` : ''}
+  </g>`;
+}
+
+function mmSVG(item) {
+  const sc = mmScene(item);
+  const { r, groups, pos, center, vb } = sc;
+  const branches = r.chars.map(c => {
+    const p = pos[c.id];
+    return `<line id="mm-b-${c.id}" x1="0" y1="0" x2="${p.x}" y2="${p.y}" stroke="${mmColor(c, groups)}" stroke-opacity="0.32" stroke-width="2.5" stroke-linecap="round"/>`;
+  }).join('');
+  const relLines = sc.rels.map(g =>
+    `<path id="mm-r-${g.rel.id}" d="${g.d}" fill="none" stroke="#5b5e6b" stroke-width="1.6"/>`
+  ).join('');
+  const arrows = sc.rels.filter(g => g.rel.dir).map(g => {
+    const a = mmArrowAt(pos[g.rel.a], g.ctrl, pos[g.rel.b], sc.boxes[g.rel.b]);
+    return `<path id="mm-a-${g.rel.id}" d="${mmArrowPath(a)}" fill="#5b5e6b"/>`;
+  }).join('');
+  const labels = sc.rels.filter(g => g.label).map(g =>
+    `<g id="mm-l-${g.rel.id}" class="mm-label" data-rid="${g.rel.id}" transform="translate(${g.lp.x.toFixed(1)},${g.lp.y.toFixed(1)})">
+      <rect x="${-g.lw / 2}" y="-10" width="${g.lw}" height="20" rx="10" fill="#ffffff" stroke="#d9dbe4"/>
+      <text y="4" text-anchor="middle" class="mm-rel">${escapeHTML(g.label)}</text>
+    </g>`
+  ).join('');
+  const centerNode = `<g class="mm-center">
+    <rect x="${-center.w / 2}" y="${-center.h / 2}" width="${center.w}" height="${center.h}" rx="18" fill="#17181c"/>
+    <text y="5" text-anchor="middle" class="mm-title">${escapeHTML(center.title)}</text>
+  </g>`;
+  const nodes = r.chars.map(c => mmNodeSVG(c, sc)).join('');
+  return `<svg id="mmSvg" viewBox="${vb.x} ${vb.y} ${vb.w} ${vb.h}" data-vb="${vb.x} ${vb.y} ${vb.w} ${vb.h}" xmlns="http://www.w3.org/2000/svg">${branches}${relLines}${centerNode}${nodes}${arrows}${labels}</svg>`;
+}
+
+function mmSizeSvg() {
+  const wrap = document.getElementById('mmWrap');
+  const svg = document.getElementById('mmSvg');
+  if (!wrap || !svg) return;
+  const vb = svg.getAttribute('data-vb').split(' ').map(Number);
+  const cw = wrap.clientWidth || 340;
+  const scale = Math.max(0.72, Math.min(1.25, cw / vb[2]));
+  svg.setAttribute('width', Math.round(vb[2] * scale));
+  svg.setAttribute('height', Math.round(vb[3] * scale));
+}
+
+// 드래그 중엔 선만 다시 계산
+function mmRedrawEdges() {
+  const item = recItem();
+  if (!item) return;
+  const r = getRecord(item);
+  const pos = mmPos;
+  r.chars.forEach(c => {
+    const l = document.getElementById('mm-b-' + c.id);
+    if (l && pos[c.id]) { l.setAttribute('x2', pos[c.id].x); l.setAttribute('y2', pos[c.id].y); }
+  });
+  const off = mmRelOffsets(r.rels);
+  r.rels.forEach(x => {
+    if (!pos[x.a] || !pos[x.b]) return;
+    const g = mmRelGeom(pos[x.a], pos[x.b], off[x.id]);
+    const p = document.getElementById('mm-r-' + x.id);
+    if (p) p.setAttribute('d', g.d);
+    const lab = document.getElementById('mm-l-' + x.id);
+    if (lab) lab.setAttribute('transform', `translate(${g.apex.x.toFixed(1)},${g.apex.y.toFixed(1)})`);
+    const ar = document.getElementById('mm-a-' + x.id);
+    if (ar) ar.setAttribute('d', mmArrowPath(mmArrowAt(pos[x.a], g.ctrl, pos[x.b], mmNodeBox(r.chars.find(c => c.id === x.b) || { name: '' }))));
+  });
+}
+
+function mmSvgPoint(svg, cx, cy) {
+  const rc = svg.getBoundingClientRect();
+  const vb = svg.getAttribute('data-vb').split(' ').map(Number);
+  return { x: vb[0] + (cx - rc.left) * vb[2] / (rc.width || vb[2]), y: vb[1] + (cy - rc.top) * vb[3] / (rc.height || vb[3]) };
+}
+
+function mmPointerDown(e) {
+  const g = e.target.closest && e.target.closest('.mm-node');
+  if (!g) return;
+  const svg = document.getElementById('mmSvg');
+  if (!svg) return;
+  e.preventDefault();
+  const cid = g.dataset.cid;
+  const p = mmSvgPoint(svg, e.clientX, e.clientY);
+  const cur = mmPos[cid] || { x: 0, y: 0 };
+  const vb = svg.getAttribute('data-vb').split(' ').map(Number);
+  mmDrag = { cid, g, svg, sx: p.x, sy: p.y, ox: cur.x, oy: cur.y, moved: false, pid: e.pointerId, vb };
+  try { g.setPointerCapture(e.pointerId); } catch (err) {}
+  g.classList.add('dragging');
+}
+function mmPointerMove(e) {
+  if (!mmDrag || (e.pointerId !== undefined && e.pointerId !== mmDrag.pid)) return;
+  const p = mmSvgPoint(mmDrag.svg, e.clientX, e.clientY);
+  const dx = p.x - mmDrag.sx, dy = p.y - mmDrag.sy;
+  if (!mmDrag.moved && Math.hypot(dx, dy) < 6) return;
+  mmDrag.moved = true;
+  const vb = mmDrag.vb;
+  const nx = Math.round(Math.max(vb[0] + 30, Math.min(vb[0] + vb[2] - 30, mmDrag.ox + dx)));
+  const ny = Math.round(Math.max(vb[1] + 20, Math.min(vb[1] + vb[3] - 20, mmDrag.oy + dy)));
+  mmPos[mmDrag.cid] = { x: nx, y: ny };
+  mmDrag.g.setAttribute('transform', `translate(${nx},${ny})`);
+  mmRedrawEdges();
+}
+function mmPointerUp(e) {
+  if (!mmDrag || (e.pointerId !== undefined && e.pointerId !== mmDrag.pid)) return;
+  const d = mmDrag;
+  mmDrag = null;
+  d.g.classList.remove('dragging');
+  if (!d.moved) { openCharEditor(d.cid); return; }
+  const item = recItem();
+  if (!item) return;
+  getRecord(item).chars.forEach(c => {
+    const p = mmPos[c.id];
+    if (p) { c.x = Math.round(p.x); c.y = Math.round(p.y); }
+  });
+  getRecord(item).manual = true;
+  recTouch(item);
+  renderRecChars();
+}
+document.addEventListener('pointermove', mmPointerMove);
+document.addEventListener('pointerup', mmPointerUp);
+document.addEventListener('pointercancel', mmPointerUp);
+// 손가락으로 인물을 끌 때 화면이 같이 스크롤되지 않게 (SVG 안에서는 touch-action 이 안 먹는 브라우저가 있음)
+document.addEventListener('touchstart', e => {
+  if (e.target.closest && e.target.closest('.mm-node')) e.preventDefault();
+}, { passive: false });
+document.addEventListener('touchmove', e => { if (mmDrag) e.preventDefault(); }, { passive: false });
+
+function mmAutoLayout() {
+  const item = recItem();
+  if (!item) return;
+  const r = getRecord(item);
+  r.chars.forEach(c => { delete c.x; delete c.y; });
+  r.manual = false;
+  recTouch(item);
+  renderRecChars();
+  showToast('자동으로 정렬했어요');
+}
+
+function renderRecChars() {
+  const item = recItem();
+  if (!item) return;
+  const r = getRecord(item);
+  const who = item.type === 'podcast' ? '출연자' : '인물';
+  const groups = mmGroups(r.chars);
+  const nameOf = id => { const c = r.chars.find(x => x.id === id); return c ? c.name : '(삭제됨)'; };
+  const body = document.getElementById('recordBody');
+  body.innerHTML = `
+    <div class="rec-actions">
+      <button type="button" class="plan-mini-btn primary" onclick="openCharEditor()">+ ${who}</button>
+      <button type="button" class="plan-mini-btn primary" onclick="openRelEditor()" ${r.chars.length < 2 ? 'disabled' : ''}>+ 관계</button>
+      <button type="button" class="plan-mini-btn" onclick="mmAutoLayout()" ${r.chars.length ? '' : 'disabled'}>자동 정렬</button>
+      <button type="button" class="plan-mini-btn" onclick="mmSaveImage()" ${r.chars.length ? '' : 'disabled'}>이미지</button>
+      <button type="button" class="plan-mini-btn" onclick="copyRecChars()" ${r.chars.length ? '' : 'disabled'}>📋 복사</button>
+    </div>
+    <div class="mm-wrap" id="mmWrap">${mmSVG(item)}</div>
+    <div class="mm-hint">${r.chars.length ? `${who}을 끌어서 옮기고, 탭하면 수정해요` : `+ ${who}로 시작해보세요. 소속을 적으면 같은 색으로 묶여요`}</div>
+    ${r.chars.length ? `<div class="rec-sub-title">${who} ${r.chars.length}</div>
+    <div class="rec-list">${r.chars.map(c => {
+      const col = mmColor(c, groups);
+      return `<button type="button" class="rec-row" onclick="openCharEditor('${c.id}')">
+        <span class="rec-dot" style="background:${col}"></span>
+        <span class="rec-row-body">
+          <span class="rec-row-title">${escapeHTML(c.name)}${c.group ? `<span class="rec-chip" style="color:${col};background:${mmTint(col, 0.88)}">${escapeHTML(c.group)}</span>` : ''}</span>
+          ${c.desc ? `<span class="rec-row-desc md-view">${renderMarkdown(c.desc)}</span>` : ''}
+        </span>
+      </button>`;
+    }).join('')}</div>` : ''}
+    ${r.rels.length ? `<div class="rec-sub-title">관계 ${r.rels.length}</div>
+    <div class="rec-list">${r.rels.map(x => `<button type="button" class="rec-row" onclick="openRelEditor('${x.id}')">
+        <span class="rec-row-body"><span class="rec-row-title">${escapeHTML(nameOf(x.a))} <span class="rec-arrow">${x.dir ? '→' : '↔'}</span> ${escapeHTML(nameOf(x.b))}${x.label ? `<span class="rec-chip">${escapeHTML(x.label)}</span>` : ''}</span></span>
+      </button>`).join('')}</div>` : ''}`;
+  mmSizeSvg();
+}
+
+// 인물 편집
+function openCharEditor(cid) {
+  const item = recItem();
+  if (!item) return;
+  const r = getRecord(item);
+  const c = cid ? r.chars.find(x => x.id === cid) : null;
+  rec.charId = c ? c.id : null;
+  const who = item.type === 'podcast' ? '출연자' : '인물';
+  document.getElementById('charModalTitle').textContent = c ? `${who} 수정` : `${who} 추가`;
+  document.getElementById('chName').value = c ? c.name : '';
+  document.getElementById('chGroup').value = c ? (c.group || '') : '';
+  document.getElementById('chDesc').value = c ? (c.desc || '') : '';
+  setMdPreview('chDesc', false);
+  document.getElementById('chGroupChips').innerHTML = mmGroups(r.chars).map(g =>
+    `<button type="button" class="plan-mini-btn" onclick="document.getElementById('chGroup').value=this.textContent">${escapeHTML(g)}</button>`
+  ).join('');
+  document.getElementById('chDeleteBtn').style.display = c ? '' : 'none';
+  document.getElementById('charModal').classList.add('active');
+}
+function closeCharEditor() { document.getElementById('charModal').classList.remove('active'); }
+
+function saveChar() {
+  const item = recItem();
+  if (!item) return;
+  const r = getRecord(item);
+  const name = document.getElementById('chName').value.trim();
+  if (!name) { showToast('이름을 입력하세요'); return; }
+  const data = { name, group: document.getElementById('chGroup').value.trim(), desc: document.getElementById('chDesc').value.trim() };
+  const c = rec.charId ? r.chars.find(x => x.id === rec.charId) : null;
+  if (c) Object.assign(c, data);
+  else r.chars.push(Object.assign({ id: uid() }, data));
+  recTouch(item);
+  closeCharEditor();
+  renderRecChars();
+  showToast(c ? '수정했어요' : '추가했어요');
+}
+
+function deleteChar() {
+  const item = recItem();
+  if (!item || !rec.charId) return;
+  const r = getRecord(item);
+  const c = r.chars.find(x => x.id === rec.charId);
+  if (!c) return;
+  const relCount = r.rels.filter(x => x.a === c.id || x.b === c.id).length;
+  closeCharEditor();
+  document.getElementById('confirmTitle').textContent = `${c.name}을(를) 지울까요?`;
+  document.getElementById('confirmDesc').textContent = relCount ? `이 인물과 연결된 관계 ${relCount}개도 함께 지워져요.` : '관계도에서 사라져요.';
+  confirmCallback = () => {
+    r.chars = r.chars.filter(x => x.id !== c.id);
+    r.rels = r.rels.filter(x => x.a !== c.id && x.b !== c.id);
+    recTouch(item);
+    closeConfirm();
+    renderRecChars();
+    showToast('삭제했어요');
+  };
+  document.getElementById('confirmModal').classList.add('active');
+}
+
+// 관계 편집
+function openRelEditor(rid) {
+  const item = recItem();
+  if (!item) return;
+  const r = getRecord(item);
+  if (r.chars.length < 2) { showToast('인물이 두 명 이상 있어야 해요'); return; }
+  const x = rid ? r.rels.find(q => q.id === rid) : null;
+  rec.relId = x ? x.id : null;
+  const opts = sel => r.chars.map(c => `<option value="${c.id}" ${c.id === sel ? 'selected' : ''}>${escapeHTML(c.name)}</option>`).join('');
+  document.getElementById('relModalTitle').textContent = x ? '관계 수정' : '관계 추가';
+  document.getElementById('relA').innerHTML = opts(x ? x.a : r.chars[0].id);
+  document.getElementById('relB').innerHTML = opts(x ? x.b : r.chars[1].id);
+  document.getElementById('relLabel').value = x ? (x.label || '') : '';
+  rec.relDir = x ? !!x.dir : false;
+  syncRelDir();
+  document.getElementById('relChips').innerHTML = MM_REL_CHIPS.map(t =>
+    `<button type="button" class="plan-mini-btn" onclick="document.getElementById('relLabel').value=this.textContent">${t}</button>`
+  ).join('');
+  document.getElementById('relDeleteBtn').style.display = x ? '' : 'none';
+  document.getElementById('relModal').classList.add('active');
+}
+function closeRelEditor() { document.getElementById('relModal').classList.remove('active'); }
+function setRelDir(d) { rec.relDir = d; syncRelDir(); }
+function syncRelDir() {
+  document.querySelectorAll('#relDirPicker .seg-option').forEach(o => o.classList.toggle('active', (o.dataset.dir === '1') === !!rec.relDir));
+}
+function swapRel() {
+  const a = document.getElementById('relA'), b = document.getElementById('relB');
+  const t = a.value; a.value = b.value; b.value = t;
+}
+
+function saveRel() {
+  const item = recItem();
+  if (!item) return;
+  const r = getRecord(item);
+  const a = document.getElementById('relA').value, b = document.getElementById('relB').value;
+  if (!a || !b || a === b) { showToast('서로 다른 두 사람을 고르세요'); return; }
+  const data = { a, b, label: document.getElementById('relLabel').value.trim(), dir: !!rec.relDir };
+  const x = rec.relId ? r.rels.find(q => q.id === rec.relId) : null;
+  if (x) Object.assign(x, data);
+  else r.rels.push(Object.assign({ id: uid() }, data));
+  recTouch(item);
+  closeRelEditor();
+  renderRecChars();
+  showToast(x ? '수정했어요' : '추가했어요');
+}
+
+function deleteRel() {
+  const item = recItem();
+  if (!item || !rec.relId) return;
+  const r = getRecord(item);
+  r.rels = r.rels.filter(q => q.id !== rec.relId);
+  recTouch(item);
+  closeRelEditor();
+  renderRecChars();
+  showToast('삭제했어요');
+}
+
+function recCharsText(item) {
+  const r = getRecord(item);
+  if (!r.chars.length) return '';
+  const nameOf = id => { const c = r.chars.find(x => x.id === id); return c ? c.name : '(삭제됨)'; };
+  const lines = [`[${item.type === 'podcast' ? '출연자' : '등장인물'}]`];
+  r.chars.forEach(c => {
+    const d = mdPreviewLine(c.desc || '', 0);
+    lines.push(`• ${c.name}${c.group ? ` (${c.group})` : ''}${d ? `: ${d}` : ''}`);
+  });
+  if (r.rels.length) {
+    lines.push('', '[관계]');
+    r.rels.forEach(x => lines.push(`• ${nameOf(x.a)} ${x.dir ? '→' : '↔'} ${nameOf(x.b)}${x.label ? `: ${x.label}` : ''}`));
+  }
+  return lines.join('\n');
+}
+function copyRecChars() {
+  const item = recItem();
+  if (item) copyPlain(`${bracketTitle(item)}\n\n` + recCharsText(item), '인물 관계를 복사했어요');
+}
+
+// 관계도 이미지 (캔버스에 직접 그림)
+function mmRoundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+function mmDrawCanvas(item) {
+  const sc = mmScene(item);
+  const { r, groups, pos, boxes, center, vb } = sc;
+  const S = 2;
+  const FONT = "-apple-system, 'Pretendard Variable', Pretendard, sans-serif";
+  const head = 64;
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.max(vb.w, 360) * S;
+  canvas.height = (vb.h + head) * S;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(S, S);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#17181c';
+  ctx.font = `700 18px ${FONT}`;
+  ctx.textAlign = 'left';
+  ctx.fillText(`${bracketTitle(item)} 인물 관계도`, 20, 34);
+  ctx.fillStyle = '#9a9daa';
+  ctx.font = `400 11px ${FONT}`;
+  ctx.fillText('CONTENTS ARCHIVE · ' + fmtToday(), 20, 52);
+  const ox = (Math.max(vb.w, 360) - vb.w) / 2;
+  ctx.translate(ox - vb.x, head - vb.y);
+  r.chars.forEach(c => {
+    const p = pos[c.id];
+    ctx.strokeStyle = mmColor(c, groups);
+    ctx.globalAlpha = 0.32;
+    ctx.lineWidth = 2.5;
+    ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(p.x, p.y); ctx.stroke();
+    ctx.globalAlpha = 1;
+  });
+  sc.rels.forEach(g => {
+    const a = pos[g.rel.a], b = pos[g.rel.b];
+    ctx.strokeStyle = '#5b5e6b'; ctx.lineWidth = 1.6;
+    ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.quadraticCurveTo(g.ctrl.x, g.ctrl.y, b.x, b.y); ctx.stroke();
+  });
+  ctx.textAlign = 'center';
+  mmRoundRect(ctx, -center.w / 2, -center.h / 2, center.w, center.h, 18);
+  ctx.fillStyle = '#17181c'; ctx.fill();
+  ctx.fillStyle = '#ffffff'; ctx.font = `700 15px ${FONT}`;
+  ctx.fillText(center.title, 0, 5);
+  r.chars.forEach(c => {
+    const p = pos[c.id], b = boxes[c.id], col = mmColor(c, groups);
+    mmRoundRect(ctx, p.x - b.w / 2, p.y - b.h / 2, b.w, b.h, 12);
+    ctx.fillStyle = mmTint(col, 0.88); ctx.fill();
+    ctx.strokeStyle = col; ctx.lineWidth = 1.8; ctx.stroke();
+    ctx.fillStyle = '#17181c'; ctx.font = `700 14px ${FONT}`;
+    ctx.fillText(b.name, p.x, p.y + (b.sub ? -3 : 5));
+    if (b.sub) { ctx.fillStyle = col; ctx.font = `600 11px ${FONT}`; ctx.fillText(b.sub, p.x, p.y + 13); }
+  });
+  sc.rels.forEach(g => {
+    if (!g.rel.dir) return;
+    const ar = mmArrowAt(pos[g.rel.a], g.ctrl, pos[g.rel.b], boxes[g.rel.b]);
+    const s = 9, w = 5.5;
+    const bx = ar.x - s * Math.cos(ar.ang), by = ar.y - s * Math.sin(ar.ang);
+    ctx.fillStyle = '#5b5e6b';
+    ctx.beginPath(); ctx.moveTo(ar.x, ar.y);
+    ctx.lineTo(bx + w * Math.sin(ar.ang), by - w * Math.cos(ar.ang));
+    ctx.lineTo(bx - w * Math.sin(ar.ang), by + w * Math.cos(ar.ang));
+    ctx.closePath(); ctx.fill();
+  });
+  sc.rels.filter(g => g.label).forEach(g => {
+    mmRoundRect(ctx, g.lp.x - g.lw / 2, g.lp.y - 10, g.lw, 20, 10);
+    ctx.fillStyle = '#ffffff'; ctx.fill();
+    ctx.strokeStyle = '#d9dbe4'; ctx.lineWidth = 1; ctx.stroke();
+    ctx.fillStyle = '#5b5e6b'; ctx.font = `600 11px ${FONT}`;
+    ctx.fillText(g.label, g.lp.x, g.lp.y + 4);
+  });
+  return canvas;
+}
+function mmSaveImage() {
+  const item = recItem();
+  if (!item || !getRecord(item).chars.length) return;
+  try {
+    const canvas = mmDrawCanvas(item);
+    shareCanvasImage(canvas, `${(item.title || 'map').replace(/[\\/:*?"<>|]/g, '_').slice(0, 30)}_인물관계도.png`);
+  } catch (e) {
+    console.error(e);
+    showToast('이미지 만들기 실패: ' + (e && e.message ? e.message : ''));
+  }
+}
+
+// ---------- 회차 기록 ----------
+const REC_EP_TEMPLATE = '**줄거리**\n- \n\n**인상 깊은 장면**\n- \n\n**한마디**\n';
+
+function recLatestWatched(item) {
+  const set = getWatchedSet(item);
+  if (!set || !set.size) return null;
+  return Math.max(...set);
+}
+
+function renderRecEps() {
+  const item = recItem();
+  if (!item) return;
+  const r = getRecord(item);
+  const total = recEpTotal(item);
+  const watched = getWatchedSet(item) || new Set();
+  const recorded = Object.keys(r.eps).map(Number).filter(n => n > 0).sort((a, b) => a - b);
+  const latest = recLatestWatched(item);
+  let nums;
+  if (rec.epFilter === 'has' || !total) nums = recorded;
+  else nums = Array.from(new Set([...Array.from({ length: total }, (_, i) => i + 1), ...recorded])).sort((a, b) => a - b);
+  const body = document.getElementById('recordBody');
+  body.innerHTML = `
+    <div class="rec-actions">
+      ${latest ? `<button type="button" class="plan-mini-btn primary" onclick="openEpEditor(${latest})">✍️ 최근 본 ${recEpLabel(item, latest)} 기록</button>` : ''}
+      <button type="button" class="plan-mini-btn" onclick="copyRecEps()" ${recorded.length ? '' : 'disabled'}>📋 복사</button>
+    </div>
+    ${total ? `<div class="filter-row" style="margin-bottom: 10px;">
+      <button class="pill ${rec.epFilter === 'all' ? 'active' : ''}" onclick="rec.epFilter='all';renderRecEps()">전체 ${total}</button>
+      <button class="pill ${rec.epFilter === 'has' ? 'active' : ''}" onclick="rec.epFilter='has';renderRecEps()">기록한 회차 ${recorded.length}</button>
+    </div>` : `<div class="form-row" style="margin-bottom: 12px;">
+      <input type="number" class="form-input" id="recEpNew" placeholder="회차 번호" min="1" inputmode="numeric">
+      <button type="button" class="btn" onclick="recAddEp()" style="padding: 12px;">기록 쓰기</button>
+    </div>`}
+    ${nums.length ? `<div class="rec-list">${nums.map(n => {
+      const e = r.eps[n];
+      const pv = e ? mdPreviewLine(e.text, 60) : '';
+      return `<button type="button" class="rec-ep-row ${e ? 'has' : ''}" onclick="openEpEditor(${n})">
+        <span class="rec-ep-num">${recEpLabel(item, n)}</span>
+        <span class="rec-ep-text">${e ? escapeHTML(pv || '(내용 없음)') : '기록 없음'}</span>
+        ${watched.has(n) ? '<span class="rec-ep-seen">✓ 봄</span>' : ''}
+      </button>`;
+    }).join('')}</div>` : `<div class="plan-empty" style="padding: 18px 0; text-align: center;">${total ? '아직 기록한 회차가 없어요' : '회차 번호를 넣고 기록을 써보세요'}</div>`}`;
+}
+
+function recAddEp() {
+  const n = parseInt(document.getElementById('recEpNew').value, 10);
+  if (!(n > 0)) { showToast('회차 번호를 입력하세요'); return; }
+  openEpEditor(n);
+}
+
+function openEpEditor(n) {
+  const item = recItem();
+  if (!item) return;
+  const r = getRecord(item);
+  rec.epNum = n;
+  const e = r.eps[n];
+  rec.epOrig = e ? e.text : '';
+  const watched = getWatchedSet(item);
+  const total = recEpTotal(item);
+  document.getElementById('epModalTitle').textContent = `${bracketTitle(item)} ${recEpLabel(item, n)}`;
+  document.getElementById('epStatus').innerHTML = watched && watched.has(n)
+    ? '<span class="rec-ep-seen">✓ 본 회차</span>' : '<span class="rec-chip">아직 안 본 회차</span>';
+  document.getElementById('recEpText').value = rec.epOrig;
+  setMdPreview('recEpText', !!rec.epOrig);
+  document.getElementById('epPrevBtn').disabled = n <= 1;
+  document.getElementById('epPrevBtn').textContent = n > 1 ? `‹ ${recEpLabel(item, n - 1)}` : '‹';
+  document.getElementById('epNextBtn').disabled = !!total && n >= total;
+  document.getElementById('epNextBtn').textContent = !total || n < total ? `${recEpLabel(item, n + 1)} ›` : '›';
+  document.getElementById('epDeleteBtn').style.display = e ? '' : 'none';
+  document.getElementById('epModal').classList.add('active');
+}
+
+// 저장 (내용을 비우면 그 회차 기록 삭제). 바뀐 게 있으면 true
+function saveEpRecord() {
+  const item = recItem();
+  if (!item || rec.epNum == null) return false;
+  const r = getRecord(item);
+  const text = document.getElementById('recEpText').value.replace(/\s+$/, '');
+  if (text === (rec.epOrig || '').replace(/\s+$/, '')) return false;
+  if (text.trim()) r.eps[rec.epNum] = { text, updatedAt: Date.now() };
+  else delete r.eps[rec.epNum];
+  rec.epOrig = text;
+  recTouch(item);
+  return true;
+}
+
+function closeEpEditor(skipSave) {
+  const changed = skipSave ? false : saveEpRecord();
+  document.getElementById('epModal').classList.remove('active');
+  rec.epNum = null;
+  if (rec.tab === 'eps') renderRecEps();
+  if (changed) showToast('저장했어요');
+}
+function moveEp(d) {
+  const n = rec.epNum + d;
+  if (n < 1) return;
+  const changed = saveEpRecord();
+  if (changed) showToast('저장했어요');
+  openEpEditor(n);
+  if (rec.tab === 'eps') renderRecEps();
+}
+function insertEpTemplate() {
+  const ta = document.getElementById('recEpText');
+  setMdPreview('recEpText', false);
+  ta.value = ta.value.trim() ? ta.value.replace(/\s+$/, '') + '\n\n' + REC_EP_TEMPLATE : REC_EP_TEMPLATE;
+  ta.focus();
+  const i = ta.value.indexOf('- ') + 2;
+  ta.setSelectionRange(i, i);
+}
+function deleteEpRecord() {
+  const item = recItem();
+  if (!item || rec.epNum == null) return;
+  const n = rec.epNum;
+  document.getElementById('confirmTitle').textContent = `${recEpLabel(item, n)} 기록을 지울까요?`;
+  document.getElementById('confirmDesc').textContent = '이 회차에 쓴 내용이 사라져요.';
+  confirmCallback = () => {
+    delete getRecord(item).eps[n];
+    recTouch(item);
+    closeConfirm();
+    closeEpEditor(true);
+    showToast('삭제했어요');
+  };
+  document.getElementById('confirmModal').classList.add('active');
+}
+
+function recEpsText(item) {
+  const r = getRecord(item);
+  const nums = Object.keys(r.eps).map(Number).filter(n => n > 0).sort((a, b) => a - b);
+  return nums.map(n => `■ ${recEpLabel(item, n)}\n${stripMarkdownText(r.eps[n].text)}`).join('\n\n');
+}
+function copyRecEps() {
+  const item = recItem();
+  if (item) copyPlain(`${bracketTitle(item)} 회차 기록\n\n` + recEpsText(item), '회차 기록을 복사했어요');
+}
+
+// ---------- 총평 ----------
+function renderRecComment() {
+  const item = recItem();
+  if (!item) return;
+  const body = document.getElementById('recordBody');
+  body.innerHTML = `
+    <div class="rec-actions">
+      <button type="button" class="plan-mini-btn" onclick="copyRecComment()" ${item.memo ? '' : 'disabled'}>📋 복사</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">별점</label>
+      <div class="rec-stars">${[1, 2, 3, 4, 5].map(n => `<button type="button" class="rec-star ${n <= (item.rating || 0) ? 'on' : ''}" onclick="setRecRating(${n})">★</button>`).join('')}</div>
+    </div>
+    <div class="md-field">
+      <div class="md-field-head"><label class="form-label" style="margin:0;">총평 · 코멘트</label><button type="button" class="md-pv-btn" id="recComment_pvbtn" onclick="toggleMdPreview('recComment')">미리보기</button></div>
+      ${mdToolsHTML('recComment')}
+      <textarea class="form-textarea md-ta" id="recComment" placeholder="다 보고 난 뒤의 전체적인 감상을 남겨보세요" style="min-height: 180px;"></textarea>
+      <div class="md-view md-pv-box" id="recComment_pv" style="display:none;" onclick="setMdPreview('recComment', false)"></div>
+    </div>
+    <button type="button" class="btn btn-primary" onclick="saveRecComment()" style="width: 100%; margin-top: 12px;">총평 저장</button>
+    <div class="mm-hint" style="margin-top: 10px;">완료할 때 뜨는 리뷰 창에 쓴 내용도 여기에 들어가요</div>`;
+  document.getElementById('recComment').value = item.memo || '';
+  setMdPreview('recComment', !!item.memo);
+}
+function setRecRating(n) {
+  const item = recItem();
+  if (!item) return;
+  item.rating = item.rating === n ? 0 : n;
+  recTouch(item);
+  document.querySelectorAll('.rec-star').forEach((s, i) => s.classList.toggle('on', i < item.rating));
+}
+function saveRecComment() {
+  const item = recItem();
+  if (!item) return;
+  item.memo = document.getElementById('recComment').value.trim();
+  recTouch(item);
+  setMdPreview('recComment', !!item.memo);
+  showToast('총평을 저장했어요');
+}
+function copyRecComment() {
+  const item = recItem();
+  if (!item || !item.memo) return;
+  copyPlain(`${bracketTitle(item)}${item.rating ? ' ' + '★'.repeat(item.rating) : ''}\n${stripMarkdownText(item.memo)}`, '총평을 복사했어요');
+}
+
+// ---------- 전체 ----------
+function recordFullText(item) {
+  const parts = [`${bracketTitle(item)} 기록장`];
+  const tabs = recTabs(item).map(t => t.k);
+  if (tabs.includes('chars')) { const t = recCharsText(item); if (t) parts.push(t); }
+  if (tabs.includes('eps')) { const t = recEpsText(item); if (t) parts.push('[회차 기록]\n' + t); }
+  if (item.memo || item.rating) parts.push(`[총평]${item.rating ? ' ' + '★'.repeat(item.rating) : ''}\n${stripMarkdownText(item.memo || '')}`.trim());
+  return parts.join('\n\n');
+}
+function copyRecordAll() {
+  const item = recItem();
+  if (item) copyPlain(recordFullText(item), '기록장 전체를 복사했어요');
+}
+
+// 검색용 글자
+function recordSearchText(item) {
+  const r = peekRecord(item);
+  if (!r) return '';
+  const out = [];
+  (r.chars || []).forEach(c => out.push(c.name, c.group, c.desc));
+  (r.rels || []).forEach(x => out.push(x.label));
+  Object.values(r.eps || {}).forEach(e => out.push(e && e.text));
+  return out.filter(Boolean).join(' ');
+}
+
+// 두 기기 기록 합치기 (중복 정리·가져오기)
+function mergeRecords(a, b) {
+  const ra = peekRecord(a), rb = peekRecord(b);
+  if (!ra && !rb) return undefined;
+  const A = ra || {}, B = rb || {};
+  const byId = (x, y) => { const m = new Map(); (x || []).forEach(o => m.set(o.id, o)); (y || []).forEach(o => m.set(o.id, o)); return [...m.values()]; };
+  const eps = Object.assign({}, A.eps || {});
+  Object.entries(B.eps || {}).forEach(([k, v]) => { if (!eps[k] || (v && (v.updatedAt || 0) >= (eps[k].updatedAt || 0))) eps[k] = v; });
+  return { chars: byId(A.chars, B.chars), rels: byId(A.rels, B.rels), eps, manual: !!(A.manual || B.manual) };
+}
+
+document.addEventListener('pointerdown', mmPointerDown);
 
 // ============ PLANNER (주간·월간 시청 계획) ============
 let planAnchor = null;       // 보고 있는 주/월의 기준 날짜 'YYYY-MM-DD'
@@ -7307,6 +8648,7 @@ render();
 updateBackupBanner();
 renderBackupStatus();
 updateSaveIndicator(false);
+mdFillToolbars();
 syncCopyDefaultPicker();
 syncYtApiKey();
 checkVersionUpdate();
