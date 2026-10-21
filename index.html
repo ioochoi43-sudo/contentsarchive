@@ -379,6 +379,7 @@
   .card-type.drama { color: var(--yellow); border-color: var(--yellow-soft); background: var(--yellow-soft); }
   .card-type.podcast { color: #7a5cc8; border-color: #e6def6; background: #ede7f8; }
   .card-type.anime { color: #c2477f; border-color: #f6dde9; background: #fae7f0; }
+  .card-type.webnovel { color: #2f8f6a; border-color: #d3ebe0; background: #e5f3ec; }
 
   .card-copy-btn {
     font-size: 10px;
@@ -663,10 +664,10 @@
   }
   .form-textarea { min-height: 80px; resize: vertical; }
 
-  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .form-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
 
-  .date-field { position: relative; }
-  .date-field .form-input { padding-right: 36px; }
+  .date-field { position: relative; min-width: 0; }
+  .date-field .form-input { padding-right: 36px; min-width: 0; width: 100%; }
   .date-clear {
     position: absolute;
     right: 8px;
@@ -737,7 +738,12 @@
   .yt-preview-title { font-size: 12px; font-weight: 600; color: var(--ink); margin-bottom: 2px; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   .yt-preview-channel { font-size: 11px; color: var(--ink-dim); }
 
-  .type-picker { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
+  .type-picker { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+  .plan-range-row { display: flex; align-items: center; gap: 6px; margin-top: 10px; }
+  .plan-range-row .form-input { flex: 1; min-width: 0; padding: 11px 12px; }
+  .plan-range-row .btn { flex-shrink: 0; padding: 11px 14px; }
+  .plan-range-info { font-size: 12px; color: var(--ink-dim); margin-top: 10px; line-height: 1.6; }
+  .plan-range-picked { margin-top: 10px; padding: 10px 12px; background: var(--accent-soft, #eceefb); border-radius: 10px; font-size: 13px; font-weight: 700; color: var(--accent); }
   .type-option-icon { display: block; font-size: 16px; margin-bottom: 3px; font-weight: 700; }
   .type-option {
     padding: 11px 2px;
@@ -1409,6 +1415,7 @@
   .mm-group-apply { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 13px; color: var(--ink-dim); cursor: pointer; }
   .mm-group-apply input { width: 18px; height: 18px; accent-color: var(--accent); }
   .rec-line { width: 4px; align-self: stretch; border-radius: 2px; flex-shrink: 0; }
+  .rec-branch { color: var(--ink-mute); font-size: 13px; margin-right: -4px; flex-shrink: 0; }
   .rec-autosave { font-size: 11px; color: var(--ink-mute); margin-top: 6px; min-height: 14px; text-align: right; }
   .rec-x-list { display: flex; flex-direction: column; gap: 8px; }
   .rec-x-row {
@@ -2285,6 +2292,7 @@
         <button class="pill" data-type="drama">드라마</button>
         <button class="pill" data-type="anime">애니</button>
         <button class="pill" data-type="podcast">팟캐스트</button>
+        <button class="pill" data-type="webnovel">웹소설</button>
       </div>
       <button class="sort-btn" onclick="toggleSortMenu(event)">
         <span id="sortBtnLabel">최근순</span>
@@ -2321,8 +2329,8 @@
     <button class="entry-card" onclick="goTab('ott')">
       <span class="entry-icon">📺</span>
       <span class="entry-body">
-        <span class="entry-title" style="display:block;">OTT별 보기</span>
-        <span class="entry-desc" style="display:block;">플랫폼마다 모아서 정리해요</span>
+        <span class="entry-title" style="display:block;">플랫폼별 보기</span>
+        <span class="entry-desc" style="display:block;">OTT·웹소설 연재처마다 모아서 정리해요</span>
       </span>
       <span class="entry-arrow">›</span>
     </button>
@@ -2348,8 +2356,8 @@
 
   <section class="view" id="view-ott">
     <button class="pill" onclick="goTab('library')" style="margin-bottom: 14px;">‹ 모아보기</button>
-    <h2 class="section-title">OTT <span>별 보기</span></h2>
-    <div class="section-sub">플랫폼마다 모아서</div>
+    <h2 class="section-title">플랫폼 <span>별 보기</span></h2>
+    <div class="section-sub">OTT·연재처마다 모아서</div>
     <div id="ottView"></div>
   </section>
 
@@ -2453,7 +2461,7 @@
     </div>
 
     <div id="versionText" style="text-align: center; margin-top: 40px; font-size: 11px; color: var(--ink-mute); letter-spacing: 0.04em; font-weight: 500;">
-      v4.6 · 데이터는 브라우저에 저장됩니다
+      v4.7 · 데이터는 브라우저에 저장됩니다
     </div>
   </section>
 </main>
@@ -2495,6 +2503,7 @@
             <div class="type-option" data-type="drama"><span class="type-option-icon">●</span>드라마</div>
             <div class="type-option" data-type="anime"><span class="type-option-icon">◆</span>애니</div>
             <div class="type-option" data-type="podcast"><span class="type-option-icon">🎙</span>팟캐스트</div>
+            <div class="type-option" data-type="webnovel"><span class="type-option-icon">📖</span>웹소설</div>
           </div>
         </div>
 
@@ -2592,6 +2601,12 @@
         <div class="form-group form-section" id="section-podcast-platform">
           <label class="form-label">채널 / 플랫폼</label>
           <input type="text" class="form-input" id="fPlatform" placeholder="예: 애플 팟캐스트, 스포티파이, 유튜브">
+        </div>
+
+        <div class="form-group form-section" id="section-novel-platform">
+          <label class="form-label">연재 플랫폼</label>
+          <div class="plan-quick" id="novelPlatformChips"></div>
+          <input type="text" class="form-input" id="fNovelPlatform" placeholder="직접 입력 (목록에 없을 때)" oninput="renderNovelPlatformChips()" style="margin-top: 8px;">
         </div>
 
         <div class="form-group form-section" id="section-podcast">
@@ -2775,6 +2790,7 @@
           <button class="pill" data-type="drama">드라마</button>
         <button class="pill" data-type="anime">애니</button>
           <button class="pill" data-type="podcast">팟캐스트</button>
+          <button class="pill" data-type="webnovel">웹소설</button>
         </div>
       </div>
 
@@ -2809,6 +2825,7 @@
           <div class="type-option" data-type="drama"><span class="type-option-icon">●</span>드라마</div>
           <div class="type-option" data-type="anime"><span class="type-option-icon">◆</span>애니</div>
           <div class="type-option" data-type="podcast"><span class="type-option-icon">🎙</span>팟캐스트</div>
+          <div class="type-option" data-type="webnovel"><span class="type-option-icon">📖</span>웹소설</div>
         </div>
       </div>
 
@@ -2921,6 +2938,11 @@
         <input type="text" class="form-input" id="chName" placeholder="예: 차하윤">
       </div>
       <div class="form-group">
+        <label class="form-label">어디에서 뻗어나갈까요</label>
+        <select class="form-input" id="chParent" onchange="syncChGroupApply()"></select>
+        <div style="font-size: 11px; color: var(--ink-mute); margin-top: 6px;">다른 인물을 고르면 그 인물에서 가지가 뻗어요 (예: 여주인공 → 하녀)</div>
+      </div>
+      <div class="form-group">
         <label class="form-label">소속 · 그룹 <span style="font-weight:400;color:var(--ink-mute);">— 같은 소속은 같은 색으로 묶여요</span></label>
         <input type="text" class="form-input" id="chGroup" placeholder="예: 검찰, 가족, 주인공" oninput="syncChGroupApply()">
         <div class="plan-quick" id="chGroupChips" style="margin-top: 8px;"></div>
@@ -2936,6 +2958,7 @@
         <textarea class="form-textarea md-ta" id="chDesc" placeholder="성격, 직업, 비밀, 떡밥…"></textarea>
         <div class="md-view md-pv-box" id="chDesc_pv" style="display:none;" onclick="setMdPreview('chDesc', false)"></div>
       </div>
+      <button type="button" class="btn" id="chAddChildBtn" onclick="addChildFromEditor()" style="width: 100%; margin-top: 16px;">+ 이 인물에 가지 추가</button>
       <div class="btn-row">
         <button type="button" class="btn btn-danger" id="chDeleteBtn" onclick="deleteChar()">삭제</button>
         <button type="button" class="btn btn-primary" onclick="saveChar()">저장</button>
@@ -3023,8 +3046,8 @@
     <div class="modal-body">
       <div id="planCheckSub" style="font-size: 13px; color: var(--ink-dim); margin-bottom: 14px; word-break: keep-all;"></div>
       <div class="plan-quick" style="margin-bottom: 4px;">
-        <button type="button" class="plan-mini-btn primary" onclick="planCheckAll(true)">전부 봤어요</button>
-        <button type="button" class="plan-mini-btn" onclick="planCheckAll(false)">하나도 못 봤어요</button>
+        <button type="button" class="plan-mini-btn primary" id="planCheckAllBtn" onclick="planCheckAll(true)">전부 봤어요</button>
+        <button type="button" class="plan-mini-btn" id="planCheckNoneBtn" onclick="planCheckAll(false)">하나도 못 봤어요</button>
       </div>
       <div class="episodes-grid" id="planCheckGrid"></div>
       <div id="planCheckHint" style="font-size: 11px; color: var(--ink-mute); margin-top: 8px;"></div>
@@ -3061,7 +3084,8 @@
         <label class="form-label" id="planEpLabel">볼 회차 선택</label>
         <div class="plan-quick" id="planQuick"></div>
         <div class="episodes-grid" id="planEpGrid"></div>
-        <div class="plan-legend">
+        <div id="planEpRange" style="display:none;"></div>
+        <div class="plan-legend" id="planLegend">
           <span><i class="lg planned"></i>선택</span>
           <span><i class="lg seen"></i>이미 봄</span>
           <span><i class="lg elsewhere"></i>다른 날 계획됨</span>
@@ -3298,6 +3322,8 @@
 
 // ============ DEFAULT TEMPLATES ============
 const DEFAULT_TEMPLATES = [
+  { id: 'def-webnovel-1', type: 'webnovel', name: '읽으며 참고', content: `- 기억할 인물: \n- 떡밥: \n- 다음에 확인할 것: \n` },
+  { id: 'def-webnovel-2', type: 'webnovel', name: '한 줄 감상', content: `## 한 줄 감상\n\n\n## 좋았던 장면\n` },
   { id: 'def-podcast-1', type: 'podcast', name: '기본 청취 메모', content: `## 한 줄 요약\n\n\n## 핵심 내용\n- \n- \n\n## 인상 깊었던 말\n\n\n## 떠오른 생각\n` },
   { id: 'def-podcast-2', type: 'podcast', name: '에피소드별 정리', content: `## EP 1\n핵심: \n메모: \n\n## EP 2\n핵심: \n메모: \n` },
   { id: 'def-podcast-3', type: 'podcast', name: '인용 모음', content: `> "인용 1"\n— 타임스탬프: \n메모: \n\n-----\n\n> "인용 2"\n— 타임스탬프: \n메모: \n` },
@@ -3331,9 +3357,16 @@ const DEFAULT_OTT = [
 ];
 
 // ============ VERSION ============
-const APP_VERSION = '4.6';
+const APP_VERSION = '4.7';
 const VERSION_KEY = 'contentsArchive_seenVersion';
 const VERSION_NOTES = {
+  '4.7': [
+    '웹소설을 추가할 수 있어요 — 제목은 《 》로, 연재 플랫폼은 포스타입·네이버블로그 (직접 입력도 돼요)',
+    '연재 중이라 전체 회차를 몰라도 \'N화까지 읽음\'으로 기록하고 +1화로 빠르게 올릴 수 있어요',
+    '계획에서 웹소설은 회차 번호로 범위를 넣어요 (예: 120 ~ 125)',
+    '모아보기의 OTT별 보기가 \'플랫폼별 보기\'가 되어 웹소설 연재처도 함께 모여요',
+    '인물 관계도에서 인물에서 인물로 가지를 뻗을 수 있어요 — 인물을 눌러 \'+ 이 인물에 가지 추가\' (끌면 가지도 같이 움직여요)'
+  ],
   '4.6': [
     '계획 복사에서 두 회차만 이어질 땐 13, 14화처럼 쉼표로 적어요 (세 회차 이상은 13~15화 그대로)'
   ],
@@ -3458,7 +3491,7 @@ function load() {
         }
         if (item.country === undefined) item.country = null;
         if (item.record) getRecord(item);
-        if (item.type === 'drama' || item.type === 'anime') {
+        if (isEpType(item.type)) {
           if (!Array.isArray(item.epWatched)) item.epWatched = [];
           if (typeof item.epSeqMode !== 'boolean') item.epSeqMode = true; // 기존 동작(순차) 유지
         }
@@ -3470,6 +3503,12 @@ function load() {
       state.templates = Array.isArray(data.templates) ? data.templates : [];
       if (state.templates.length === 0) {
         state.templates = DEFAULT_TEMPLATES.map(t => ({ ...t, createdAt: Date.now() }));
+      }
+      state.seededTypes = (data.settings && Array.isArray(data.settings.seededTypes)) ? data.settings.seededTypes : [];
+      if (!state.seededTypes.includes('webnovel')) {
+        DEFAULT_TEMPLATES.filter(t => t.type === 'webnovel' && !state.templates.some(x => x.id === t.id))
+          .forEach(t => state.templates.push({ ...t, createdAt: Date.now() }));
+        state.seededTypes.push('webnovel');
       }
       state.ottPlatforms = Array.isArray(data.ottPlatforms) ? data.ottPlatforms : [];
       state.countries = Array.isArray(data.countries) ? data.countries : [];
@@ -3528,7 +3567,8 @@ function save(isDataChange) {
         copyDefaultProgress: state.copyDefaultProgress,
         timelineSort: state.timelineSort,
         ytApiKey: state.ytApiKey,
-        planView: state.planView
+        planView: state.planView,
+        seededTypes: state.seededTypes || ['webnovel']
       },
       savedAt: now
     }));
@@ -3620,7 +3660,20 @@ function thumbFitStyle(item) {
   return item.thumbFit === 'contain' ? 'object-fit:contain;background:var(--bg-soft);' : 'object-fit:cover;';
 }
 
-function typeName(t) { return {youtube:'유튜브', movie:'영화', drama:'드라마', anime:'애니', podcast:'팟캐스트'}[t] || t; }
+function typeName(t) { return {youtube:'유튜브', movie:'영화', drama:'드라마', anime:'애니', podcast:'팟캐스트', webnovel:'웹소설'}[t] || t; }
+// 회차(화)로 진행하는 유형: 드라마·애니·웹소설 (팟캐스트는 EP)
+function isEpType(t) { return t === 'drama' || t === 'anime' || t === 'webnovel'; }
+// OTT·국가가 있는 영상물
+function isScreenType(t) { return t === 'movie' || t === 'drama' || t === 'anime'; }
+const OPEN_EP_TOTAL = 100000; // 연재 중이라 전체 회차를 모르는 웹소설의 가상 상한
+const EP_GRID_MAX = 150;      // 이보다 회차가 많으면 버튼 대신 숫자로 입력
+// 유형별 동사
+function epVerb(t) {
+  if (t === 'podcast') return { q: '들었나요', did: '들었어요', ing: '듣는 중', seen: '들은', miss: '못 들은', done: '들음' };
+  if (t === 'webnovel') return { q: '읽었나요', did: '읽었어요', ing: '읽는 중', seen: '읽은', miss: '못 읽은', done: '읽음' };
+  return { q: '봤나요', did: '봤어요', ing: '보는 중', seen: '본', miss: '못 본', done: '봄' };
+}
+const NOVEL_PLATFORMS = ['포스타입', '네이버블로그'];
 function statusName(s) { return {wishlist:'위시리스트', watching:'진행 중', done:'완료', dropped:'중단'}[s] || s; }
 
 function showToast(msg) {
@@ -3631,13 +3684,14 @@ function showToast(msg) {
 }
 
 function getProgress(item) {
-  if ((item.type === 'drama' || item.type === 'anime') && item.totalEp > 0) return Math.min(100, Math.round((item.currentEp || 0) / item.totalEp * 100));
+  if (isEpType(item.type) && item.totalEp > 0) return Math.min(100, Math.round((item.currentEp || 0) / item.totalEp * 100));
   if (item.type === 'podcast' && item.totalPodEp > 0) return Math.min(100, Math.round((item.currentPodEp || 0) / item.totalPodEp * 100));
   return null;
 }
 
 function progressText(item) {
-  if ((item.type === 'drama' || item.type === 'anime') && item.totalEp > 0) return `${item.currentEp || 0} / ${item.totalEp} 회`;
+  if (isEpType(item.type) && item.totalEp > 0) return `${item.currentEp || 0} / ${item.totalEp} 회`;
+  if (item.type === 'webnovel') return item.currentEp > 0 ? `${item.currentEp}화까지 · 연재 중` : '연재 중';
   if (item.type === 'podcast' && item.totalPodEp > 0) return `EP ${item.currentPodEp || 0} / ${item.totalPodEp}`;
   return null;
 }
@@ -3645,9 +3699,9 @@ function progressText(item) {
 function starString(n) { return n ? '★'.repeat(n) + '☆'.repeat(5 - n) : ''; }
 
 // ============ COPY TEXT ============
-// 제목을 유형에 맞는 괄호로 감싸기 (모두 영상물 〈 〉)
+// 제목을 유형에 맞는 괄호로 감싸기 (영상물 〈 〉, 웹소설 《 》)
 function bracketTitle(item) {
-  return `〈${item.title}〉`;
+  return item && item.type === 'webnovel' ? `《${item.title}》` : `〈${item && item.title}〉`;
 }
 
 // 복사용 텍스트 생성. withProgress=true면 진행 상황(다음 회차/에피소드) 포함
@@ -3655,10 +3709,11 @@ function buildCopyText(item, withProgress) {
   const t = bracketTitle(item);
   if (!withProgress) return t;
   // 진행 상황 포함
-  if ((item.type === 'drama' || item.type === 'anime') && item.totalEp > 0) {
+  if (isEpType(item.type) && item.totalEp > 0) {
     const next = Math.min((item.currentEp || 0) + 1, item.totalEp);
     return `${t} ${next}화~`;
   }
+  if (item.type === 'webnovel') return `${t} ${(item.currentEp || 0) + 1}화~`; // 연재 중
   if (item.type === 'podcast') {
     const cur = item.currentPodEp || 0;
     const next = item.totalPodEp > 0 ? Math.min(cur + 1, item.totalPodEp) : cur + 1;
@@ -4308,8 +4363,8 @@ function renderTimeline() {
   // 홈 가로 포스터
   const scroll = document.getElementById('homeScroll');
   if (scroll) {
-    const typeEmoji = { youtube: '▶️', movie: '🎬', drama: '📺', anime: '✨', podcast: '🎧' };
-    const verb = t => t === 'podcast' ? '듣는 중' : '보는 중';
+    const typeEmoji = { youtube: '▶️', movie: '🎬', drama: '📺', anime: '✨', podcast: '🎧', webnovel: '📖' };
+    const verb = t => epVerb(t).ing;
     scroll.innerHTML = watching.length === 0
       ? `<div style="padding: 30px 20px; color: var(--ink-mute); font-size: 13px;">+ 버튼으로 첫 기록을 시작해보세요</div>`
       : watching.map(item => {
@@ -4327,7 +4382,7 @@ function renderTimeline() {
         return `<div class="home-poster" onclick="openDetail('${item.id}')">
           <div class="home-poster-thumb">${thumb}${dayBadge}</div>
           <div class="home-poster-title">${escapeHTML(item.title)}</div>
-          ${prog !== null ? `<div class="home-poster-bar"><div class="home-poster-fill" style="width:${prog}%"></div></div><div class="home-poster-pct">${prog}% (${ptxt})</div>` : `<div class="home-poster-pct">${verb(item.type)}</div>`}
+          ${prog !== null ? `<div class="home-poster-bar"><div class="home-poster-fill" style="width:${prog}%"></div></div><div class="home-poster-pct">${prog}% (${ptxt})</div>` : `<div class="home-poster-pct">${item.type === 'webnovel' && item.currentEp > 0 ? `${item.currentEp}화까지 ${epVerb(item.type).done}` : verb(item.type)}</div>`}
         </div>`;
       }).join('');
   }
@@ -4376,9 +4431,10 @@ function renderOttView() {
   const container = document.getElementById('ottView');
   if (!container) return;
   // movie/drama/anime items that have OTT
-  const relevant = state.items.filter(i => (i.type === 'movie' || i.type === 'drama' || i.type === 'anime'));
-  if (relevant.length === 0) {
-    container.innerHTML = emptyHTML('영화·드라마·애니 기록이 없어요', 'OTT 정보를 담은 기록이 쌓이면 여기 모입니다');
+  const relevant = state.items.filter(i => isScreenType(i.type));
+  const novels = state.items.filter(i => i.type === 'webnovel');
+  if (relevant.length === 0 && novels.length === 0) {
+    container.innerHTML = emptyHTML('영화·드라마·애니·웹소설 기록이 없어요', 'OTT·연재 플랫폼 정보를 담은 기록이 쌓이면 여기 모입니다');
     return;
   }
   const sortedOtt = getOttSorted();
@@ -4404,6 +4460,30 @@ function renderOttView() {
       ${items.map(cardHTML).join('')}
     </div>`;
   });
+  // 웹소설 연재 플랫폼
+  const groupHTML = (name, items, color, muted) => {
+    const stat = [];
+    const w = items.filter(i => i.status === 'watching').length, d = items.filter(i => i.status === 'done').length, s = items.filter(i => i.status === 'wishlist').length;
+    if (w) stat.push(`진행중 <b>${w}</b>`); if (d) stat.push(`완료 <b>${d}</b>`); if (s) stat.push(`위시 <b>${s}</b>`);
+    return `<div class="ott-group">
+      <div class="ott-group-head">
+        <span class="ott-group-dot" style="background: ${color}"></span>
+        <span class="ott-group-name" ${muted ? 'style="color: var(--ink-mute);"' : ''}>${escapeHTML(name)}</span>
+        <span class="ott-group-count">${items.length}개</span>
+      </div>
+      ${stat.length ? `<div class="ott-group-stat">${stat.join('')}</div>` : ''}
+      ${items.map(cardHTML).join('')}
+    </div>`;
+  };
+  if (novels.length) {
+    const names = [...new Set([...NOVEL_PLATFORMS, ...novels.map(i => (i.platform || '').trim()).filter(Boolean)])];
+    names.forEach(nm => {
+      const items = sortItems(novels.filter(i => (i.platform || '').trim() === nm));
+      if (items.length) html += groupHTML(`${nm} · 웹소설`, items, '#2f8f6a');
+    });
+    const none = sortItems(novels.filter(i => !(i.platform || '').trim()));
+    if (none.length) html += groupHTML('웹소설 · 플랫폼 미지정', none, 'var(--line)', true);
+  }
   // No OTT assigned
   const noOtt = sortItems(relevant.filter(i => (i.otts || []).filter(id => getOttById(id)).length === 0));
   if (noOtt.length > 0) {
@@ -4444,8 +4524,8 @@ function renderStatsView() {
   </div>`;
 
   // type distribution bar chart
-  const typeColors = { youtube: '#c4543a', movie: '#4a6f96', drama: '#c4923a', anime: '#c2477f', podcast: '#7a5cc8' };
-  const types = ['youtube','movie','drama','anime','podcast'];
+  const typeColors = { youtube: '#c4543a', movie: '#4a6f96', drama: '#c4923a', anime: '#c2477f', podcast: '#7a5cc8', webnovel: '#2f8f6a' };
+  const types = ['youtube','movie','drama','anime','podcast','webnovel'];
   const typeCounts = types.map(t => items.filter(i => i.type === t).length);
   const maxType = Math.max(...typeCounts, 1);
   html += `<div class="stat-card">
@@ -4532,7 +4612,7 @@ function renderHallView() {
     const rank = idx < 3 ? medals[idx] : `<span style="font-size: 13px; color: var(--ink-mute); font-weight: 700;">${idx+1}</span>`;
     const thumb = item.thumb
       ? `<img class="hall-thumb" src="${escapeHTML(item.thumb)}" alt="" loading="lazy" style="${thumbFitStyle(item)}">`
-      : `<div class="hall-thumb" style="display:flex;align-items:center;justify-content:center;background:var(--bg-soft);color:var(--ink-mute);font-size:18px;">${{youtube:'▶',movie:'★',drama:'●',anime:'◆',podcast:'🎙'}[item.type]||''}</div>`;
+      : `<div class="hall-thumb" style="display:flex;align-items:center;justify-content:center;background:var(--bg-soft);color:var(--ink-mute);font-size:18px;">${{youtube:'▶',movie:'★',drama:'●',anime:'◆',podcast:'🎙',webnovel:'📖'}[item.type]||''}</div>`;
     return `<div class="hall-item" onclick="openDetail('${item.id}')">
       <div class="hall-rank">${rank}</div>
       ${thumb}
@@ -4608,7 +4688,7 @@ function cardHTML(item) {
   if (item.endDate && item.status === 'done') meta.push(`<span>${fmtDate(item.endDate)} 완료</span>`);
   if (item.rating > 0) meta.push(`<span class="card-stars">${starString(item.rating)}</span>`);
   if (item.status !== 'watching') meta.push(`<span>${statusName(item.status)}</span>`);
-  if (item.type === 'podcast' && item.platform) meta.push(`<span>${escapeHTML(item.platform)}</span>`);
+  if ((item.type === 'podcast' || item.type === 'webnovel') && item.platform) meta.push(`<span>${escapeHTML(item.platform)}</span>`);
   if (item.country) { const c = getCountryById(item.country); if (c) meta.push(`<span>${escapeHTML(c.name)}</span>`); }
   (item.otts || []).forEach(oid => {
     const ott = getOttById(oid);
@@ -4763,12 +4843,36 @@ function selectType(type) {
     document.getElementById('section-ott').classList.add('active');
     document.getElementById('section-country').classList.add('active');
   }
-  if (type === 'drama' || type === 'anime') document.getElementById('section-drama').classList.add('active');
+  if (isEpType(type)) document.getElementById('section-drama').classList.add('active');
+  document.getElementById('fTotalEp').placeholder = type === 'webnovel' ? '전체 (연재 중이면 비움)' : '전체 회차';
+  if (type === 'webnovel') {
+    document.getElementById('section-novel-platform').classList.add('active');
+    renderNovelPlatformChips();
+  }
   if (type === 'podcast') {
     document.getElementById('section-podcast-platform').classList.add('active');
     document.getElementById('section-podcast').classList.add('active');
   }
-  document.getElementById('creatorLabel').textContent = {youtube:'채널', movie:'감독', drama:'연출 / 작가', anime:'감독 / 제작사', podcast:'진행자 / 제작'}[type] || '';
+  document.getElementById('creatorLabel').textContent = {youtube:'채널', movie:'감독', drama:'연출 / 작가', anime:'감독 / 제작사', podcast:'진행자 / 제작', webnovel:'작가'}[type] || '';
+}
+
+// 웹소설 연재 플랫폼: 기본 2개 + 직접 입력했던 곳들
+function novelPlatformList() {
+  const used = state.items.filter(i => i.type === 'webnovel' && i.platform).map(i => String(i.platform).trim()).filter(Boolean);
+  return [...new Set([...NOVEL_PLATFORMS, ...used])];
+}
+function renderNovelPlatformChips() {
+  const box = document.getElementById('novelPlatformChips');
+  if (!box) return;
+  const v = document.getElementById('fNovelPlatform').value.trim();
+  box.innerHTML = novelPlatformList().map(p =>
+    `<button type="button" class="plan-mini-btn ${p === v ? 'primary' : ''}" data-p="${escapeHTML(p)}" onclick="pickNovelPlatform(this.dataset.p)">${escapeHTML(p)}</button>`
+  ).join('');
+}
+function pickNovelPlatform(p) {
+  const el = document.getElementById('fNovelPlatform');
+  el.value = el.value.trim() === p ? '' : p;
+  renderNovelPlatformChips();
 }
 
 document.getElementById('statusPicker').addEventListener('click', (e) => {
@@ -4858,7 +4962,8 @@ function fillForm(item) {
   document.getElementById('fTitle').value = item.title || '';
   document.getElementById('fCreator').value = item.creator || '';
   document.getElementById('fCast').value = item.cast || '';
-  document.getElementById('fPlatform').value = item.platform || '';
+  document.getElementById('fPlatform').value = item.type === 'podcast' ? (item.platform || '') : '';
+  document.getElementById('fNovelPlatform').value = item.type === 'webnovel' ? (item.platform || '') : '';
   document.getElementById('fLink').value = item.link || '';
   document.getElementById('fTotalEp').value = item.totalEp || '';
   document.getElementById('fCurrentEp').value = item.currentEp || '';
@@ -4920,7 +5025,8 @@ function saveContent(e) {
     title: document.getElementById('fTitle').value.trim(),
     creator: document.getElementById('fCreator').value.trim(),
     cast: document.getElementById('fCast').value.trim(),
-    platform: state.selectedType === 'podcast' ? document.getElementById('fPlatform').value.trim() : '',
+    platform: state.selectedType === 'podcast' ? document.getElementById('fPlatform').value.trim()
+      : state.selectedType === 'webnovel' ? document.getElementById('fNovelPlatform').value.trim() : '',
     otts: (state.selectedType === 'movie' || state.selectedType === 'drama' || state.selectedType === 'anime') ? [...state.selectedOtts] : [],
     country: (state.selectedType === 'movie' || state.selectedType === 'drama' || state.selectedType === 'anime') ? state.selectedCountry : null,
     link: document.getElementById('fLink').value.trim(),
@@ -4962,7 +5068,9 @@ function openDetail(id) {
   const ptext = progressText(item);
 
   let episodesHTML = '';
-  if ((item.type === 'drama' || item.type === 'anime') && item.totalEp > 0) {
+  if (isEpType(item.type) && (item.type === 'webnovel' ? !(item.totalEp > 0) || item.totalEp > EP_GRID_MAX : item.totalEp > EP_GRID_MAX)) {
+    episodesHTML = epCompactHTML(item);
+  } else if (isEpType(item.type) && item.totalEp > 0) {
     const watchedSet = new Set(item.epWatched || []);
     const seqMode = item.epSeqMode !== false; // 기본은 순차 모드(기존 동작 유지)
     const watchedCount = seqMode ? (item.currentEp || 0) : watchedSet.size;
@@ -4980,7 +5088,7 @@ function openDetail(id) {
           <button class="ep-mode-btn ${seqMode ? 'active' : ''}" onclick="setEpMode('${item.id}', true)">순차</button>
         </div>
       </div>
-      <div style="font-size:11px;color:var(--ink-mute);margin-bottom:8px;">${seqMode ? '탭하면 거기까지 한꺼번에 체크돼요' : '본 회차만 하나씩 탭해서 체크해요'}</div>
+      <div style="font-size:11px;color:var(--ink-mute);margin-bottom:8px;">${seqMode ? '탭하면 거기까지 한꺼번에 체크돼요' : `${epVerb(item.type).seen} 회차만 하나씩 탭해서 체크해요`}</div>
       <div class="progress-bar"><div class="progress-fill" style="width: ${pct}%"></div></div>
       <div class="episodes-grid">${grid}</div>
     </div>`;
@@ -5068,7 +5176,7 @@ function openDetail(id) {
 
     <div class="detail-section"><div class="detail-label">상태</div><div class="detail-value">${statusName(item.status)}</div></div>
     ${item.cast ? `<div class="detail-section"><div class="detail-label">출연</div><div class="detail-value">${escapeHTML(item.cast)}</div></div>` : ''}
-    ${item.platform ? `<div class="detail-section"><div class="detail-label">채널 / 플랫폼</div><div class="detail-value">${escapeHTML(item.platform)}</div></div>` : ''}
+    ${item.platform ? `<div class="detail-section"><div class="detail-label">${item.type === 'webnovel' ? '연재 플랫폼' : '채널 / 플랫폼'}</div><div class="detail-value">${escapeHTML(item.platform)}</div></div>` : ''}
     ${(() => {
       const sel = (item.otts || []).map(id => getOttById(id)).filter(Boolean);
       if (sel.length === 0) return '';
@@ -5085,7 +5193,7 @@ function openDetail(id) {
     ${recordCardHTML(item)}
 
     ${(() => {
-      const hasProgress = ((item.type === 'drama' || item.type === 'anime') && item.totalEp > 0) || (item.type === 'podcast');
+      const hasProgress = (isEpType(item.type) && item.totalEp > 0) || item.type === 'podcast' || item.type === 'webnovel';
       const titleOnly = buildCopyText(item, false);
       const withProg = buildCopyText(item, true);
       return `<div class="detail-section">
@@ -5116,6 +5224,59 @@ function openDetail(id) {
   document.body.style.overflow = 'hidden';
 }
 
+// 회차가 많거나(웹소설) 연재 중이라 전체를 모를 때: 숫자로 진행 입력
+function epCompactHTML(item) {
+  const v = epVerb(item.type);
+  const total = item.totalEp || 0;
+  const cur = item.currentEp || 0;
+  const seen = getWatchedSet(item);
+  const count = seen ? seen.size : cur;
+  const pct = total > 0 ? Math.min(100, Math.round(count / total * 100)) : 0;
+  return `<div class="episodes-section">
+    <div class="detail-label">${v.seen} 회차</div>
+    <div class="detail-value" style="font-size: 17px; font-weight: 700;">${cur}화까지 ${v.done}
+      <span style="font-size: 12px; font-weight: 500; color: var(--ink-mute);">${total ? `/ 전체 ${total}화` : '· 연재 중'}</span></div>
+    ${count > cur ? `<div style="font-size: 11px; color: var(--ink-mute); margin-top: 2px;">띄엄띄엄 ${v.seen} 회차까지 합치면 ${count}화</div>` : ''}
+    ${total ? `<div class="progress-bar" style="margin-top: 8px;"><div class="progress-fill" style="width: ${pct}%"></div></div>` : ''}
+    <div style="margin-top: 10px; display: flex; gap: 8px;">
+      <button type="button" class="btn" onclick="bumpEp('${item.id}', 1)" style="flex: 1; padding: 12px;">+1화</button>
+      <input type="number" id="quickEp" value="${cur}" min="0" inputmode="numeric" class="form-input" style="flex: 1; min-width: 0;">
+      <button type="button" class="btn btn-primary" onclick="setEpFromInput('${item.id}')" style="flex: 1; padding: 12px;">업데이트</button>
+    </div>
+    ${!total && item.type === 'webnovel' ? `<div style="font-size: 11px; color: var(--ink-mute); margin-top: 8px;">완결되면 '기록 수정'에서 전체 회차를 넣어주세요</div>` : ''}
+  </div>`;
+}
+function setEpProgress(id, n) {
+  const item = state.items.find(i => i.id === id);
+  if (!item) return;
+  n = Math.max(0, Math.floor(Number(n)) || 0);
+  if (item.totalEp > 0) n = Math.min(n, item.totalEp);
+  const prev = { ep: item.currentEp || 0, pod: item.currentPodEp || 0 };
+  item.currentEp = n;
+  applyFormProgress(item, prev); // 개별 체크 방식이면 체크 목록도 맞춤
+  item.updatedAt = Date.now();
+  let becameDone = false;
+  if (item.totalEp > 0 && n >= item.totalEp && item.status !== 'done') {
+    item.status = 'done';
+    if (!item.endDate) item.endDate = today();
+    becameDone = true;
+  }
+  save(true);
+  render();
+  openDetail(id);
+  showToast(`${n}화까지 ${epVerb(item.type).done}`);
+  if (becameDone) setTimeout(() => promptDoneReview(id), 300);
+}
+function bumpEp(id, d) {
+  const item = state.items.find(i => i.id === id);
+  if (item) setEpProgress(id, (item.currentEp || 0) + d);
+}
+function setEpFromInput(id) {
+  const v = parseInt(document.getElementById('quickEp').value, 10);
+  if (isNaN(v)) { showToast('회차 숫자를 넣어주세요'); return; }
+  setEpProgress(id, v);
+}
+
 function closeDetailModal() {
   document.getElementById('detailModal').classList.remove('active');
   document.body.style.overflow = '';
@@ -5143,7 +5304,7 @@ function markDone(id) {
   if (!item) return;
   item.status = 'done';
   if (!item.endDate) item.endDate = today();
-  if ((item.type === 'drama' || item.type === 'anime') && item.totalEp > 0) {
+  if (isEpType(item.type) && item.totalEp > 0) {
     item.currentEp = item.totalEp;
     item.epWatched = Array.from({length: item.totalEp}, (_, i) => i + 1);
   }
@@ -5708,7 +5869,7 @@ async function loadNotePhotos(note) {
   }
   return out;
 }
-function noteFoot(item) { return `〈${mmClip(item.title || '', 22)}〉 메모 · CONTENTS ARCHIVE`; }
+function noteFoot(item) { return `${bracketTitle({ title: mmClip(item.title || '', 22), type: item.type })} 메모 · CONTENTS ARCHIVE`; }
 async function drawNoteImage(item, note) {
   const photos = await loadNotePhotos(note);
   return drawDocImage(env => noteLayout(item, note, env, photos));
@@ -6604,7 +6765,7 @@ function exportExcel() {
     });
 
     // 3. Stats sheet
-    const byType = ['youtube','movie','drama','anime','podcast'].map(t => ({
+    const byType = ['youtube','movie','drama','anime','podcast','webnovel'].map(t => ({
       '유형': typeName(t),
       '전체': state.items.filter(i => i.type === t).length,
       '진행중': state.items.filter(i => i.type === t && i.status === 'watching').length,
@@ -7032,6 +7193,22 @@ function getRecord(item) {
   });
   if (!Array.isArray(r.rels)) r.rels = [];
   const ids = new Set(r.chars.map(c => c.id));
+  // 인물에서 뻗은 가지(부모): 없는 인물·자기 자신·순환은 끊음
+  r.chars.forEach(c => {
+    if (c.parent == null) return;
+    c.parent = String(c.parent);
+    if (!ids.has(c.parent) || c.parent === c.id) delete c.parent;
+  });
+  const byIdP = new Map(r.chars.map(c => [c.id, c]));
+  r.chars.forEach(c => {
+    const seen = new Set([c.id]);
+    let p = c.parent;
+    while (p) {
+      if (seen.has(p)) { delete c.parent; break; }
+      seen.add(p);
+      p = (byIdP.get(p) || {}).parent;
+    }
+  });
   const okRel = x => x && typeof x === 'object' && x.id != null && ids.has(String(x.a)) && ids.has(String(x.b)) && String(x.a) !== String(x.b);
   if (!r.rels.every(okRel)) r.rels = r.rels.filter(okRel);
   r.rels.forEach(x => {
@@ -7055,7 +7232,7 @@ function getRecord(item) {
 // 있을 때만 꺼내기 (화면 표시·검색용 — 없는 기록장을 새로 만들지 않음)
 function peekRecord(item) { return item && item.record ? getRecord(item) : null; }
 function recItem() { return state.items.find(i => i.id === rec.itemId); }
-function recEpisodic(item) { return item.type === 'drama' || item.type === 'anime' || item.type === 'podcast'; }
+function recEpisodic(item) { return isEpType(item.type) || item.type === 'podcast'; }
 function recEpTotal(item) { return item.type === 'podcast' ? (item.totalPodEp || 0) : (item.totalEp || 0); }
 function recEpLabel(item, n) { return item.type === 'podcast' ? `EP${n}` : `${n}화`; }
 function recTabs(item) {
@@ -7146,11 +7323,51 @@ function mmGroups(chars) {
 const MM_SWATCHES = ['#3d4cc8', '#2a8bb0', '#2f8f6a', '#6b7a2a', '#e0a100', '#c4782a', '#b5483b', '#c2477f', '#7a5cc8', '#8a5a3c', '#5b5e6b', '#17181c'];
 function mmValidColor(c) { return typeof c === 'string' && /^#[0-9a-fA-F]{6}$/.test(c); }
 // 색 우선순위: 인물에 직접 고른 색 → 소속에 고른 색 → 소속별 자동 색 → 회색
-function mmColor(c, groups, gc) {
+function mmColor(c, groups, gc, chars, depth) {
   if (mmValidColor(c.color)) return c.color;
   const g = (c.group || '').trim();
   if (g && gc && mmValidColor(gc[g])) return gc[g];
-  return g ? MM_COLORS[groups.indexOf(g) % MM_COLORS.length] : '#5b5e6b';
+  if (g) return MM_COLORS[groups.indexOf(g) % MM_COLORS.length];
+  if (c.parent && chars && (depth || 0) < 30) {
+    const p = chars.find(x => x.id === c.parent);
+    if (p) return mmColor(p, groups, gc, chars, (depth || 0) + 1);
+  }
+  return '#5b5e6b';
+}
+// 인물 가지 구조
+function mmTree(chars) {
+  const ids = new Set(chars.map(c => c.id));
+  const kids = {}, roots = [];
+  chars.forEach(c => {
+    const p = c.parent && c.parent !== c.id && ids.has(c.parent) ? c.parent : null;
+    if (p) (kids[p] = kids[p] || []).push(c); else roots.push(c);
+  });
+  return { roots, kids };
+}
+// 가지 순서대로 (부모 다음에 자식) + 깊이
+function mmTreeOrder(chars) {
+  const { roots, kids } = mmTree(chars);
+  const out = [], seen = new Set();
+  const walk = (c, d) => {
+    if (seen.has(c.id)) return;
+    seen.add(c.id);
+    out.push({ c, depth: d });
+    (kids[c.id] || []).forEach(k => walk(k, d + 1));
+  };
+  roots.forEach(c => walk(c, 0));
+  chars.forEach(c => walk(c, 0)); // 혹시 남은 것(순환 등)
+  return out;
+}
+function mmDescendants(chars, id) {
+  const { kids } = mmTree(chars);
+  const out = [], seen = new Set([id]), st = [...(kids[id] || [])];
+  while (st.length) {
+    const k = st.pop();
+    if (seen.has(k.id)) continue;
+    seen.add(k.id); out.push(k.id);
+    st.push(...(kids[k.id] || []));
+  }
+  return out;
 }
 function mmAutoColor(group, groups) {
   const g = (group || '').trim();
@@ -7193,12 +7410,15 @@ function mmNodeBox(c) {
   return { w: Math.round(w), h: sub ? 44 : 32, name, sub };
 }
 
+const MM_STEP = 120; // 인물 → 가지 인물 거리
 function mmAutoPositions(chars) {
+  const { roots, kids } = mmTree(chars);
   const groups = mmGroups(chars);
   const gi = c => { const g = (c.group || '').trim(); return g ? groups.indexOf(g) : groups.length; };
-  const order = chars.map((c, i) => ({ c, i })).sort((p, q) => gi(p.c) - gi(q.c) || p.i - q.i).map(p => p.c);
+  const order = roots.map((c, i) => ({ c, i })).sort((p, q) => gi(p.c) - gi(q.c) || p.i - q.i).map(p => p.c);
   const n = order.length;
-  if (n === 0) return {};
+  const pos = {};
+  if (n === 0) return pos;
   const boxes = order.map(c => mmNodeBox(c));
   const place = R => {
     const rx = R * 0.82, ry = R * 1.12;
@@ -7219,24 +7439,97 @@ function mmAutoPositions(chars) {
   let R = Math.max(n <= 3 ? 125 : 150, (n * 118) / (2 * Math.PI));
   let pts = place(R);
   for (let k = 0; k < 40 && !clear(pts); k++) { R *= 1.07; pts = place(R); }
-  const pos = {};
   order.forEach((c, i) => { pos[c.id] = pts[i]; });
+  // 가지 인물: 부모에서 바깥쪽으로 부채꼴
+  if (chars.length > n) {
+    const placeKids = (parent, ang, depth) => {
+      const list = kids[parent.id] || [];
+      const m = list.length;
+      const spread = m > 1 ? Math.min(0.62, 2.0 / m) : 0;
+      list.forEach((k, i) => {
+        const a = ang + (i - (m - 1) / 2) * spread;
+        const p0 = pos[parent.id];
+        pos[k.id] = { x: Math.round(p0.x + Math.cos(a) * MM_STEP), y: Math.round(p0.y + Math.sin(a) * MM_STEP) };
+        if (depth < 30) placeKids(k, a, depth + 1);
+      });
+    };
+    order.forEach(c => { const p = pos[c.id]; placeKids(c, Math.atan2(p.y, p.x), 0); });
+    mmRelax(pos, chars);
+  }
   return pos;
 }
 
-// 저장된 위치(수동 배치) 우선, 없으면 자동. 수동 배치 중 새 인물은 빈 자리로.
+// 겹친 상자 밀어내기 (fixed에 든 인물은 그대로)
+function mmRelax(pos, chars, fixed) {
+  const list = chars.filter(c => pos[c.id]);
+  const box = {};
+  list.forEach(c => { box[c.id] = mmNodeBox(c); });
+  const isFixed = id => fixed && fixed.has(id);
+  const GAP = 14;
+  for (let it = 0; it < 80; it++) {
+    let moved = false;
+    for (let i = 0; i < list.length; i++) {
+      const a = list[i], pa = pos[a.id], ba = box[a.id];
+      // 가운데 작품 상자에서 떨어지기
+      if (!isFixed(a.id)) {
+        const ox = (ba.w / 2 + 70 + GAP) - Math.abs(pa.x), oy = (ba.h / 2 + 22 + GAP) - Math.abs(pa.y);
+        if (ox > 0 && oy > 0) {
+          if (ox < oy) pa.x += (pa.x >= 0 ? 1 : -1) * ox; else pa.y += (pa.y >= 0 ? 1 : -1) * oy;
+          moved = true;
+        }
+      }
+      for (let j = i + 1; j < list.length; j++) {
+        const b = list[j], pb = pos[b.id], bb = box[b.id];
+        const dx = pb.x - pa.x, dy = pb.y - pa.y;
+        const ox = (ba.w + bb.w) / 2 + GAP - Math.abs(dx), oy = (ba.h + bb.h) / 2 + GAP - Math.abs(dy);
+        if (ox <= 0 || oy <= 0) continue;
+        const fa = isFixed(a.id), fb = isFixed(b.id);
+        if (fa && fb) continue;
+        const wa = fa ? 0 : fb ? 1 : 0.5, wb = 1 - wa;
+        if (ox < oy) {
+          const s = dx >= 0 ? 1 : -1;
+          pa.x -= s * ox * wa; pb.x += s * ox * wb;
+        } else {
+          const s = dy >= 0 ? 1 : -1;
+          pa.y -= s * oy * wa; pb.y += s * oy * wb;
+        }
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  list.forEach(c => { pos[c.id].x = Math.round(pos[c.id].x); pos[c.id].y = Math.round(pos[c.id].y); });
+}
+
+// 저장된 위치(수동 배치) 우선, 없으면 자동. 수동 배치 중 새 인물은 빈 자리로 (가지 인물은 부모 옆에).
 function mmPositions(item) {
   const r = getRecord(item);
   const auto = mmAutoPositions(r.chars);
+  const has = c => typeof c.x === 'number' && typeof c.y === 'number';
+  const placed = r.chars.filter(has);
   const pos = {};
-  const placed = r.chars.filter(c => typeof c.x === 'number' && typeof c.y === 'number');
-  r.chars.forEach(c => {
-    if (typeof c.x === 'number' && typeof c.y === 'number') { pos[c.id] = { x: c.x, y: c.y }; return; }
-    if (!placed.length) { pos[c.id] = auto[c.id]; return; }
-    const cands = Object.values(auto);
+  if (!placed.length) { r.chars.forEach(c => { pos[c.id] = { x: auto[c.id].x, y: auto[c.id].y }; }); return pos; }
+  placed.forEach(c => { pos[c.id] = { x: c.x, y: c.y }; });
+  const minDist = p => Math.min(Infinity, ...Object.values(pos).map(q => Math.hypot(q.x - p.x, q.y - p.y)));
+  mmTreeOrder(r.chars).forEach(({ c }) => {
+    if (pos[c.id]) return;
+    const par = c.parent ? r.chars.find(x => x.id === c.parent) : null;
+    if (par && pos[par.id]) {
+      const p0 = pos[par.id];
+      const base = Math.atan2(p0.y, p0.x);
+      let best = null, bestD = -1;
+      for (const off of [0, 0.6, -0.6, 1.2, -1.2, 1.8, -1.8, 2.5, -2.5, Math.PI]) {
+        const p = { x: Math.round(p0.x + Math.cos(base + off) * MM_STEP), y: Math.round(p0.y + Math.sin(base + off) * MM_STEP) };
+        const d = minDist(p);
+        if (d >= 100) { best = p; break; }
+        if (d > bestD) { bestD = d; best = p; }
+      }
+      pos[c.id] = best;
+      return;
+    }
     let best = auto[c.id], bestD = -1;
-    cands.forEach(p => {
-      const d = Math.min(...Object.values(pos).concat(placed.map(q => ({ x: q.x, y: q.y }))).map(q => Math.hypot(q.x - p.x, q.y - p.y)));
+    Object.values(auto).forEach(p => {
+      const d = minDist(p);
       if (d > bestD) { bestD = d; best = p; }
     });
     pos[c.id] = { x: best.x, y: best.y };
@@ -7351,7 +7644,7 @@ function mmScene(item) {
 }
 
 function mmNodeSVG(c, sc) {
-  const p = sc.pos[c.id], b = sc.boxes[c.id], col = mmColor(c, sc.groups, sc.gc);
+  const p = sc.pos[c.id], b = sc.boxes[c.id], col = mmColor(c, sc.groups, sc.gc, sc.r.chars);
   return `<g class="mm-node" id="mm-n-${c.id}" data-cid="${c.id}" transform="translate(${p.x},${p.y})">
     <rect x="${-b.w / 2}" y="${-b.h / 2}" width="${b.w}" height="${b.h}" rx="12" fill="${mmTint(col, 0.86)}" stroke="${col}" stroke-width="2"/>
     <text y="${b.sub ? -3 : 5}" text-anchor="middle" class="mm-name">${escapeHTML(b.name)}</text>
@@ -7363,8 +7656,8 @@ function mmSVG(item) {
   const sc = mmScene(item);
   const { r, groups, gc, pos, center, vb } = sc;
   const branches = r.chars.map(c => {
-    const p = pos[c.id];
-    return `<line id="mm-b-${c.id}" x1="0" y1="0" x2="${p.x}" y2="${p.y}" stroke="${mmColor(c, groups, gc)}" stroke-opacity="0.32" stroke-width="2.5" stroke-linecap="round"/>`;
+    const p = pos[c.id], q = (c.parent && pos[c.parent]) || { x: 0, y: 0 };
+    return `<line id="mm-b-${c.id}" x1="${q.x}" y1="${q.y}" x2="${p.x}" y2="${p.y}" stroke="${mmColor(c, groups, gc, r.chars)}" stroke-opacity="${c.parent ? 0.5 : 0.32}" stroke-width="2.5" stroke-linecap="round"/>`;
   }).join('');
   const relLines = sc.rels.map(g =>
     `<path id="mm-r-${g.rel.id}" d="${g.d}" fill="none" stroke="${mmRelColor(g.rel)}" stroke-width="${g.rel.color ? 2.2 : 1.6}" stroke-linecap="round"/>`
@@ -7407,7 +7700,10 @@ function mmRedrawEdges() {
   const pos = mmPos;
   r.chars.forEach(c => {
     const l = document.getElementById('mm-b-' + c.id);
-    if (l && pos[c.id]) { l.setAttribute('x2', pos[c.id].x); l.setAttribute('y2', pos[c.id].y); }
+    if (!l || !pos[c.id]) return;
+    const q = (c.parent && pos[c.parent]) || { x: 0, y: 0 };
+    l.setAttribute('x1', q.x); l.setAttribute('y1', q.y);
+    l.setAttribute('x2', pos[c.id].x); l.setAttribute('y2', pos[c.id].y);
   });
   const off = mmRelOffsets(r.rels);
   r.rels.forEach(x => {
@@ -7438,7 +7734,9 @@ function mmPointerDown(e) {
   const p = mmSvgPoint(svg, e.clientX, e.clientY);
   const cur = mmPos[cid] || { x: 0, y: 0 };
   const vb = svg.getAttribute('data-vb').split(' ').map(Number);
-  mmDrag = { cid, g, svg, sx: p.x, sy: p.y, ox: cur.x, oy: cur.y, moved: false, pid: e.pointerId, vb };
+  const it = recItem();
+  const desc = it ? mmDescendants(getRecord(it).chars, cid).filter(id => mmPos[id]).map(id => ({ id, x: mmPos[id].x, y: mmPos[id].y })) : [];
+  mmDrag = { cid, g, svg, sx: p.x, sy: p.y, ox: cur.x, oy: cur.y, moved: false, pid: e.pointerId, vb, desc };
   try { g.setPointerCapture(e.pointerId); } catch (err) {}
   g.classList.add('dragging');
 }
@@ -7453,6 +7751,14 @@ function mmPointerMove(e) {
   const ny = Math.round(Math.max(vb[1] + 20, Math.min(vb[1] + vb[3] - 20, mmDrag.oy + dy)));
   mmPos[mmDrag.cid] = { x: nx, y: ny };
   mmDrag.g.setAttribute('transform', `translate(${nx},${ny})`);
+  // 이 인물에서 뻗은 가지 인물들도 같이 이동
+  const ddx = nx - mmDrag.ox, ddy = ny - mmDrag.oy;
+  mmDrag.desc.forEach(d => {
+    const x = d.x + ddx, y = d.y + ddy;
+    mmPos[d.id] = { x, y };
+    const el = document.getElementById('mm-n-' + d.id);
+    if (el) el.setAttribute('transform', `translate(${x},${y})`);
+  });
   mmRedrawEdges();
 }
 function mmPointerUp(e) {
@@ -7508,12 +7814,12 @@ function renderRecChars() {
       <button type="button" class="plan-mini-btn" onclick="copyRecChars()" ${r.chars.length ? '' : 'disabled'}>📋 복사</button>
     </div>
     <div class="mm-wrap" id="mmWrap">${mmSVG(item)}</div>
-    <div class="mm-hint">${r.chars.length ? `${who}을 끌어서 옮기고, 탭하면 수정·색 변경을 해요` : `+ ${who}로 시작해보세요. 소속을 적으면 같은 색으로 묶여요`}</div>
+    <div class="mm-hint">${r.chars.length ? `${who}을 끌어서 옮기고, 탭하면 수정·색 변경·가지 추가를 해요` : `+ ${who}로 시작해보세요. 소속을 적으면 같은 색으로 묶여요`}</div>
     ${r.chars.length ? `<div class="rec-sub-title">${who} ${r.chars.length}</div>
-    <div class="rec-list">${r.chars.map(c => {
-      const col = mmColor(c, groups, r.groupColors);
-      return `<button type="button" class="rec-row" onclick="openCharEditor('${c.id}')">
-        <span class="rec-dot" style="background:${col}"></span>
+    <div class="rec-list">${mmTreeOrder(r.chars).map(({ c, depth }) => {
+      const col = mmColor(c, groups, r.groupColors, r.chars);
+      return `<button type="button" class="rec-row" onclick="openCharEditor('${c.id}')" ${depth ? `style="margin-left:${Math.min(depth, 4) * 18}px"` : ''}>
+        ${depth ? '<span class="rec-branch">↳</span>' : ''}<span class="rec-dot" style="background:${col}"></span>
         <span class="rec-row-body">
           <span class="rec-row-title">${escapeHTML(c.name)}${c.group ? `<span class="rec-chip" style="color:${mmReadable(col)};background:${mmTint(col, 0.86)}">${escapeHTML(c.group)}</span>` : ''}</span>
           ${c.desc ? `<span class="rec-row-desc md-view">${renderMarkdown(c.desc)}</span>` : ''}
@@ -7551,14 +7857,23 @@ function pickMmColor(kind, c) {
 }
 
 // 인물 편집
-function openCharEditor(cid) {
+function openCharEditor(cid, parentId) {
   const item = recItem();
   if (!item) return;
   const r = getRecord(item);
   const c = cid ? r.chars.find(x => x.id === cid) : null;
   rec.charId = c ? c.id : null;
   const who = item.type === 'podcast' ? '출연자' : '인물';
-  document.getElementById('charModalTitle').textContent = c ? `${who} 수정` : `${who} 추가`;
+  const presetParent = c ? (c.parent || '') : (parentId && r.chars.some(x => x.id === parentId) ? parentId : '');
+  const parentName = presetParent ? (r.chars.find(x => x.id === presetParent) || {}).name : '';
+  document.getElementById('charModalTitle').textContent = c ? `${who} 수정` : (parentName ? `${parentName}에 가지 추가` : `${who} 추가`);
+  // 연결: 가운데(작품) 또는 다른 인물 (자기 자신·자기 가지 아래 인물은 제외 → 순환 방지)
+  const banned = new Set(c ? [c.id, ...mmDescendants(r.chars, c.id)] : []);
+  document.getElementById('chParent').innerHTML = `<option value="">가운데 (작품)</option>` +
+    mmTreeOrder(r.chars).filter(({ c: x }) => !banned.has(x.id)).map(({ c: x, depth }) =>
+      `<option value="${x.id}" ${x.id === presetParent ? 'selected' : ''}>${'　'.repeat(depth)}${depth ? '↳ ' : ''}${escapeHTML(x.name)}</option>`).join('');
+  document.getElementById('chParent').value = presetParent;
+  document.getElementById('chAddChildBtn').style.display = c ? '' : 'none';
   document.getElementById('chName').value = c ? c.name : '';
   document.getElementById('chGroup').value = c ? (c.group || '') : '';
   document.getElementById('chDesc').value = c ? (c.desc || '') : '';
@@ -7590,11 +7905,23 @@ function syncChGroupApply() {
   if (!item || !dot) return;
   const r = getRecord(item), gc = r.groupColors || {};
   const apply = document.getElementById('chGroupApply').checked;
-  dot.style.background = g && !apply && mmValidColor(gc[g]) ? gc[g] : mmAutoColor(g, mmGroups(r.chars));
+  const par = document.getElementById('chParent').value;
+  const parC = par ? r.chars.find(x => x.id === par) : null;
+  dot.style.background = g && !apply && mmValidColor(gc[g]) ? gc[g]
+    : (!g && parC ? mmColor(parC, mmGroups(r.chars), gc, r.chars) : mmAutoColor(g, mmGroups(r.chars)));
+}
+// 이 인물에서 가지 뻗은 새 인물 추가
+function addChildFromEditor() {
+  const pid = rec.charId;
+  if (!pid) return;
+  if (charDirty()) persistChar(); // 고치던 내용은 먼저 저장
+  closeCharEditor(true);
+  openCharEditor(null, pid);
 }
 function charFormState() {
   return JSON.stringify([document.getElementById('chName').value.trim(), document.getElementById('chGroup').value.trim(),
-    document.getElementById('chDesc').value.trim(), rec.charColor || '', document.getElementById('chGroupApply').checked]);
+    document.getElementById('chDesc').value.trim(), rec.charColor || '', document.getElementById('chGroupApply').checked,
+    document.getElementById('chParent').value]);
 }
 function charDirty() { return isModalOpen('charModal') && rec.charSnap != null && charFormState() !== rec.charSnap; }
 function closeCharEditor(force) {
@@ -7630,6 +7957,11 @@ function persistChar() {
   let target = c;
   if (c) Object.assign(c, data);
   else { target = Object.assign({ id: uid() }, data); r.chars.push(target); }
+  // 연결(가지): 자기 자신·자기 가지 아래로는 못 붙임
+  const par = document.getElementById('chParent').value;
+  if (par && par !== target.id && r.chars.some(x => x.id === par) && !mmDescendants(r.chars, target.id).includes(par)) {
+    if (target.parent !== par) { target.parent = par; delete target.x; delete target.y; } // 새 부모 옆으로
+  } else if (target.parent) { delete target.parent; delete target.x; delete target.y; }
   // 색: 소속 전체에 적용하거나, 이 인물에만
   const col = mmValidColor(rec.charColor) ? rec.charColor : '';
   if (data.group && document.getElementById('chGroupApply').checked) {
@@ -7652,10 +7984,13 @@ function deleteChar() {
   const c = r.chars.find(x => x.id === rec.charId);
   if (!c) return;
   const relCount = r.rels.filter(x => x.a === c.id || x.b === c.id).length;
+  const kidCount = r.chars.filter(x => x.parent === c.id).length;
   closeCharEditor(true);
   document.getElementById('confirmTitle').textContent = `${c.name}을(를) 지울까요?`;
-  document.getElementById('confirmDesc').textContent = relCount ? `이 인물과 연결된 관계 ${relCount}개도 함께 지워져요.` : '관계도에서 사라져요.';
+  document.getElementById('confirmDesc').textContent = (relCount ? `이 인물과 연결된 관계 ${relCount}개도 함께 지워져요.` : '관계도에서 사라져요.')
+    + (kidCount ? ` 이 인물에서 뻗은 인물 ${kidCount}명은 지우지 않고 한 칸 위로 붙여요.` : '');
   confirmCallback = () => {
+    r.chars.forEach(x => { if (x.parent === c.id) { if (c.parent) x.parent = c.parent; else delete x.parent; } });
     r.chars = r.chars.filter(x => x.id !== c.id);
     r.rels = r.rels.filter(x => x.a !== c.id && x.b !== c.id);
     recTouch(item);
@@ -7758,9 +8093,10 @@ function recCharsText(item) {
   if (!r.chars.length) return '';
   const nameOf = id => { const c = r.chars.find(x => x.id === id); return c ? c.name : '(삭제됨)'; };
   const lines = [`[${item.type === 'podcast' ? '출연자' : '등장인물'}]`];
-  r.chars.forEach(c => {
+  mmTreeOrder(r.chars).forEach(({ c, depth }) => {
     const d = mdPreviewLine(c.desc || '', 0);
-    lines.push(`• ${c.name}${c.group ? ` (${c.group})` : ''}${d ? `: ${d}` : ''}`);
+    const pre = depth ? '  '.repeat(depth) + '└ ' : '• ';
+    lines.push(`${pre}${c.name}${c.group ? ` (${c.group})` : ''}${d ? `: ${d}` : ''}`);
   });
   if (r.rels.length) {
     lines.push('', '[관계]');
@@ -7810,12 +8146,12 @@ function mmDrawCanvas(item, opts) {
   ctx.translate(ox - vb.x, head - vb.y);
   const gc = sc.gc;
   r.chars.forEach(c => {
-    const p = pos[c.id];
-    ctx.strokeStyle = mmColor(c, groups, gc);
-    ctx.globalAlpha = 0.32;
+    const p = pos[c.id], q = (c.parent && pos[c.parent]) || { x: 0, y: 0 };
+    ctx.strokeStyle = mmColor(c, groups, gc, r.chars);
+    ctx.globalAlpha = c.parent ? 0.5 : 0.32;
     ctx.lineWidth = 2.5;
     ctx.lineCap = 'round';
-    ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(p.x, p.y); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(q.x, q.y); ctx.lineTo(p.x, p.y); ctx.stroke();
     ctx.globalAlpha = 1;
   });
   sc.rels.forEach(g => {
@@ -7828,7 +8164,7 @@ function mmDrawCanvas(item, opts) {
   ctx.fillStyle = '#ffffff'; ctx.font = `700 15px ${FONT}`;
   ctx.fillText(center.title, 0, 5);
   r.chars.forEach(c => {
-    const p = pos[c.id], b = boxes[c.id], col = mmColor(c, groups, gc);
+    const p = pos[c.id], b = boxes[c.id], col = mmColor(c, groups, gc, r.chars);
     mmRoundRect(ctx, p.x - b.w / 2, p.y - b.h / 2, b.w, b.h, 12);
     ctx.fillStyle = mmTint(col, 0.86); ctx.fill();
     ctx.strokeStyle = col; ctx.lineWidth = 2; ctx.stroke();
@@ -7892,7 +8228,7 @@ function renderRecEps() {
   const body = document.getElementById('recordBody');
   body.innerHTML = `
     <div class="rec-actions">
-      ${latest ? `<button type="button" class="plan-mini-btn primary" onclick="openEpEditor(${latest})">✍️ 최근 본 ${recEpLabel(item, latest)} 기록</button>` : ''}
+      ${latest ? `<button type="button" class="plan-mini-btn primary" onclick="openEpEditor(${latest})">✍️ 최근 ${epVerb(item.type).seen} ${recEpLabel(item, latest)} 기록</button>` : ''}
       <button type="button" class="plan-mini-btn" onclick="copyRecEps()" ${recorded.length ? '' : 'disabled'}>📋 복사</button>
     </div>
     ${total ? `<div class="filter-row" style="margin-bottom: 10px;">
@@ -7908,7 +8244,7 @@ function renderRecEps() {
       return `<button type="button" class="rec-ep-row ${e ? 'has' : ''}" onclick="openEpEditor(${n})">
         <span class="rec-ep-num">${recEpLabel(item, n)}</span>
         <span class="rec-ep-text">${e ? escapeHTML(pv || '(내용 없음)') : '기록 없음'}</span>
-        ${watched.has(n) ? '<span class="rec-ep-seen">✓ 봄</span>' : ''}
+        ${watched.has(n) ? `<span class="rec-ep-seen">✓ ${epVerb(item.type).done}</span>` : ''}
       </button>`;
     }).join('')}</div>` : `<div class="plan-empty" style="padding: 18px 0; text-align: center;">${total ? '아직 기록한 회차가 없어요' : '회차 번호를 넣고 기록을 써보세요'}</div>`}`;
 }
@@ -7930,7 +8266,7 @@ function openEpEditor(n) {
   const total = recEpTotal(item);
   document.getElementById('epModalTitle').textContent = `${bracketTitle(item)} ${recEpLabel(item, n)}`;
   document.getElementById('epStatus').innerHTML = watched && watched.has(n)
-    ? '<span class="rec-ep-seen">✓ 본 회차</span>' : '<span class="rec-chip">아직 안 본 회차</span>';
+    ? `<span class="rec-ep-seen">✓ ${epVerb(item.type).seen} 회차</span>` : `<span class="rec-chip">아직 안 ${epVerb(item.type).seen} 회차</span>`;
   document.getElementById('recEpText').value = rec.epOrig;
   setMdPreview('recEpText', !!rec.epOrig);
   document.getElementById('epPrevBtn').disabled = n <= 1;
@@ -8327,13 +8663,15 @@ function recLayout(item, sec, env, map) {
     env.ensure(42 + 4 + 46 + 44); // 소제목만 쪽 끝에 남지 않게
     env.text([{ text: `${isPod ? '출연자' : '등장인물'} ${r.chars.length}`, bold: true }], 26, 42, '#9a9daa');
     env.y += 4;
-    r.chars.forEach(c => {
-      const col = mmColor(c, groups, gc);
+    mmTreeOrder(r.chars).forEach(({ c, depth }) => {
+      const col = mmColor(c, groups, gc, r.chars);
+      const ind = Math.min(depth, 4) * 36;
       const toks = [{ text: c.name, bold: true }];
       if (c.group) toks.push({ text: '  ' + c.group, bold: true, color: mmReadable(col) });
       env.ensure(46 + (c.desc && c.desc.trim() ? 44 : 0));
-      env.text(toks, 28, 46, '#17181c', { indent: 36, swatch: { kind: 'dot', color: col, x: 0 } });
-      if (c.desc && c.desc.trim()) env.md(c.desc, 36, '#5b5e6b');
+      if (depth && env.draw) { env.font(false, 24); env.ctx.fillStyle = '#c3c6d1'; env.ctx.fillText('└', env.PAD + ind - 30, env.y + 32); }
+      env.text(toks, 28, 46, '#17181c', { indent: 36 + ind, swatch: { kind: 'dot', color: col, x: ind } });
+      if (c.desc && c.desc.trim()) env.md(c.desc, 36 + ind, '#5b5e6b');
       env.y += 6;
     });
     if (r.rels.length) {
@@ -8431,7 +8769,7 @@ function drawDocPdf(pdf, layout, foot, counter) {
 }
 function drawRecordPdf(pdf, item, sec) {
   const map = sec.chars ? recMapImage(item, 1.4) : null;
-  const foot = `〈${mmClip(item.title || '', 22)}〉 기록장 · CONTENTS ARCHIVE`;
+  const foot = `${bracketTitle({ title: mmClip(item.title || '', 22), type: item.type })} 기록장 · CONTENTS ARCHIVE`;
   return drawDocPdf(pdf, env => recLayout(item, sec, env, map), foot);
 }
 
@@ -8458,10 +8796,11 @@ function buildRecordWordHTML(item, sec) {
     } catch (e) { /* 그림이 안 되면 목록만 */ }
     const groups = mmGroups(r.chars), gc = r.groupColors || {};
     h += `<h3 style="color:#5e5b56;margin:12pt 0 4pt;">${isPod ? '출연자' : '등장인물'} ${r.chars.length}</h3>`;
-    r.chars.forEach(c => {
-      const col = mmColor(c, groups, gc);
-      h += `<p style="margin:4pt 0 2pt;"><span style="color:${col};">●</span> <b>${escapeHTML(c.name)}</b>${c.group ? ` &nbsp;<span style="color:${mmReadable(col)};font-weight:bold;">${escapeHTML(c.group)}</span>` : ''}</p>`;
-      if (c.desc && c.desc.trim()) h += `<div style="margin-left:16pt;color:#5e5b56;">${renderMarkdownForExport(c.desc)}</div>`;
+    mmTreeOrder(r.chars).forEach(({ c, depth }) => {
+      const col = mmColor(c, groups, gc, r.chars);
+      const ml = Math.min(depth, 4) * 16;
+      h += `<p style="margin:4pt 0 2pt ${ml}pt;">${depth ? '<span style="color:#c3c6d1;">└</span> ' : ''}<span style="color:${col};">●</span> <b>${escapeHTML(c.name)}</b>${c.group ? ` &nbsp;<span style="color:${mmReadable(col)};font-weight:bold;">${escapeHTML(c.group)}</span>` : ''}</p>`;
+      if (c.desc && c.desc.trim()) h += `<div style="margin-left:${16 + ml}pt;color:#5e5b56;">${renderMarkdownForExport(c.desc)}</div>`;
     });
     if (r.rels.length) {
       const nameOf = id => (r.chars.find(x => x.id === id) || { name: '(삭제됨)' }).name;
@@ -8548,7 +8887,7 @@ function planLine(plan) {
   const item = state.items.find(i => i.id === plan.itemId);
   const title = item ? item.title : (plan.titleSnap || '삭제된 기록');
   const type = item ? item.type : plan.typeSnap;
-  let line = `〈${title}〉`;
+  let line = bracketTitle({ title, type });
   const ep = formatEpRanges(plan.eps, type === 'podcast');
   if (ep) line += ' ' + ep;
   if (plan.text) line += ' ' + plan.text;
@@ -8836,11 +9175,32 @@ function renderPlanEpPicker() {
   if (!info) { grp.style.display = 'none'; return; }
   grp.style.display = 'block';
   const unit = info.podcast ? '편' : '화';
-  document.getElementById('planEpLabel').textContent = info.podcast ? '들을 에피소드 선택' : '볼 회차 선택';
+  document.getElementById('planEpLabel').textContent = info.podcast ? '들을 에피소드 선택' : info.type === 'webnovel' ? '읽을 회차 선택' : '볼 회차 선택';
   const elsewhere = planEpsElsewhere(item.id);
   document.getElementById('planQuick').innerHTML =
-    [1, 2, 3].map(n => `<button type="button" class="plan-mini-btn primary" onclick="planQuickPick(${n})">다음 ${n}${unit}</button>`).join('') +
+    (info.big ? [1, 3, 5, 10] : [1, 2, 3]).map(n => `<button type="button" class="plan-mini-btn primary" onclick="planQuickPick(${n})">다음 ${n}${unit}</button>`).join('') +
     (planEdit.eps.length ? `<button type="button" class="plan-mini-btn" onclick="planClearEps()">선택 해제</button>` : '');
+  const gridEl = document.getElementById('planEpGrid'), rangeEl = document.getElementById('planEpRange'), legend = document.getElementById('planLegend');
+  if (info.big) {
+    // 회차가 많거나 연재 중: 버튼 대신 숫자로
+    gridEl.style.display = 'none'; legend.style.display = 'none'; rangeEl.style.display = 'block';
+    const v = epVerb(info.type);
+    const seen = info.seen || new Set();
+    let cur = 0; while (seen.has(cur + 1)) cur++;
+    const extra = seen.size - cur;
+    const info1 = `${cur ? `${cur}화까지 ${v.done}` : `아직 ${v.seen} 회차 없음`}${extra > 0 ? ` (+ 띄엄띄엄 ${extra}화)` : ''}${info.open ? ' · 연재 중' : ` · 전체 ${info.total}화`}`;
+    const info2 = elsewhere.size ? `다른 날 계획: ${formatEpRanges([...elsewhere], info.podcast)}` : '';
+    rangeEl.innerHTML = `<div class="plan-range-info">${escapeHTML(info1)}${info2 ? '<br>' + escapeHTML(info2) : ''}</div>
+      <div class="plan-range-row">
+        <input type="number" class="form-input" id="planRangeFrom" placeholder="시작 화" min="1" inputmode="numeric">
+        <span style="color: var(--ink-mute);">~</span>
+        <input type="number" class="form-input" id="planRangeTo" placeholder="끝 화" min="1" inputmode="numeric">
+        <button type="button" class="btn" onclick="planAddRange()">추가</button>
+      </div>
+      ${planEdit.eps.length ? `<div class="plan-range-picked">선택: ${escapeHTML(formatEpRanges(planEdit.eps, info.podcast))}</div>` : ''}`;
+    return;
+  }
+  gridEl.style.display = ''; legend.style.display = ''; rangeEl.style.display = 'none'; rangeEl.innerHTML = '';
   let grid = '';
   for (let e = 1; e <= info.total; e++) {
     const cls = ['ep-btn'];
@@ -8850,6 +9210,25 @@ function renderPlanEpPicker() {
     grid += `<button type="button" class="${cls.join(' ')}" onclick="togglePlanEp(${e})">${e}</button>`;
   }
   document.getElementById('planEpGrid').innerHTML = grid;
+}
+
+// 회차 범위 넣기 (예: 120 ~ 125)
+function planAddRange() {
+  const item = state.items.find(i => i.id === planEdit.itemId);
+  const info = planEpInfo(item);
+  if (!info) return;
+  const a = parseInt(document.getElementById('planRangeFrom').value, 10);
+  let b = parseInt(document.getElementById('planRangeTo').value, 10);
+  if (!(a >= 1)) { showToast('시작 회차를 넣어주세요'); return; }
+  if (isNaN(b)) b = a;
+  if (b < a) { showToast('끝 회차가 시작보다 작아요'); return; }
+  if (!info.open && b > info.total) { showToast(`전체 ${info.total}화까지만 고를 수 있어요`); return; }
+  if (b - a >= 300) { showToast('한 번에 300화까지만 넣을 수 있어요'); return; }
+  const set = new Set(planEdit.eps);
+  for (let e = a; e <= b; e++) set.add(e);
+  planEdit.eps = [...set].sort((x, y) => x - y);
+  renderPlanEpPicker();
+  updatePlanPreview();
 }
 
 function togglePlanEp(e) {
@@ -8945,8 +9324,9 @@ function progressSpec(item) {
   if (item.type === 'podcast') {
     return { total: item.totalPodEp || 0, seq: item.podSeqMode === true, cur: 'currentPodEp', list: 'podWatched', mode: 'podSeqMode' };
   }
-  if (item.type === 'drama' || item.type === 'anime') {
-    return { total: item.totalEp || 0, seq: item.epSeqMode !== false, cur: 'currentEp', list: 'epWatched', mode: 'epSeqMode' };
+  if (isEpType(item.type)) {
+    const open = item.type === 'webnovel' && !(item.totalEp > 0);
+    return { total: open ? OPEN_EP_TOTAL : (item.totalEp || 0), open, seq: item.epSeqMode !== false, cur: 'currentEp', list: 'epWatched', mode: 'epSeqMode' };
   }
   return null;
 }
@@ -8990,7 +9370,7 @@ function setWatchedSet(item, set) {
 function planEpInfo(item) {
   const f = progressSpec(item);
   if (!f || !(f.total > 0)) return null;
-  return { total: f.total, seen: getWatchedSet(item), podcast: item.type === 'podcast', seq: f.seq };
+  return { total: f.total, seen: getWatchedSet(item), podcast: item.type === 'podcast', seq: f.seq, open: !!f.open, big: !!f.open || f.total > EP_GRID_MAX, type: item.type };
 }
 
 function snapshotProgress(item) {
@@ -9049,12 +9429,14 @@ function onPlanCheck(id) {
     return;
   }
   planCheck = { planId: id, picked: [...eps], seq: info.seq };
-  const unit = info.podcast ? '들었나요' : '봤나요';
-  document.getElementById('planCheckTitle').textContent = `어디까지 ${unit}?`;
+  const vb = epVerb(item.type);
+  document.getElementById('planCheckTitle').textContent = `어디까지 ${vb.q}?`;
+  document.getElementById('planCheckAllBtn').textContent = `전부 ${vb.did}`;
+  document.getElementById('planCheckNoneBtn').textContent = `하나도 못 ${vb.did}`;
   document.getElementById('planCheckSub').textContent = `${fmtPlanDay(p.date)} · ${planLine(p)}`;
   document.getElementById('planCheckHint').textContent = info.seq
-    ? '마지막으로 본 회차를 탭하세요 (그 회차까지 한꺼번에 선택돼요)'
-    : '본 회차만 하나씩 탭하세요';
+    ? `마지막으로 ${vb.seen} 회차를 탭하세요 (그 회차까지 한꺼번에 선택돼요)`
+    : `${vb.seen} 회차만 하나씩 탭하세요`;
   renderPlanCheck();
   document.getElementById('planCheckModal').classList.add('active');
   document.body.style.overflow = 'hidden';
@@ -9121,9 +9503,9 @@ function renderPlanCheck() {
   if (r.leftover.length) {
     if (r.next) {
       const merged = [...new Set([...r.leftover, ...(r.next.eps || [])])];
-      lines.push(`↪ 못 본 ${fmt(r.leftover)} → ${fmtPlanDay(r.next.date)} 계획이 ${planLine({ itemId: r.next.itemId, eps: merged, text: r.next.text })}(으)로 바뀌어요`);
+      lines.push(`↪ ${epVerb(item.type).miss} ${fmt(r.leftover)} → ${fmtPlanDay(r.next.date)} 계획이 ${planLine({ itemId: r.next.itemId, eps: merged, text: r.next.text })}(으)로 바뀌어요`);
     } else {
-      lines.push(`↪ 못 본 ${fmt(r.leftover)} → ${fmtPlanDay(carryDateFor(p))} 새 계획으로 옮겨요`);
+      lines.push(`↪ ${epVerb(item.type).miss} ${fmt(r.leftover)} → ${fmtPlanDay(carryDateFor(p))} 새 계획으로 옮겨요`);
     }
   }
   if (r.after.size >= r.total && item.status !== 'done') lines.push('🎉 마지막 회차까지 다 보면 완료로 바뀌어요');
@@ -9131,9 +9513,10 @@ function renderPlanCheck() {
     ? lines.map(l => `<div>${escapeHTML(l)}</div>`).join('')
     : '<div>선택한 회차가 없어요</div>';
   const btn = document.getElementById('planCheckConfirm');
-  if (r.watched.length === r.planned.length) btn.textContent = '다 봤어요 ✓';
-  else if (r.watched.length === 0) btn.textContent = '못 봤어요 · 전부 다음으로';
-  else btn.textContent = `${fmt(r.watched)}만 봤어요`;
+  const vd = epVerb(item.type).did;
+  if (r.watched.length === r.planned.length) btn.textContent = `다 ${vd} ✓`;
+  else if (r.watched.length === 0) btn.textContent = `못 ${vd} · 전부 다음으로`;
+  else btn.textContent = `${fmt(r.watched)}만 ${vd}`;
 }
 
 function confirmPlanCheck() {
