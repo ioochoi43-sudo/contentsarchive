@@ -739,6 +739,15 @@
   .yt-preview-channel { font-size: 11px; color: var(--ink-dim); }
 
   .type-picker { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+  .plan-extra { margin-top: 14px; padding: 12px; border: 1px dashed var(--line); border-radius: 12px; }
+  .plan-extra-label { font-size: 12px; font-weight: 700; color: var(--ink-dim); margin-bottom: 8px; }
+  .plan-extra-row { display: flex; align-items: center; gap: 6px; }
+  .plan-extra-row .plan-mini-btn { flex-shrink: 0; }
+  .plan-extra-input { flex: 1; min-width: 0; padding: 8px 10px !important; }
+  .plan-extra-state { font-size: 12px; color: var(--accent); font-weight: 700; margin-top: 8px; display: flex; align-items: center; gap: 8px; }
+  .plan-extra-state:empty { display: none; }
+  .plan-extra-state button { border: 0; background: none; color: var(--ink-mute); font-size: 12px; font-weight: 600; text-decoration: underline; cursor: pointer; padding: 0; font-family: var(--sans); }
+  .ep-btn.extra { background: var(--accent-soft, #eceefb); border: 1.5px dashed var(--accent); color: var(--accent); font-weight: 700; }
   .plan-range-row { display: flex; align-items: center; gap: 6px; margin-top: 10px; }
   .plan-range-row .form-input { flex: 1; min-width: 0; padding: 11px 12px; }
   .plan-range-row .btn { flex-shrink: 0; padding: 11px 14px; }
@@ -2476,7 +2485,7 @@
     </div>
 
     <div id="versionText" style="text-align: center; margin-top: 40px; font-size: 11px; color: var(--ink-mute); letter-spacing: 0.04em; font-weight: 500;">
-      v4.8 · 데이터는 브라우저에 저장됩니다
+      v4.9 · 데이터는 브라우저에 저장됩니다
     </div>
   </section>
 </main>
@@ -3088,6 +3097,16 @@
       </div>
       <div class="episodes-grid" id="planCheckGrid"></div>
       <div id="planCheckHint" style="font-size: 11px; color: var(--ink-mute); margin-top: 8px;"></div>
+      <div class="plan-extra">
+        <div class="plan-extra-label" id="planCheckMoreLabel">계획보다 더 봤나요?</div>
+        <div class="plan-extra-row">
+          <button type="button" class="plan-mini-btn" onclick="planCheckMore(1)" id="planMore1">+1화</button>
+          <button type="button" class="plan-mini-btn" onclick="planCheckMore(3)" id="planMore3">+3화</button>
+          <button type="button" class="plan-mini-btn" onclick="planCheckMore(5)" id="planMore5">+5화</button>
+          <input type="number" class="form-input plan-extra-input" id="planCheckUpTo" min="1" inputmode="numeric" placeholder="몇 화까지" oninput="planCheckSetUpTo(this.value)">
+        </div>
+        <div class="plan-extra-state" id="planCheckExtraState"></div>
+      </div>
       <div class="plan-preview-box" style="margin-top: 14px;">
         <div class="plan-preview-label">이렇게 반영돼요</div>
         <div id="planCheckPreview" class="plan-check-preview"></div>
@@ -3394,9 +3413,14 @@ const DEFAULT_OTT = [
 ];
 
 // ============ VERSION ============
-const APP_VERSION = '4.8';
+const APP_VERSION = '4.9';
 const VERSION_KEY = 'contentsArchive_seenVersion';
 const VERSION_NOTES = {
+  '4.9': [
+    '계획 체크할 때 "계획보다 더 봤나요?"에서 +1·+3·+5화나 "몇 화까지"로 실제 본 만큼 기록해요',
+    '더 본 회차까지 진행 기록에 체크되고, 계획 줄도 실제 본 회차로 바뀌어요 (예: 151~153화 → 151~160화)',
+    '다음 날 계획에 이미 본 회차가 있으면 알아서 빠져요 (체크 취소하면 원래대로)'
+  ],
   '4.8': [
     '플랫폼별 보기: 플랫폼 버튼을 누르면 그 플랫폼 작품만 보여요 (진행중·완료 등으로 한 번 더 거르기)',
     '인물 관계도: 인물 수정 창의 \'기존 인물 붙이기\'로 이미 있는 인물을 가지로 옮길 수 있어요'
@@ -9014,6 +9038,11 @@ function planRowNote(p) {
     const pod = (item ? item.type : p.typeSnap) === 'podcast';
     bits.push(`↪ ${formatEpRanges(p.check.carry.eps, pod)} → ${t ? fmtPlanDay(t.date) : '다음 계획'}로 넘김`);
   }
+  if (p.done && p.check && (p.check.extraEps || []).length) {
+    const item = state.items.find(i => i.id === p.itemId);
+    const t = item ? item.type : p.typeSnap;
+    bits.push(`＋ 계획보다 ${p.check.extraEps.length}${t === 'podcast' ? '편' : '화'} 더 ${epVerb(t).did}`);
+  }
   if (!p.done && p.carried) bits.push('↩ 못 본 회차를 옮겨온 계획');
   return bits.length ? `<div class="plan-row-note">${escapeHTML(bits.join(' · '))}</div>` : '';
 }
@@ -9521,7 +9550,7 @@ function carryDateFor(plan) {
 }
 
 // ===== 체크 모달 =====
-let planCheck = { planId: null, picked: [], seq: true };
+let planCheck = { planId: null, picked: [], seq: true, extraEnd: 0 };
 
 function onPlanCheck(id) {
   const p = (state.plans || []).find(x => x.id === id);
@@ -9539,8 +9568,14 @@ function onPlanCheck(id) {
     renderPlanView();
     return;
   }
-  planCheck = { planId: id, picked: [...eps], seq: info.seq };
+  planCheck = { planId: id, picked: [...eps], seq: info.seq, extraEnd: 0 };
   const vb = epVerb(item.type);
+  const u = info.podcast ? '편' : '화';
+  document.getElementById('planCheckMoreLabel').textContent = `계획보다 더 ${vb.q}?`;
+  [1, 3, 5].forEach(n => { document.getElementById('planMore' + n).textContent = `+${n}${u}`; });
+  const upTo = document.getElementById('planCheckUpTo');
+  upTo.value = '';
+  upTo.placeholder = info.podcast ? '몇 EP까지' : '몇 화까지';
   document.getElementById('planCheckTitle').textContent = `어디까지 ${vb.q}?`;
   document.getElementById('planCheckAllBtn').textContent = `전부 ${vb.did}`;
   document.getElementById('planCheckNoneBtn').textContent = `하나도 못 ${vb.did}`;
@@ -9572,6 +9607,8 @@ function planCheckTap(e) {
     const upTo = eps.filter(x => x <= e);
     const isSameAsCurrent = picked.length === upTo.length && Math.max(...picked) === e;
     planCheck.picked = isSameAsCurrent ? eps.filter(x => x < e) : upTo;
+    planCheck.extraEnd = 0;
+    document.getElementById('planCheckUpTo').value = '';
   } else {
     const i = picked.indexOf(e);
     if (i >= 0) picked.splice(i, 1); else picked.push(e);
@@ -9583,31 +9620,95 @@ function planCheckTap(e) {
 function planCheckAll(all) {
   const { eps } = planCheckPlanned();
   planCheck.picked = all ? [...eps] : [];
+  if (!all) { planCheck.extraEnd = 0; document.getElementById('planCheckUpTo').value = ''; }
+  renderPlanCheck();
+}
+
+// 계획보다 더 본 회차: 계획 마지막 다음부터 extraEnd까지
+function planExtraCap(info, end) {
+  let v = Math.floor(Number(end)) || 0;
+  if (!info.open && info.total > 0) v = Math.min(v, info.total);
+  return v;
+}
+function planCheckMore(n) {
+  const { eps, info } = planCheckPlanned();
+  if (!info || !eps.length) return;
+  const last = Math.max(...eps);
+  const base = planCheck.extraEnd > last ? planCheck.extraEnd : last;
+  const next = planExtraCap(info, Math.min(base + n, last + 500));
+  if (next <= last) { showToast('마지막 회차까지 계획돼 있어요'); return; }
+  planCheck.extraEnd = next;
+  planCheck.picked = [...eps]; // 더 봤다면 계획한 건 다 본 것
+  document.getElementById('planCheckUpTo').value = next;
+  renderPlanCheck();
+}
+function planCheckSetUpTo(v) {
+  const { eps, info } = planCheckPlanned();
+  if (!info || !eps.length) return;
+  const n = parseInt(v, 10);
+  const last = Math.max(...eps);
+  if (isNaN(n)) { planCheck.extraEnd = 0; renderPlanCheck(); return; }
+  if (n > last) {
+    planCheck.extraEnd = planExtraCap(info, Math.min(n, last + 500));
+    planCheck.picked = [...eps];
+  } else {
+    planCheck.extraEnd = 0;
+    if (planCheck.seq) planCheck.picked = eps.filter(x => x <= n); // 계획 안쪽 숫자면 "거기까지"
+  }
+  renderPlanCheck();
+}
+function planCheckClearExtra() {
+  planCheck.extraEnd = 0;
+  document.getElementById('planCheckUpTo').value = '';
   renderPlanCheck();
 }
 
 // 체크 결과 미리 계산 (모달 미리보기와 실제 저장이 같은 계산을 써요)
-function computePlanCheck(p, item, picked) {
+function computePlanCheck(p, item, picked, extraEnd) {
   const info = planEpInfo(item);
   const planned = [...(p.eps || [])].filter(e => e <= info.total).sort((a, b) => a - b);
-  const watched = planned.filter(e => picked.includes(e));
+  // 계획보다 더 본 회차
+  const extra = [];
+  const last = planned.length ? planned[planned.length - 1] : 0;
+  const end = planExtraCap(info, extraEnd || 0);
+  for (let e = last + 1; e <= end && extra.length < 500; e++) extra.push(e);
+  const watched = [...planned.filter(e => picked.includes(e)), ...extra];
   const before = getWatchedSet(item);
   const after = new Set([...before, ...watched]);
   const added = watched.filter(e => !before.has(e));
   const leftover = planned.filter(e => !watched.includes(e) && !after.has(e));
   const next = leftover.length ? findNextPlan(p) : null;
-  return { planned, watched, added, leftover, next, after, total: info.total, podcast: info.podcast };
+  // 이번에 새로 본 회차가 다른(아직 안 한) 계획에 있으면 거기서 빼기
+  const addedSet = new Set(added);
+  const trims = addedSet.size ? (state.plans || [])
+    .filter(x => x.id !== p.id && x.itemId === p.itemId && !x.done && (x.eps || []).some(e => addedSet.has(e)))
+    .sort((a, b) => planOrderKey(a).localeCompare(planOrderKey(b)))
+    .map(x => {
+      const eps = (x.eps || []).filter(e => addedSet.has(e));
+      const rest = (x.eps || []).filter(e => !addedSet.has(e));
+      // 이월될 회차가 들어갈 계획이면 비지 않음
+      const getsCarry = next && next.id === x.id && leftover.length > 0;
+      return { plan: x, eps, empty: rest.length === 0 && !x.text && !getsCarry };
+    }) : [];
+  return { planned, watched, extra, added, leftover, next, after, trims, total: info.total, podcast: info.podcast };
 }
 
 function renderPlanCheck() {
   const { p, item, info, eps } = planCheckPlanned();
   if (!p || !info) return;
   const picked = planCheck.picked;
+  const r = computePlanCheck(p, item, picked, planCheck.extraEnd);
+  const fmt = arr => formatEpRanges(arr, r.podcast);
+  const vb = epVerb(item.type);
   document.getElementById('planCheckGrid').innerHTML = eps.map(e =>
     `<button type="button" class="ep-btn ${picked.includes(e) ? 'planned' : ''}" onclick="planCheckTap(${e})">${e}</button>`
-  ).join('');
-  const r = computePlanCheck(p, item, picked);
-  const fmt = arr => formatEpRanges(arr, r.podcast);
+  ).join('') + (r.extra.length
+    ? (r.extra.length <= 24
+      ? r.extra.map(e => `<button type="button" class="ep-btn extra" onclick="planCheckClearExtra()" title="더 본 회차">${e}</button>`).join('')
+      : `<button type="button" class="ep-btn extra" style="width:auto;padding:0 10px;" onclick="planCheckClearExtra()">+${fmt(r.extra)}</button>`)
+    : '');
+  document.getElementById('planCheckExtraState').innerHTML = r.extra.length
+    ? `<span>＋ ${escapeHTML(fmt(r.extra))} 더 ${escapeHTML(vb.did)}</span><button type="button" onclick="planCheckClearExtra()">지우기</button>` : '';
   const lines = [];
   if (r.added.length) lines.push(`✓ ${fmt(r.added)} → 진행 기록에 체크돼요`);
   else if (r.watched.length) lines.push('✓ 이미 진행 기록에 체크돼 있어요');
@@ -9619,13 +9720,16 @@ function renderPlanCheck() {
       lines.push(`↪ ${epVerb(item.type).miss} ${fmt(r.leftover)} → ${fmtPlanDay(carryDateFor(p))} 새 계획으로 옮겨요`);
     }
   }
+  if (r.extra.length) lines.push(`＋ 계획보다 ${r.extra.length}${r.podcast ? '편' : '화'} 더 → 이 계획은 ${planLine({ itemId: p.itemId, eps: r.watched, text: p.text })}(으)로 남아요`);
+  r.trims.forEach(t => lines.push(`↷ ${fmtPlanDay(t.plan.date)} 계획의 ${fmt(t.eps)}는 이미 ${vb.seen} 거라 빠져요${t.empty ? ' (빈 계획은 지워요)' : ''}`));
   if (r.after.size >= r.total && item.status !== 'done') lines.push('🎉 마지막 회차까지 다 보면 완료로 바뀌어요');
   document.getElementById('planCheckPreview').innerHTML = lines.length
     ? lines.map(l => `<div>${escapeHTML(l)}</div>`).join('')
     : '<div>선택한 회차가 없어요</div>';
   const btn = document.getElementById('planCheckConfirm');
   const vd = epVerb(item.type).did;
-  if (r.watched.length === r.planned.length) btn.textContent = `다 ${vd} ✓`;
+  if (r.extra.length) btn.textContent = `${fmt(r.watched)} ${vd} ✓`;
+  else if (r.watched.length === r.planned.length) btn.textContent = `다 ${vd} ✓`;
   else if (r.watched.length === 0) btn.textContent = `못 ${vd} · 전부 다음으로`;
   else btn.textContent = `${fmt(r.watched)}만 ${vd}`;
 }
@@ -9633,7 +9737,7 @@ function renderPlanCheck() {
 function confirmPlanCheck() {
   const { p, item, info } = planCheckPlanned();
   if (!p || !item || !info) { closePlanCheck(); return; }
-  const r = computePlanCheck(p, item, planCheck.picked);
+  const r = computePlanCheck(p, item, planCheck.picked, planCheck.extraEnd);
   const snap = snapshotProgress(item);
   const wasDone = item.status === 'done';
 
@@ -9669,15 +9773,33 @@ function confirmPlanCheck() {
     }
   }
 
+  // 2-1) 이번에 본 회차를 다른 계획에서 빼기 (빈 계획은 지움, 되돌리기용으로 기억)
+  const trims = [];
+  r.trims.forEach(t => {
+    const x = (state.plans || []).find(y => y.id === t.plan.id);
+    if (!x || x.done) return;
+    const rm = new Set(t.eps);
+    if ((x.eps || []).every(e => rm.has(e)) && !x.text && !(carry && carry.planId === x.id)) {
+      trims.push({ planId: x.id, eps: [...t.eps], deleted: true, plan: JSON.parse(JSON.stringify(x)) });
+      state.plans = state.plans.filter(y => y.id !== x.id);
+    } else {
+      x.eps = (x.eps || []).filter(e => !rm.has(e));
+      x.updatedAt = Date.now();
+      trims.push({ planId: x.id, eps: [...t.eps], deleted: false });
+    }
+  });
+
   // 3) 계획 체크 + 되돌리기용 기록
   p.check = {
     origEps: [...(p.eps || [])],
     watchedEps: [...r.watched],
     addedEps: [...r.added],
+    extraEps: [...r.extra],
     prev: snap,
     afterSig: JSON.stringify(snapshotProgress(item)),
     madeDone: becameDone,
-    carry
+    carry,
+    trims
   };
   p.eps = [...r.watched];
   p.done = true;
@@ -9689,6 +9811,8 @@ function confirmPlanCheck() {
   const msgs = [];
   if (r.added.length) msgs.push(`${formatEpRanges(r.added, r.podcast)} 체크됨`);
   if (carry) msgs.push(`${formatEpRanges(r.leftover, r.podcast)}는 ${fmtPlanDay(state.plans.find(x => x.id === carry.planId).date)}로 넘겼어요`);
+  if (r.extra.length) msgs.push(`계획보다 ${r.extra.length}${r.podcast ? '편' : '화'} 더`);
+  if (trims.length) msgs.push(`다른 계획 ${trims.length}개 정리`);
   if (converted) msgs.push('띄엄띄엄 봐서 개별 모드로 바뀌었어요');
   showToast(msgs.join(' · ') || '체크했어요');
   if (becameDone) setTimeout(() => promptDoneReview(item.id), 350);
@@ -9710,6 +9834,7 @@ function confirmUncheckPlan(p) {
   const parts = [];
   if (c.addedEps && c.addedEps.length) parts.push(`진행 기록에 체크된 ${formatEpRanges(c.addedEps, pod)}를 해제`);
   if (c.carry && c.carry.eps.length) parts.push(`다음 계획으로 넘긴 ${formatEpRanges(c.carry.eps, pod)}를 원래대로`);
+  if (c.trims && c.trims.length) parts.push(`다른 계획에서 뺀 회차를 원래대로`);
   document.getElementById('confirmTitle').textContent = '체크를 취소할까요?';
   document.getElementById('confirmDesc').textContent = parts.length ? parts.join('하고, ') + ' 돌려요.' : '계획을 다시 미완료로 돌려요.';
   confirmCallback = () => { uncheckPlan(p.id); closeConfirm(); };
@@ -9757,6 +9882,17 @@ function uncheckPlan(id) {
       }
     }
   }
+
+  // 2-1) 다른 계획에서 뺐던 회차·지운 계획 되살리기
+  (c.trims || []).forEach(t => {
+    const x = (state.plans || []).find(y => y.id === t.planId);
+    if (t.deleted) {
+      if (!x && t.plan) state.plans.push(Object.assign({}, t.plan, { updatedAt: Date.now() }));
+    } else if (x && !x.done) {
+      x.eps = [...new Set([...(x.eps || []), ...t.eps])].sort((a, b) => a - b);
+      x.updatedAt = Date.now();
+    }
+  });
 
   // 3) 계획 원래대로 (그 사이 계획을 직접 고쳤다면 고친 내용 유지)
   const sameWatched = (p.eps || []).length === (c.watchedEps || []).length &&
