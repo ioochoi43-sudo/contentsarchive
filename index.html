@@ -1964,6 +1964,21 @@
     gap: 12px;
   }
   .ott-group-stat b { color: var(--accent); font-weight: 700; }
+  .pf-block { margin-bottom: 14px; }
+  .pf-block-title { font-size: 11px; font-weight: 700; color: var(--ink-mute); letter-spacing: 0.04em; margin: 0 2px 8px; }
+  .pf-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pf-chip {
+    display: inline-flex; align-items: center; gap: 7px; max-width: 100%;
+    padding: 9px 12px 9px 11px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg-elev);
+    font-family: var(--sans); font-size: 14px; font-weight: 600; color: var(--ink); cursor: pointer;
+  }
+  .pf-chip.muted { color: var(--ink-dim); }
+  .pf-chip.on { border-color: var(--accent); background: var(--accent-soft, #eceefb); color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+  .pf-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .pf-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pf-count { font-size: 12px; font-weight: 700; color: var(--ink-mute); background: var(--bg-soft); border-radius: 100px; padding: 1px 7px; font-variant-numeric: tabular-nums; }
+  .pf-chip.on .pf-count { background: #fff; color: var(--accent); }
+  .pf-panel { margin-top: 18px; padding-top: 16px; border-top: 1px dashed var(--line); scroll-margin-top: 70px; }
 
   /* STATS DASHBOARD */
   .stat-card {
@@ -2357,7 +2372,7 @@
   <section class="view" id="view-ott">
     <button class="pill" onclick="goTab('library')" style="margin-bottom: 14px;">‹ 모아보기</button>
     <h2 class="section-title">플랫폼 <span>별 보기</span></h2>
-    <div class="section-sub">OTT·연재처마다 모아서</div>
+    <div class="section-sub">플랫폼을 누르면 그 작품만 보여요</div>
     <div id="ottView"></div>
   </section>
 
@@ -2461,7 +2476,7 @@
     </div>
 
     <div id="versionText" style="text-align: center; margin-top: 40px; font-size: 11px; color: var(--ink-mute); letter-spacing: 0.04em; font-weight: 500;">
-      v4.7 · 데이터는 브라우저에 저장됩니다
+      v4.8 · 데이터는 브라우저에 저장됩니다
     </div>
   </section>
 </main>
@@ -2958,10 +2973,32 @@
         <textarea class="form-textarea md-ta" id="chDesc" placeholder="성격, 직업, 비밀, 떡밥…"></textarea>
         <div class="md-view md-pv-box" id="chDesc_pv" style="display:none;" onclick="setMdPreview('chDesc', false)"></div>
       </div>
-      <button type="button" class="btn" id="chAddChildBtn" onclick="addChildFromEditor()" style="width: 100%; margin-top: 16px;">+ 이 인물에 가지 추가</button>
+      <div class="form-row" id="chBranchRow" style="margin-top: 16px;">
+        <button type="button" class="btn" id="chAddChildBtn" onclick="addChildFromEditor()">+ 새 인물 가지</button>
+        <button type="button" class="btn" id="chAttachBtn" onclick="openAttach()">기존 인물 붙이기</button>
+      </div>
       <div class="btn-row">
         <button type="button" class="btn btn-danger" id="chDeleteBtn" onclick="deleteChar()">삭제</button>
         <button type="button" class="btn btn-primary" onclick="saveChar()">저장</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ATTACH EXISTING CHARACTERS -->
+<div class="modal" id="attachModal" style="z-index: 260;">
+  <div class="modal-content">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title" id="attachTitle" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">가지로 붙일 인물</div>
+      <button class="modal-close" onclick="closeAttach()">×</button>
+    </div>
+    <div class="modal-body">
+      <div style="font-size: 12px; color: var(--ink-mute); margin-bottom: 12px; line-height: 1.6;">체크한 인물이 이 인물에서 뻗어 나와요. 체크를 풀면 가운데(작품)로 돌아가요.</div>
+      <div class="rec-x-list" id="attachList"></div>
+      <div class="btn-row">
+        <button type="button" class="btn" onclick="closeAttach()">취소</button>
+        <button type="button" class="btn btn-primary" onclick="applyAttach()">적용</button>
       </div>
     </div>
   </div>
@@ -3357,9 +3394,13 @@ const DEFAULT_OTT = [
 ];
 
 // ============ VERSION ============
-const APP_VERSION = '4.7';
+const APP_VERSION = '4.8';
 const VERSION_KEY = 'contentsArchive_seenVersion';
 const VERSION_NOTES = {
+  '4.8': [
+    '플랫폼별 보기: 플랫폼 버튼을 누르면 그 플랫폼 작품만 보여요 (진행중·완료 등으로 한 번 더 거르기)',
+    '인물 관계도: 인물 수정 창의 \'기존 인물 붙이기\'로 이미 있는 인물을 가지로 옮길 수 있어요'
+  ],
   '4.7': [
     '웹소설을 추가할 수 있어요 — 제목은 《 》로, 연재 플랫폼은 포스타입·네이버블로그 (직접 입력도 돼요)',
     '연재 중이라 전체 회차를 몰라도 \'N화까지 읽음\'으로 기록하고 +1화로 빠르게 올릴 수 있어요',
@@ -4427,77 +4468,82 @@ function renderStats() {
 }
 
 // ============ OTT VIEW ============
+// 플랫폼 버튼을 누르면 그 플랫폼 작품만 보여줌
+let ottViewSel = null;      // 'ott:<id>' · 'novel:<이름>' · 'none-ott' · 'none-novel'
+let ottViewStatus = 'all';  // 상태 거르기
+function ottViewGroups() {
+  const screen = state.items.filter(i => isScreenType(i.type));
+  const novels = state.items.filter(i => i.type === 'webnovel');
+  const ott = [], novel = [], none = [];
+  getOttSorted().forEach(o => {
+    const items = screen.filter(i => (i.otts || []).includes(o.id));
+    if (items.length) ott.push({ key: 'ott:' + o.id, name: o.name, color: o.color || '#9e9a93', items });
+  });
+  const names = [...new Set([...NOVEL_PLATFORMS, ...novels.map(i => (i.platform || '').trim()).filter(Boolean)])];
+  names.forEach(nm => {
+    const items = novels.filter(i => (i.platform || '').trim() === nm);
+    if (items.length) novel.push({ key: 'novel:' + nm, name: nm, color: '#2f8f6a', items });
+  });
+  const noOtt = screen.filter(i => (i.otts || []).filter(id => getOttById(id)).length === 0);
+  if (noOtt.length) none.push({ key: 'none-ott', name: 'OTT 미지정', color: 'var(--line)', items: noOtt, muted: true });
+  const noNovel = novels.filter(i => !(i.platform || '').trim());
+  if (noNovel.length) none.push({ key: 'none-novel', name: '웹소설 미지정', color: 'var(--line)', items: noNovel, muted: true });
+  return { ott, novel, none, all: [...ott, ...novel, ...none] };
+}
 function renderOttView() {
   const container = document.getElementById('ottView');
   if (!container) return;
-  // movie/drama/anime items that have OTT
-  const relevant = state.items.filter(i => isScreenType(i.type));
-  const novels = state.items.filter(i => i.type === 'webnovel');
-  if (relevant.length === 0 && novels.length === 0) {
+  const G = ottViewGroups();
+  if (!G.all.length) {
     container.innerHTML = emptyHTML('영화·드라마·애니·웹소설 기록이 없어요', 'OTT·연재 플랫폼 정보를 담은 기록이 쌓이면 여기 모입니다');
     return;
   }
-  const sortedOtt = getOttSorted();
-  let html = '';
-  // Each OTT group
-  sortedOtt.forEach(ott => {
-    const items = sortItems(relevant.filter(i => (i.otts || []).includes(ott.id)));
-    if (items.length === 0) return;
-    const watching = items.filter(i => i.status === 'watching').length;
-    const done = items.filter(i => i.status === 'done').length;
-    const wish = items.filter(i => i.status === 'wishlist').length;
-    const stat = [];
-    if (watching) stat.push(`진행중 <b>${watching}</b>`);
-    if (done) stat.push(`완료 <b>${done}</b>`);
-    if (wish) stat.push(`위시 <b>${wish}</b>`);
-    html += `<div class="ott-group">
+  if (!G.all.some(g => g.key === ottViewSel)) { ottViewSel = G.all[0].key; ottViewStatus = 'all'; }
+  const sel = G.all.find(g => g.key === ottViewSel);
+  const watchingN = items => items.filter(i => i.status === 'watching').length;
+  const chip = g => `<button type="button" class="pf-chip ${g.key === ottViewSel ? 'on' : ''} ${g.muted ? 'muted' : ''}" data-key="${escapeHTML(g.key)}" onclick="pickOttView(this.dataset.key)">
+      <span class="pf-dot" style="background:${escapeHTML(g.color)}"></span>
+      <span class="pf-name">${escapeHTML(g.name)}</span>
+      <span class="pf-count">${g.items.length}</span>
+    </button>`;
+  const block = (title, list) => list.length ? `<div class="pf-block"><div class="pf-block-title">${title}</div><div class="pf-chips">${list.map(chip).join('')}</div></div>` : '';
+  // 고른 플랫폼
+  const counts = { all: sel.items.length };
+  ['watching', 'done', 'wishlist', 'dropped'].forEach(s => { counts[s] = sel.items.filter(i => i.status === s).length; });
+  if (ottViewStatus !== 'all' && !counts[ottViewStatus]) ottViewStatus = 'all';
+  const shown = sortItems(ottViewStatus === 'all' ? sel.items : sel.items.filter(i => i.status === ottViewStatus));
+  const stName = { all: '전체', watching: '진행중', done: '완료', wishlist: '위시', dropped: '중단' };
+  const pills = ['all', 'watching', 'done', 'wishlist', 'dropped'].filter(s => s === 'all' || counts[s])
+    .map(s => `<button type="button" class="pill ${ottViewStatus === s ? 'active' : ''}" onclick="pickOttStatus('${s}')">${stName[s]} <span class="pill-count">${counts[s]}</span></button>`).join('');
+  container.innerHTML = `
+    ${block('OTT', G.ott)}
+    ${block('웹소설 연재처', G.novel)}
+    ${block('미지정', G.none)}
+    <div class="pf-panel" id="pfPanel">
       <div class="ott-group-head">
-        <span class="ott-group-dot" style="background: ${escapeHTML(ott.color || '#9e9a93')}"></span>
-        <span class="ott-group-name">${escapeHTML(ott.name)}</span>
-        <span class="ott-group-count">${items.length}개</span>
+        <span class="ott-group-dot" style="background: ${escapeHTML(sel.color)}"></span>
+        <span class="ott-group-name">${escapeHTML(sel.name)}</span>
+        <span class="ott-group-count">${sel.items.length}개${watchingN(sel.items) ? ` · 진행중 ${watchingN(sel.items)}` : ''}</span>
       </div>
-      ${stat.length ? `<div class="ott-group-stat">${stat.join('')}</div>` : ''}
-      ${items.map(cardHTML).join('')}
+      ${counts.all > 1 ? `<div class="filter-row" style="margin-bottom: 12px;">${pills}</div>` : ''}
+      ${shown.map(cardHTML).join('')}
     </div>`;
-  });
-  // 웹소설 연재 플랫폼
-  const groupHTML = (name, items, color, muted) => {
-    const stat = [];
-    const w = items.filter(i => i.status === 'watching').length, d = items.filter(i => i.status === 'done').length, s = items.filter(i => i.status === 'wishlist').length;
-    if (w) stat.push(`진행중 <b>${w}</b>`); if (d) stat.push(`완료 <b>${d}</b>`); if (s) stat.push(`위시 <b>${s}</b>`);
-    return `<div class="ott-group">
-      <div class="ott-group-head">
-        <span class="ott-group-dot" style="background: ${color}"></span>
-        <span class="ott-group-name" ${muted ? 'style="color: var(--ink-mute);"' : ''}>${escapeHTML(name)}</span>
-        <span class="ott-group-count">${items.length}개</span>
-      </div>
-      ${stat.length ? `<div class="ott-group-stat">${stat.join('')}</div>` : ''}
-      ${items.map(cardHTML).join('')}
-    </div>`;
-  };
-  if (novels.length) {
-    const names = [...new Set([...NOVEL_PLATFORMS, ...novels.map(i => (i.platform || '').trim()).filter(Boolean)])];
-    names.forEach(nm => {
-      const items = sortItems(novels.filter(i => (i.platform || '').trim() === nm));
-      if (items.length) html += groupHTML(`${nm} · 웹소설`, items, '#2f8f6a');
-    });
-    const none = sortItems(novels.filter(i => !(i.platform || '').trim()));
-    if (none.length) html += groupHTML('웹소설 · 플랫폼 미지정', none, 'var(--line)', true);
-  }
-  // No OTT assigned
-  const noOtt = sortItems(relevant.filter(i => (i.otts || []).filter(id => getOttById(id)).length === 0));
-  if (noOtt.length > 0) {
-    html += `<div class="ott-group">
-      <div class="ott-group-head">
-        <span class="ott-group-dot" style="background: var(--line)"></span>
-        <span class="ott-group-name" style="color: var(--ink-mute);">OTT 미지정</span>
-        <span class="ott-group-count">${noOtt.length}개</span>
-      </div>
-      ${noOtt.map(cardHTML).join('')}
-    </div>`;
-  }
-  container.innerHTML = html || emptyHTML('표시할 기록이 없어요', '');
 }
+function pickOttView(key) {
+  const changed = ottViewSel !== key;
+  ottViewSel = key;
+  if (changed) ottViewStatus = 'all';
+  renderOttView();
+  // 목록 머리가 화면에 보이게 (버튼이 많아 아래로 밀렸을 때만)
+  const p = document.getElementById('pfPanel');
+  if (p && changed) {
+    const r = p.getBoundingClientRect();
+    if (r.top > window.innerHeight * 0.6) {
+      try { p.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) { p.scrollIntoView(); }
+    }
+  }
+}
+function pickOttStatus(s) { ottViewStatus = s; renderOttView(); }
 
 // ============ STATS DASHBOARD ============
 function renderStatsView() {
@@ -7358,6 +7404,10 @@ function mmTreeOrder(chars) {
   chars.forEach(c => walk(c, 0)); // 혹시 남은 것(순환 등)
   return out;
 }
+// 저장 위치를 지워서 새 자리(부모 옆)에 다시 놓이게. 그 인물의 가지 인물들도 같이
+function mmUnplace(chars, id) {
+  [id, ...mmDescendants(chars, id)].forEach(cid => { const c = chars.find(x => x.id === cid); if (c) { delete c.x; delete c.y; } });
+}
 function mmDescendants(chars, id) {
   const { kids } = mmTree(chars);
   const out = [], seen = new Set([id]), st = [...(kids[id] || [])];
@@ -7873,7 +7923,8 @@ function openCharEditor(cid, parentId) {
     mmTreeOrder(r.chars).filter(({ c: x }) => !banned.has(x.id)).map(({ c: x, depth }) =>
       `<option value="${x.id}" ${x.id === presetParent ? 'selected' : ''}>${'　'.repeat(depth)}${depth ? '↳ ' : ''}${escapeHTML(x.name)}</option>`).join('');
   document.getElementById('chParent').value = presetParent;
-  document.getElementById('chAddChildBtn').style.display = c ? '' : 'none';
+  document.getElementById('chBranchRow').style.display = c ? '' : 'none';
+  document.getElementById('chAttachBtn').disabled = !c || r.chars.length < 2;
   document.getElementById('chName').value = c ? c.name : '';
   document.getElementById('chGroup').value = c ? (c.group || '') : '';
   document.getElementById('chDesc').value = c ? (c.desc || '') : '';
@@ -7910,6 +7961,66 @@ function syncChGroupApply() {
   dot.style.background = g && !apply && mmValidColor(gc[g]) ? gc[g]
     : (!g && parC ? mmColor(parC, mmGroups(r.chars), gc, r.chars) : mmAutoColor(g, mmGroups(r.chars)));
 }
+// 이미 있는 인물들을 이 인물의 가지로 붙이기 (삭제하고 다시 만들 필요 없이)
+let attachFor = null;
+function openAttach() {
+  const item = recItem();
+  if (!item || !rec.charId) return;
+  if (charDirty()) persistChar(); // 고치던 내용은 먼저 저장
+  const r = getRecord(item);
+  const me = r.chars.find(x => x.id === rec.charId);
+  if (!me) return;
+  attachFor = me.id;
+  // 내 위쪽(부모·조상)은 붙일 수 없음 → 순환 방지
+  const ancestors = new Set();
+  for (let p = me.parent, k = 0; p && k < 50; k++) { ancestors.add(p); p = (r.chars.find(x => x.id === p) || {}).parent; }
+  const nameOf = id => (r.chars.find(x => x.id === id) || {}).name || '';
+  const groups = mmGroups(r.chars), gc = r.groupColors || {};
+  const cands = mmTreeOrder(r.chars).map(o => o.c).filter(x => x.id !== me.id && !ancestors.has(x.id));
+  document.getElementById('attachTitle').textContent = `${me.name}에 붙일 인물`;
+  document.getElementById('attachList').innerHTML = cands.length ? cands.map(x => `<label class="rec-x-row">
+      <input type="checkbox" data-cid="${x.id}" ${x.parent === me.id ? 'checked' : ''}>
+      <span class="rec-dot" style="background:${mmColor(x, groups, gc, r.chars)}"></span>
+      <span class="rec-x-name">${escapeHTML(x.name)}</span>
+      <span class="rec-x-sub">${x.parent === me.id ? '지금 연결됨' : x.parent ? `지금: ${escapeHTML(nameOf(x.parent))}에 연결` : '지금: 가운데'}</span>
+    </label>`).join('') : '<div class="plan-empty" style="padding: 14px 0;">붙일 수 있는 인물이 없어요</div>';
+  document.getElementById('attachModal').classList.add('active');
+  syncBodyScrollLock();
+}
+function closeAttach() {
+  attachFor = null;
+  document.getElementById('attachModal').classList.remove('active');
+  syncBodyScrollLock();
+}
+function applyAttach() {
+  const item = recItem();
+  if (!item || !attachFor) { closeAttach(); return; }
+  const r = getRecord(item);
+  const me = r.chars.find(x => x.id === attachFor);
+  if (!me) { closeAttach(); return; }
+  let added = 0, removed = 0;
+  document.querySelectorAll('#attachList input[data-cid]').forEach(cb => {
+    const x = r.chars.find(c => c.id === cb.dataset.cid);
+    if (!x || x.id === me.id) return;
+    if (cb.checked && x.parent !== me.id) {
+      // 내 가지 아래에 있던 인물을 고르면 그 인물만 옮김 (순환 안 생김: 조상은 목록에서 빠져 있음)
+      x.parent = me.id; mmUnplace(r.chars, x.id); added++;
+    } else if (!cb.checked && x.parent === me.id) {
+      delete x.parent; mmUnplace(r.chars, x.id); removed++;
+    }
+  });
+  getRecord(item); // 혹시 모를 순환 정리
+  recTouch(item);
+  const name = me.name;
+  closeAttach();
+  closeCharEditor(true);
+  renderRecChars();
+  const msg = [];
+  if (added) msg.push(`${added}명을 ${name}에 붙였어요`);
+  if (removed) msg.push(`${removed}명은 가운데로 옮겼어요`);
+  showToast(msg.length ? msg.join(' · ') : '바뀐 게 없어요');
+}
+
 // 이 인물에서 가지 뻗은 새 인물 추가
 function addChildFromEditor() {
   const pid = rec.charId;
@@ -7960,8 +8071,8 @@ function persistChar() {
   // 연결(가지): 자기 자신·자기 가지 아래로는 못 붙임
   const par = document.getElementById('chParent').value;
   if (par && par !== target.id && r.chars.some(x => x.id === par) && !mmDescendants(r.chars, target.id).includes(par)) {
-    if (target.parent !== par) { target.parent = par; delete target.x; delete target.y; } // 새 부모 옆으로
-  } else if (target.parent) { delete target.parent; delete target.x; delete target.y; }
+    if (target.parent !== par) { target.parent = par; mmUnplace(r.chars, target.id); } // 새 부모 옆으로 (가지 인물도 같이)
+  } else if (target.parent) { delete target.parent; mmUnplace(r.chars, target.id); }
   // 색: 소속 전체에 적용하거나, 이 인물에만
   const col = mmValidColor(rec.charColor) ? rec.charColor : '';
   if (data.group && document.getElementById('chGroupApply').checked) {
