@@ -739,6 +739,20 @@
   .yt-preview-channel { font-size: 11px; color: var(--ink-dim); }
 
   .type-picker { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+  .parts-box { margin: 8px 0 4px; padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg-soft); }
+  .part-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 36px; gap: 8px; margin-bottom: 8px; }
+  .part-row .form-input { padding: 10px 12px; background: #fff; }
+  .part-row-head { margin-bottom: 4px; font-size: 11px; font-weight: 700; color: var(--ink-mute); }
+  .part-row-head em { font-style: normal; font-weight: 500; }
+  .mini-cap { display: block; font-size: 11px; font-weight: 700; color: var(--ink-mute); margin: 10px 2px 6px; }
+  .mini-cap-row .mini-cap { margin-bottom: 0; }
+  .part-del { border: 0; background: none; color: var(--ink-mute); font-size: 18px; cursor: pointer; }
+  .parts-hint { font-size: 11px; color: var(--ink-mute); margin-top: 8px; line-height: 1.6; }
+  .ep-part-head { grid-column: 1 / -1; font-size: 12px; font-weight: 700; color: var(--ink-dim); margin-top: 6px; }
+  .ep-part-head:first-child { margin-top: 0; }
+  .ep-part-head span { font-weight: 500; color: var(--ink-mute); }
+  .episodes-section.side { margin-top: 14px; }
+  .plan-tracks { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
   .plan-extra { margin-top: 14px; padding: 12px; border: 1px dashed var(--line); border-radius: 12px; }
   .plan-extra-label { font-size: 12px; font-weight: 700; color: var(--ink-dim); margin-bottom: 8px; }
   .plan-extra-row { display: flex; align-items: center; gap: 6px; }
@@ -1425,6 +1439,9 @@
   .mm-group-apply input { width: 18px; height: 18px; accent-color: var(--accent); }
   .rec-line { width: 4px; align-self: stretch; border-radius: 2px; flex-shrink: 0; }
   .rec-branch { color: var(--ink-mute); font-size: 13px; margin-right: -4px; flex-shrink: 0; }
+  .rec-ep-new { display: flex; gap: 8px; }
+  .rec-ep-new .form-input { flex: 1; min-width: 0; }
+  .rec-ep-new select.form-input { flex: 0 0 auto; max-width: 40%; }
   .rec-autosave { font-size: 11px; color: var(--ink-mute); margin-top: 6px; min-height: 14px; text-align: right; }
   .rec-x-list { display: flex; flex-direction: column; gap: 8px; }
   .rec-x-row {
@@ -1886,6 +1903,24 @@
     position: relative;
     animation: fadeIn 0.4s ease;
   }
+  .backup-banner.warn { background: #fdf0ec; border-color: #f2c9bd; }
+  .guard-box { background: var(--bg-soft); border-radius: 12px; padding: 12px 14px; }
+  .guard-row { display: flex; justify-content: space-between; gap: 10px; font-size: 12px; color: var(--ink-dim); padding: 4px 0; }
+  .guard-row b { font-weight: 600; color: var(--ink); text-align: right; }
+  .guard-snap { font-size: 12px; color: var(--accent); font-weight: 600; margin-top: 6px; }
+  .snap-row { display: flex; align-items: center; gap: 8px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .snap-body { flex: 1; min-width: 0; }
+  .snap-time { font-size: 14px; font-weight: 700; color: var(--ink); }
+  .snap-sub { font-size: 12px; color: var(--ink-mute); margin-top: 2px; }
+  .undo-bar {
+    position: fixed; left: 0; right: 0; margin: 0 auto; width: max-content; bottom: calc(156px + env(safe-area-inset-bottom)); transform: translateY(16px);
+    display: flex; align-items: center; gap: 14px; max-width: calc(100% - 32px); box-sizing: border-box;
+    background: #17181c; color: #fff; border-radius: 12px; padding: 10px 12px 10px 16px; font-size: 13px;
+    opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 330; box-shadow: 0 8px 24px rgba(0,0,0,.18);
+  }
+  .undo-bar.show { opacity: 1; pointer-events: auto; transform: translateY(0); }
+  .undo-bar span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .undo-bar button { border: 0; background: none; color: #9fb0ff; font-weight: 700; font-size: 13px; cursor: pointer; flex-shrink: 0; font-family: var(--sans); }
   .backup-banner-icon {
     font-size: 22px;
     flex-shrink: 0;
@@ -2260,6 +2295,22 @@
 </nav>
 
 <main>
+  <div id="guardNotice" class="backup-banner warn" style="display: none;">
+    <div class="backup-banner-icon">🛡️</div>
+    <div class="backup-banner-text">
+      <div class="backup-banner-title">데이터 지킴이</div>
+      <div class="backup-banner-desc" id="guardNoticeText"></div>
+    </div>
+    <button class="backup-banner-close" onclick="hideGuardNotice()" aria-label="닫기">×</button>
+  </div>
+  <div id="storageWarn" class="backup-banner warn" style="display: none;">
+    <div class="backup-banner-icon">⚠️</div>
+    <div class="backup-banner-text">
+      <div class="backup-banner-title">기본 저장소에 저장하지 못하고 있어요</div>
+      <div class="backup-banner-desc">기기 안 보조 저장소에는 저장 중이에요. 지금 백업 파일을 받아두고, 사진이 많은 메모를 정리해 주세요.</div>
+    </div>
+    <button class="backup-banner-btn" onclick="exportData()">백업</button>
+  </div>
   <div id="backupBanner" class="backup-banner" style="display: none;">
     <div class="backup-banner-icon">💾</div>
     <div class="backup-banner-text">
@@ -2470,12 +2521,25 @@
     </div>
 
     <div style="margin-top: 24px;">
+      <h3 style="font-size: 13px; font-weight: 600; color: var(--ink-mute); letter-spacing: 0.04em; margin-bottom: 10px;">🛡️ 데이터 지킴이</h3>
+      <div class="guard-box">
+        <div id="guardStatus"></div>
+        <div class="guard-snap" id="guardSnapCount"></div>
+        <div class="form-row" style="margin-top: 10px;">
+          <button type="button" class="btn" onclick="openSnapList()">자동 백업 · 되돌리기</button>
+          <button type="button" class="btn" onclick="makeManualSnapshot()">지금 기기 안에 백업</button>
+        </div>
+        <div style="font-size: 11px; color: var(--ink-mute); margin-top: 10px; line-height: 1.6;">저장할 때마다 기기 안 보조 저장소에도 한 번 더 저장하고, 30분마다·앱 열 때·지우기 직전에 복원 지점을 남겨요. 휴대폰을 잃어버리거나 앱 데이터가 지워지는 건 막을 수 없으니 <b>백업 파일</b>도 가끔 받아두세요.</div>
+      </div>
+    </div>
+
+    <div style="margin-top: 24px;">
       <h3 style="font-size: 13px; font-weight: 600; color: var(--ink-mute); letter-spacing: 0.04em; margin-bottom: 10px;">내보내기 / 백업</h3>
       <div style="font-size: 12px; color: var(--ink-dim); line-height: 1.6; background: var(--bg-soft); border-radius: 10px; padding: 12px 14px; margin-bottom: 12px;">
         💡 데이터는 <strong>이 기기에만</strong> 저장돼요. 다른 기기와는 자동으로 합쳐지지 않고, 오래 안 쓰면 사라질 수 있어요. 가끔 <strong>JSON 백업</strong>을 받아두면 안전하게 보관·복원할 수 있어요.
       </div>
       <button class="btn" onclick="exportExcel()" style="width: 100%; margin-bottom: 8px;">📊 엑셀 파일로 내보내기 (.xlsx)</button>
-      <button class="btn btn-primary" onclick="exportData()" style="width: 100%; margin-bottom: 8px;">💾 JSON 백업 다운로드</button>
+      <button class="btn btn-primary" onclick="exportData()" style="width: 100%; margin-bottom: 8px;">💾 백업 파일 저장 (JSON)</button>
       <label class="btn" style="width: 100%; margin-bottom: 8px; display: block; text-align: center;">
         JSON 백업 가져오기
         <input type="file" accept=".json" onchange="importData(event)" style="display: none;">
@@ -2485,7 +2549,7 @@
     </div>
 
     <div id="versionText" style="text-align: center; margin-top: 40px; font-size: 11px; color: var(--ink-mute); letter-spacing: 0.04em; font-weight: 500;">
-      v4.9 · 데이터는 브라우저에 저장됩니다
+      v5.1 · 데이터는 브라우저에 저장됩니다
     </div>
   </section>
 </main>
@@ -2616,9 +2680,36 @@
 
         <div class="form-group form-section" id="section-drama">
           <label class="form-label">회차</label>
-          <div class="form-row">
+          <div class="form-row" id="epPlainRow">
             <input type="number" class="form-input" id="fCurrentEp" placeholder="현재 회차" min="0">
             <input type="number" class="form-input" id="fTotalEp" placeholder="전체 회차" min="1">
+          </div>
+          <div id="partCurRow" style="display:none;">
+            <div class="mini-cap">지금 어디까지 봤나요</div>
+            <div class="form-row">
+              <select class="form-input" id="fCurPart"></select>
+              <input type="number" class="form-input" id="fCurLocal" placeholder="몇 화까지" min="0" inputmode="numeric">
+            </div>
+          </div>
+          <label class="mm-group-apply"><input type="checkbox" id="fUseParts" onchange="syncPartsUI(true)"> 1부·2부처럼 나눠져 있어요</label>
+          <div class="parts-box" id="partsBox" style="display:none;">
+            <div class="part-row part-row-head"><span>부 이름</span><span>회차 수 <em>(연재 중이면 비움)</em></span><span></span></div>
+            <div id="partsList"></div>
+            <button type="button" class="plan-mini-btn" onclick="addPartRow()">+ 부 추가</button>
+            <input type="hidden" id="fPartRestart" value="1">
+            <div class="seg-picker" id="partNumPicker" style="margin-top: 10px;">
+              <button type="button" class="seg-option active" data-restart="1" onclick="setPartNum(true)">부마다 1화부터</button>
+              <button type="button" class="seg-option" data-restart="0" onclick="setPartNum(false)">1부부터 이어서</button>
+            </div>
+            <div class="parts-hint" id="partsSummary"></div>
+          </div>
+          <label class="mm-group-apply"><input type="checkbox" id="fHasSide" onchange="syncSideUI()"> 외전이 있어요</label>
+          <div id="sideBox" style="display:none; margin-top: 8px;">
+            <div class="form-row mini-cap-row"><span class="mini-cap">외전 몇 화까지 봤나요</span><span class="mini-cap">외전 전체 (모르면 비움)</span></div>
+            <div class="form-row">
+              <input type="number" class="form-input" id="fSideCur" placeholder="0" min="0" inputmode="numeric">
+              <input type="number" class="form-input" id="fSideTotal" placeholder="예: 10" min="1" inputmode="numeric">
+            </div>
           </div>
         </div>
 
@@ -3138,8 +3229,10 @@
       </div>
       <div class="form-group" id="planEpGroup" style="display:none;">
         <label class="form-label" id="planEpLabel">볼 회차 선택</label>
+        <div class="plan-tracks" id="planTrackRow"></div>
         <div class="plan-quick" id="planQuick"></div>
         <div class="episodes-grid" id="planEpGrid"></div>
+        <div class="plan-range-info" id="planPickedOther"></div>
         <div id="planEpRange" style="display:none;"></div>
         <div class="plan-legend" id="planLegend">
           <span><i class="lg planned"></i>선택</span>
@@ -3372,6 +3465,22 @@
 </div>
 
 <div class="toast" id="toast"></div>
+<div class="undo-bar" id="undoBar"><span id="undoText"></span><button type="button" onclick="runUndo()">되돌리기</button></div>
+
+<!-- SNAPSHOT LIST -->
+<div class="modal" id="snapModal" style="z-index: 260;">
+  <div class="modal-content">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title">자동 백업 · 되돌리기</div>
+      <button class="modal-close" onclick="closeSnapList()">×</button>
+    </div>
+    <div class="modal-body">
+      <div style="font-size: 12px; color: var(--ink-dim); line-height: 1.6; margin-bottom: 12px;">기기 안에 자동으로 남는 복원 지점이에요. 되돌려도 지금 상태는 따로 보관돼요. '파일'로 꺼내서 다른 곳에 보관할 수도 있어요.</div>
+      <div id="snapList"></div>
+    </div>
+  </div>
+</div>
 
 <script>
 'use strict';
@@ -3413,9 +3522,21 @@ const DEFAULT_OTT = [
 ];
 
 // ============ VERSION ============
-const APP_VERSION = '4.9';
+const APP_VERSION = '5.1';
 const VERSION_KEY = 'contentsArchive_seenVersion';
 const VERSION_NOTES = {
+  '5.1': [
+    '데이터 지킴이: 저장할 때마다 기기 안 보조 저장소에도 한 번 더 저장해요 (기본 저장소가 가득 차거나 깨져도 복구)',
+    '자동 백업(복원 지점)이 30분마다·앱 열 때·지우기 직전에 남아요 — 더보기 → 데이터 지킴이에서 그 시점으로 되돌리기',
+    '기록·메모를 지우면 잠깐 \'되돌리기\' 버튼이 떠요',
+    '저장된 데이터를 읽지 못하면 절대 빈 데이터로 덮어쓰지 않고, 보조 저장본으로 되살려요',
+    '백업 파일은 공유 시트로 열려서 \'파일에 저장\'·iCloud에 바로 보관할 수 있어요'
+  ],
+  '5.0': [
+    '외전을 따로 기록할 수 있어요 — \'기록 수정\'에서 "외전이 있어요" 체크 (외전까지 다 보면 완료)',
+    '1부·2부·3부로 나눌 수 있어요 — 부마다 1화부터 세거나, 1부부터 이어서 세기 중 고르기',
+    '계획·복사·회차 기록에도 \'2부 5화\', \'외전 3화\'처럼 나와요'
+  ],
   '4.9': [
     '계획 체크할 때 "계획보다 더 봤나요?"에서 +1·+3·+5화나 "몇 화까지"로 실제 본 만큼 기록해요',
     '더 본 회차까지 진행 기록에 체크되고, 계획 줄도 실제 본 회차로 바뀌어요 (예: 151~153화 → 151~160화)',
@@ -3484,6 +3605,7 @@ const VERSION_NOTES = {
 // ============ STATE ============
 const STORAGE_KEY = 'contentsArchive_v1';
 let state = {
+  saveSeq: 0,
   items: [],
   templates: [],
   ottPlatforms: [],
@@ -3523,128 +3645,515 @@ let state = {
 };
 
 // ============ STORAGE ============
+const SEQ_KEY = 'contentsArchive_seq';          // 저장할 때마다 1씩 커지는 번호 (어느 저장본이 최신인지)
+const BROKEN_KEY = 'contentsArchive_v1_broken'; // 읽지 못한 저장본 원본 보관
+function setDefaultLists() {
+  state.templates = DEFAULT_TEMPLATES.map(t => ({ ...t, createdAt: Date.now() }));
+  state.ottPlatforms = DEFAULT_OTT.map((o, i) => ({ ...o, order: i, createdAt: Date.now() }));
+  state.countries = DEFAULT_COUNTRIES.map((c, i) => ({ ...c, order: i, createdAt: Date.now() }));
+}
 function load() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      const data = JSON.parse(raw);
-      if (data.savedAt) state.lastSavedAt = data.savedAt;
-      state.items = Array.isArray(data.items) ? data.items : [];
-      // Migrate old single-note items
-      state.items.forEach(item => {
-        if (typeof item.note === 'string' && !Array.isArray(item.notes)) {
-          if (item.note.trim()) {
-            item.notes = [{
-              id: uid(),
-              title: '기존 노트',
-              content: item.note,
-              createdAt: item.updatedAt || Date.now(),
-              updatedAt: item.updatedAt || Date.now()
-            }];
-          } else {
-            item.notes = [];
-          }
-          delete item.note;
-        } else if (!Array.isArray(item.notes)) {
-          item.notes = [];
-        }
-        (item.notes || []).forEach(n => { if (!Array.isArray(n.images)) n.images = []; });
-        // Ensure ott field exists (null = no OTT)
-        if (!Array.isArray(item.otts)) {
-          item.otts = item.ott ? [item.ott] : [];
-          delete item.ott;
-        }
-        if (item.country === undefined) item.country = null;
-        if (item.record) getRecord(item);
-        if (isEpType(item.type)) {
-          if (!Array.isArray(item.epWatched)) item.epWatched = [];
-          if (typeof item.epSeqMode !== 'boolean') item.epSeqMode = true; // 기존 동작(순차) 유지
-        }
-        if (item.type === 'podcast') {
-          if (!Array.isArray(item.podWatched)) item.podWatched = [];
-          if (typeof item.podSeqMode !== 'boolean') item.podSeqMode = false;
-        }
-      });
-      state.templates = Array.isArray(data.templates) ? data.templates : [];
-      if (state.templates.length === 0) {
-        state.templates = DEFAULT_TEMPLATES.map(t => ({ ...t, createdAt: Date.now() }));
-      }
-      state.seededTypes = (data.settings && Array.isArray(data.settings.seededTypes)) ? data.settings.seededTypes : [];
-      if (!state.seededTypes.includes('webnovel')) {
-        DEFAULT_TEMPLATES.filter(t => t.type === 'webnovel' && !state.templates.some(x => x.id === t.id))
-          .forEach(t => state.templates.push({ ...t, createdAt: Date.now() }));
-        state.seededTypes.push('webnovel');
-      }
-      state.ottPlatforms = Array.isArray(data.ottPlatforms) ? data.ottPlatforms : [];
-      state.countries = Array.isArray(data.countries) ? data.countries : [];
-      state.plans = Array.isArray(data.plans) ? data.plans : [];
-      if (state.countries.length === 0) state.countries = DEFAULT_COUNTRIES.map((c, i) => ({ ...c, order: i, createdAt: Date.now() }));
-      else state.countries.forEach((c, i) => { if (c.order === undefined) c.order = i; });
-      if (state.ottPlatforms.length === 0) {
-        state.ottPlatforms = DEFAULT_OTT.map((o, i) => ({ ...o, order: i, createdAt: Date.now() }));
+  state.saveBlocked = false;
+  state.brokenRaw = null;
+  state.loadFrom = 'local';
+  let raw = null;
+  try { raw = localStorage.getItem(STORAGE_KEY); } catch (err) { state.loadFrom = 'unavailable'; }
+  if (!raw) {
+    setDefaultLists();
+    state.items = []; state.plans = [];
+    state.saveSeq = 0;
+    state.startSeq = 0;
+    if (state.loadFrom !== 'unavailable') state.loadFrom = 'empty';
+    return;
+  }
+  let data = null;
+  try { data = JSON.parse(raw); } catch (err) { data = null; }
+  if (!data || typeof data !== 'object' || !Array.isArray(data.items)) { markBroken(raw); return; }
+  try { applyData(data); }
+  catch (err) { console.error('Load failed', err); markBroken(raw); return; }
+  state.lastJson = raw;
+  state.startSeq = state.saveSeq;
+}
+// 읽을 수 없는 저장본: 덮어쓰지 않게 저장을 멈추고 원본을 따로 보관 (복구는 guardianStart에서)
+function markBroken(raw) {
+  state.saveBlocked = true;
+  state.brokenRaw = raw;
+  state.loadFrom = 'broken';
+  try { if (!localStorage.getItem(BROKEN_KEY)) localStorage.setItem(BROKEN_KEY, raw); } catch (err) {}
+  setDefaultLists();
+  state.items = []; state.plans = [];
+  state.saveSeq = Math.max(0, parseInt((() => { try { return localStorage.getItem(SEQ_KEY); } catch (er) { return 0; } })(), 10) || 0);
+  state.startSeq = state.saveSeq;
+}
+// 저장본(객체)을 화면 상태로 — 불러오기·되돌리기·복구에서 같이 씀
+function applyData(data) {
+  state.lastSavedAt = data.savedAt || null;
+  state.saveSeq = Math.max(0, parseInt(data.seq, 10) || 0);
+  // 이상한 값(빈 칸·숫자 등)이 섞여 있어도 나머지 기록은 지킴
+  state.items = (Array.isArray(data.items) ? data.items : []).filter(it => it && typeof it === 'object' && !Array.isArray(it));
+  state.items.forEach(it => { if (it.id == null || it.id === '') it.id = uid(); else if (typeof it.id !== 'string') it.id = String(it.id); });
+  // Migrate old single-note items
+  state.items.forEach(item => { try {
+    if (typeof item.note === 'string' && !Array.isArray(item.notes)) {
+      if (item.note.trim()) {
+        item.notes = [{
+          id: uid(),
+          title: '기존 노트',
+          content: item.note,
+          createdAt: item.updatedAt || Date.now(),
+          updatedAt: item.updatedAt || Date.now()
+        }];
       } else {
-        // Ensure order field
-        state.ottPlatforms.forEach((o, i) => { if (o.order === undefined) o.order = i; });
+        item.notes = [];
       }
-      if (data.settings) {
-        state.sortBy = data.settings.sortBy || 'updated';
-        state.sortDir = data.settings.sortDir || 'desc';
-        state.lastBackupAt = data.settings.lastBackupAt || null;
-        state.changesSinceBackup = data.settings.changesSinceBackup || 0;
-        state.bannerDismissedAt = data.settings.bannerDismissedAt || null;
-        if (data.settings.copyDefaultProgress !== undefined) state.copyDefaultProgress = data.settings.copyDefaultProgress;
-        if (data.settings.timelineSort) state.timelineSort = data.settings.timelineSort;
-        if (typeof data.settings.ytApiKey === 'string') state.ytApiKey = data.settings.ytApiKey;
-        if (data.settings.planView) state.planView = data.settings.planView;
-      }
-    } else {
-      state.templates = DEFAULT_TEMPLATES.map(t => ({ ...t, createdAt: Date.now() }));
-      state.ottPlatforms = DEFAULT_OTT.map((o, i) => ({ ...o, order: i, createdAt: Date.now() }));
-      state.countries = DEFAULT_COUNTRIES.map((c, i) => ({ ...c, order: i, createdAt: Date.now() }));
+      delete item.note;
+    } else if (!Array.isArray(item.notes)) {
+      item.notes = [];
     }
-  } catch(e) {
-    console.error('Load failed', e);
-    state.items = [];
-    state.plans = [];
+    if (Array.isArray(item.notes)) item.notes = item.notes.filter(n => n && typeof n === 'object');
+    (item.notes || []).forEach(n => { if (!Array.isArray(n.images)) n.images = []; });
+    // Ensure ott field exists (null = no OTT)
+    if (!Array.isArray(item.otts)) {
+      item.otts = item.ott ? [item.ott] : [];
+      delete item.ott;
+    }
+    if (item.country === undefined) item.country = null;
+    if (item.record) getRecord(item);
+    if (isEpType(item.type)) {
+      if (item.parts != null) {
+        item.parts = Array.isArray(item.parts) ? item.parts.filter(p => p && typeof p === 'object')
+          .map((p, i) => ({ name: String(p.name || `${i + 1}부`).slice(0, 20), count: Math.max(0, parseInt(p.count, 10) || 0) })) : [];
+        if (!item.parts.length) delete item.parts;
+      }
+      if (item.hasSide) {
+        item.sideTotal = Math.max(0, parseInt(item.sideTotal, 10) || 0);
+        item.sideWatched = Array.isArray(item.sideWatched) ? [...new Set(item.sideWatched.map(Number).filter(n => n >= 1))].sort((a, b) => a - b) : [];
+      }
+      if (!Array.isArray(item.epWatched)) item.epWatched = [];
+      if (typeof item.epSeqMode !== 'boolean') item.epSeqMode = true; // 기존 동작(순차) 유지
+    }
+    if (item.type === 'podcast') {
+      if (!Array.isArray(item.podWatched)) item.podWatched = [];
+      if (typeof item.podSeqMode !== 'boolean') item.podSeqMode = false;
+    }
+  } catch (err) { console.error('기록 하나를 정리하다 실패 (기록은 그대로 둠)', err); } });
+  state.templates = Array.isArray(data.templates) ? data.templates : [];
+  if (state.templates.length === 0) {
     state.templates = DEFAULT_TEMPLATES.map(t => ({ ...t, createdAt: Date.now() }));
+  }
+  state.seededTypes = (data.settings && Array.isArray(data.settings.seededTypes)) ? data.settings.seededTypes : [];
+  if (!state.seededTypes.includes('webnovel')) {
+    DEFAULT_TEMPLATES.filter(t => t.type === 'webnovel' && !state.templates.some(x => x.id === t.id))
+      .forEach(t => state.templates.push({ ...t, createdAt: Date.now() }));
+    state.seededTypes.push('webnovel');
+  }
+  state.ottPlatforms = Array.isArray(data.ottPlatforms) ? data.ottPlatforms : [];
+  state.countries = Array.isArray(data.countries) ? data.countries : [];
+  state.plans = (Array.isArray(data.plans) ? data.plans : []).filter(p => p && typeof p === 'object');
+  if (state.countries.length === 0) state.countries = DEFAULT_COUNTRIES.map((c, i) => ({ ...c, order: i, createdAt: Date.now() }));
+  else state.countries.forEach((c, i) => { if (c.order === undefined) c.order = i; });
+  if (state.ottPlatforms.length === 0) {
     state.ottPlatforms = DEFAULT_OTT.map((o, i) => ({ ...o, order: i, createdAt: Date.now() }));
+  } else {
+    // Ensure order field
+    state.ottPlatforms.forEach((o, i) => { if (o.order === undefined) o.order = i; });
+  }
+  if (data.settings) {
+    state.sortBy = data.settings.sortBy || 'updated';
+    state.sortDir = data.settings.sortDir || 'desc';
+    state.lastBackupAt = data.settings.lastBackupAt || null;
+    state.changesSinceBackup = data.settings.changesSinceBackup || 0;
+    state.bannerDismissedAt = data.settings.bannerDismissedAt || null;
+    if (data.settings.copyDefaultProgress !== undefined) state.copyDefaultProgress = data.settings.copyDefaultProgress;
+    if (data.settings.timelineSort) state.timelineSort = data.settings.timelineSort;
+    if (typeof data.settings.ytApiKey === 'string') state.ytApiKey = data.settings.ytApiKey;
+    if (data.settings.planView) state.planView = data.settings.planView;
   }
 }
 
+// 저장할 내용 전체
+function buildPayload(now) {
+  return {
+  items: state.items,
+  templates: state.templates,
+  ottPlatforms: state.ottPlatforms,
+  countries: state.countries,
+  plans: state.plans,
+  settings: {
+    sortBy: state.sortBy,
+    sortDir: state.sortDir,
+    lastBackupAt: state.lastBackupAt,
+    changesSinceBackup: state.changesSinceBackup,
+    bannerDismissedAt: state.bannerDismissedAt,
+    copyDefaultProgress: state.copyDefaultProgress,
+    timelineSort: state.timelineSort,
+    ytApiKey: state.ytApiKey,
+    planView: state.planView,
+    seededTypes: state.seededTypes || ['webnovel']
+  },
+  savedAt: now,
+  seq: state.saveSeq || 0
+};
+}
 function save(isDataChange) {
   if (isDataChange) {
     state.changesSinceBackup = (state.changesSinceBackup || 0) + 1;
   }
+  // 저장본을 읽지 못해 복구 확인 중이면, 원본을 덮어쓰지 않게 잠시 보류
+  if (state.saveBlocked) { state.pendingSave = true; return; }
   const now = Date.now();
+  // 다른 창(탭)에서 더 최근에 저장했다면, 덮어쓰기 전에 그 저장본을 자동 백업에 보관
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({
-      items: state.items,
-      templates: state.templates,
-      ottPlatforms: state.ottPlatforms,
-      countries: state.countries,
-      plans: state.plans,
-      settings: {
-        sortBy: state.sortBy,
-        sortDir: state.sortDir,
-        lastBackupAt: state.lastBackupAt,
-        changesSinceBackup: state.changesSinceBackup,
-        bannerDismissedAt: state.bannerDismissedAt,
-        copyDefaultProgress: state.copyDefaultProgress,
-        timelineSort: state.timelineSort,
-        ytApiKey: state.ytApiKey,
-        planView: state.planView,
-        seededTypes: state.seededTypes || ['webnovel']
-      },
-      savedAt: now
-    }));
-    state.lastSavedAt = now;
-    updateSaveIndicator(true);
-  } catch(e) {
-    console.error(e);
-    showToast('저장 실패 (저장공간 가득)');
+    const other = parseInt(localStorage.getItem(SEQ_KEY), 10) || 0;
+    if (other > (state.saveSeq || 0)) {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) snapshotRaw('other', raw);
+      state.saveSeq = other;
+      showToast('다른 창에서 저장된 내용이 있어 자동 백업에 보관해뒀어요');
+    }
+  } catch (err) {}
+  state.saveSeq = (state.saveSeq || 0) + 1;
+  const json = JSON.stringify(buildPayload(now));
+  let ok = false;
+  try {
+    localStorage.setItem(STORAGE_KEY, json);
+    ok = (localStorage.getItem(STORAGE_KEY) || '').length === json.length; // 제대로 들어갔는지 확인
+    if (ok) localStorage.setItem(SEQ_KEY, String(state.saveSeq));
+  } catch (err) {
+    console.error(err);
+    ok = false;
   }
-  if (isDataChange) updateBackupBanner();
+  state.lastJson = json;
+  state.lastSavedAt = now;
+  mirrorSave(json, state.saveSeq, now); // 기기 안 보조 저장소에도 항상
+  const was = !!state.lsFailed;
+  state.lsFailed = !ok;
+  if (was !== state.lsFailed) updateStorageWarn();
+  updateSaveIndicator(true);
+  if (isDataChange) { updateBackupBanner(); maybeAutoSnapshot(); }
 }
+
+// ============ 데이터 지킴이 ============
+// 1) 저장할 때마다 기기 안 보조 저장소(IndexedDB)에도 똑같이 저장 → 기본 저장소가 가득 차거나 깨져도 복구
+// 2) 자동 백업(복원 지점): 30분마다 + 앱 열 때 + 지우기·가져오기·되돌리기 직전
+const IDB_NAME = 'contentsArchiveDB';
+let idbPromise = null;
+function idbOpen() {
+  if (idbPromise) return idbPromise;
+  idbPromise = new Promise((res, rej) => {
+    try {
+      if (!window.indexedDB) { rej(new Error('IndexedDB 없음')); return; }
+      const rq = indexedDB.open(IDB_NAME, 1);
+      rq.onupgradeneeded = () => {
+        const db = rq.result;
+        if (!db.objectStoreNames.contains('kv')) db.createObjectStore('kv');
+        if (!db.objectStoreNames.contains('snapMeta')) db.createObjectStore('snapMeta', { keyPath: 'id', autoIncrement: true });
+        if (!db.objectStoreNames.contains('snapData')) db.createObjectStore('snapData');
+      };
+      rq.onsuccess = () => {
+        const db = rq.result;
+        db.onversionchange = () => { try { db.close(); } catch (er) {} idbPromise = null; };
+        res(db);
+      };
+      rq.onerror = () => rej(rq.error);
+      rq.onblocked = () => rej(new Error('IndexedDB blocked'));
+    } catch (err) { rej(err); }
+  });
+  idbPromise.catch(() => { idbPromise = null; });
+  return idbPromise;
+}
+function idbReq(store, mode, make) {
+  return idbOpen().then(db => new Promise((res, rej) => {
+    const tx = db.transaction(store, mode);
+    const req = make(tx.objectStore(store));
+    let result;
+    if (req) req.onsuccess = () => { result = req.result; };
+    tx.oncomplete = () => res(result);
+    tx.onerror = () => rej(tx.error);
+    tx.onabort = () => rej(tx.error || new Error('abort'));
+  }));
+}
+// 보조 저장소: 가장 최근 저장본 하나 (쓰는 중이면 마지막 것만 이어서)
+let mirrorBusy = false, mirrorNext = null;
+function mirrorSave(json, seq, savedAt) {
+  mirrorNext = { json, seq, savedAt };
+  if (mirrorBusy) return;
+  mirrorBusy = true;
+  const step = () => {
+    const job = mirrorNext;
+    mirrorNext = null;
+    if (!job) { mirrorBusy = false; return; }
+    idbReq('kv', 'readwrite', st => st.put(job, 'mirror'))
+      .then(() => { state.mirrorOk = true; state.mirrorAt = job.savedAt; })
+      .catch(err => { state.mirrorOk = false; console.warn('보조 저장 실패', err); })
+      .then(step);
+  };
+  step();
+}
+function currentJson() { return state.lastJson || JSON.stringify(buildPayload(state.lastSavedAt || Date.now())); }
+function parseBackup(json) {
+  try { const d = JSON.parse(json); return d && typeof d === 'object' && Array.isArray(d.items) ? d : null; } catch (err) { return null; }
+}
+const SNAP_GAP = 30 * 60 * 1000;
+const SNAP_REASON = { auto: '자동', start: '앱 열 때', manual: '직접 만든 백업', import: '가져오기 전', clear: '전체 삭제 전', delete: '기록 삭제 전',
+  dedupe: '중복 정리 전', restore: '되돌리기 전', other: '다른 창 저장본', broken: '읽지 못한 저장본', mirror: '보조 저장본 불러오기 전', memo: '메모 삭제 전' };
+function snapshotRaw(reason, json) {
+  if (!json) return Promise.resolve(null);
+  const d = parseBackup(json);
+  const meta = { ts: Date.now(), reason, count: d ? d.items.length : -1, size: json.length };
+  return idbOpen().then(db => new Promise((res, rej) => {
+    const tx = db.transaction(['snapMeta', 'snapData'], 'readwrite');
+    const r = tx.objectStore('snapMeta').add(meta);
+    r.onsuccess = () => { tx.objectStore('snapData').put(json, r.result); };
+    tx.oncomplete = () => res(r.result);
+    tx.onerror = () => rej(tx.error);
+    tx.onabort = () => rej(tx.error || new Error('abort'));
+  })).then(id => {
+    if (reason === 'auto' || reason === 'start') idbReq('kv', 'readwrite', st => st.put(meta.ts, 'lastSnapAt')).catch(() => {});
+    return pruneSnaps().then(() => id);
+  }).catch(err => { console.warn('자동 백업 실패', err); return null; });
+}
+function takeSnapshot(reason) { return snapshotRaw(reason, currentJson()); }
+function maybeAutoSnapshot() {
+  if (Date.now() - (state.lastSnapAt || 0) < SNAP_GAP) return;
+  state.lastSnapAt = Date.now();
+  takeSnapshot('auto');
+}
+function listSnaps() { return idbReq('snapMeta', 'readonly', st => st.getAll()).then(a => (a || []).sort((x, y) => y.ts - x.ts)); }
+function readSnap(id) { return idbReq('snapData', 'readonly', st => st.get(id)); }
+// 오래된 자동 백업 정리: 최근 15개 + 최근 30일은 하루 1개씩 + 위험 작업 직전 백업은 7일 (최대 10개). 전체 크기도 제한
+function pruneSnaps() {
+  return listSnaps().then(list => {
+    const now = Date.now();
+    const keep = new Set();
+    list.slice(0, 15).forEach(m => keep.add(m.id));
+    const days = new Set();
+    list.forEach(m => {
+      if (now - m.ts > 31 * 86400000) return;
+      const k = ymdLocal(new Date(m.ts));
+      if (!days.has(k)) { days.add(k); keep.add(m.id); }
+    });
+    list.filter(m => !['auto', 'start'].includes(m.reason) && now - m.ts < 7 * 86400000).slice(0, 10).forEach(m => keep.add(m.id));
+    let total = 0;
+    const kept = list.filter(m => keep.has(m.id));
+    kept.forEach((m, i) => { total += m.size || 0; if (i >= 5 && total > 30e6) keep.delete(m.id); }); // 너무 크면 오래된 것부터 (최근 5개는 항상 유지)
+    const drop = list.filter(m => !keep.has(m.id));
+    if (!drop.length) return;
+    return idbOpen().then(db => new Promise(res => {
+      const tx = db.transaction(['snapMeta', 'snapData'], 'readwrite');
+      drop.forEach(m => { tx.objectStore('snapMeta').delete(m.id); tx.objectStore('snapData').delete(m.id); });
+      tx.oncomplete = res; tx.onerror = res; tx.onabort = res;
+    }));
+  }).catch(() => {});
+}
+function requestPersist() {
+  try {
+    if (!navigator.storage || !navigator.storage.persisted) return;
+    navigator.storage.persisted().then(p => {
+      state.persisted = p;
+      if (!p && navigator.storage.persist) return navigator.storage.persist().then(r => { state.persisted = r; renderGuardStatus(); });
+    }).catch(() => {});
+  } catch (err) {}
+}
+// 앱을 열 때: 보조 저장본과 비교·복구, 자동 백업
+async function guardianStart() {
+  requestPersist();
+  let mirror = null;
+  try { mirror = await idbReq('kv', 'readonly', st => st.get('mirror')); state.idbOk = true; } catch (err) { state.idbOk = false; }
+  try { state.lastSnapAt = Math.max(state.lastSnapAt || 0, (await idbReq('kv', 'readonly', st => st.get('lastSnapAt'))) || 0); } catch (err) {}
+  if (state.saveBlocked) {
+    // 기본 저장본을 읽지 못함 → 원본 보관, 보조 저장본이나 가장 최근 자동 백업으로 복구
+    if (state.brokenRaw) await snapshotRaw('broken', state.brokenRaw);
+    let src = null, from = '';
+    const md = mirror && parseBackup(mirror.json);
+    if (md) { src = md; from = '기기 안 보조 저장본'; }
+    else {
+      const list = await listSnaps().catch(() => []);
+      for (const m of list) {
+        if (m.reason === 'broken') continue;
+        const d = parseBackup(await readSnap(m.id).catch(() => null));
+        if (d) { src = d; from = `${fmtSnapTime(m.ts)} 자동 백업`; break; }
+      }
+    }
+    state.saveBlocked = false;
+    if (src) {
+      const keepSeq = Math.max(state.saveSeq || 0, parseInt(src.seq, 10) || 0);
+      applyData(src);
+      state.saveSeq = keepSeq;
+      save(false);
+      render();
+      showGuardNotice(`저장된 데이터를 읽지 못해서 ${from}으로 되살렸어요. 읽지 못한 원본도 자동 백업에 따로 보관했어요.`);
+    } else {
+      if (state.pendingSave) save(false);
+      showGuardNotice('저장된 데이터를 읽지 못했어요. 원본은 따로 보관해 뒀으니 백업 파일이 있다면 \'JSON 백업 가져오기\'로 복원해 주세요.');
+    }
+    state.pendingSave = false;
+  } else if (mirror && (parseInt(mirror.seq, 10) || 0) > (state.startSeq || 0) && state.saveSeq === state.startSeq) {
+    // 기본 저장소보다 보조 저장본이 더 최근 (기본 저장이 실패했거나 지워졌던 경우)
+    // 저장 번호와 저장 시각이 둘 다 더 최근일 때만 자동으로 바꾸고, 애매하면 자동 백업에 보관만
+    const md = parseBackup(mirror.json);
+    const newerTime = (mirror.savedAt || 0) >= (state.lastSavedAt || 0);
+    if (md && !newerTime) snapshotRaw('mirror', mirror.json);
+    if (md && newerTime) {
+      if (state.items.length) await snapshotRaw('mirror', currentJson());
+      applyData(md);
+      state.saveSeq = Math.max(state.saveSeq, parseInt(mirror.seq, 10) || 0);
+      save(false);
+      render();
+      showGuardNotice('기본 저장소보다 기기 안 보조 저장본이 더 최근이라 그걸로 불러왔어요. (이전 상태는 자동 백업에 보관)');
+    }
+  } else if (!mirror && (state.items.length || state.plans.length)) {
+    mirrorSave(currentJson(), state.saveSeq, state.lastSavedAt || Date.now()); // 처음 한 번 채우기
+  }
+  if (state.items.length && Date.now() - (state.lastSnapAt || 0) > 6 * 3600000) {
+    state.lastSnapAt = Date.now();
+    takeSnapshot('start');
+  }
+  renderGuardStatus();
+}
+// 다른 창(탭)에서 저장하면 이 창도 최신으로
+window.addEventListener('storage', ev => {
+  if (ev.key !== STORAGE_KEY || !ev.newValue) return;
+  const d = parseBackup(ev.newValue);
+  if (!d || (parseInt(d.seq, 10) || 0) <= (state.saveSeq || 0)) return;
+  try {
+    applyData(d);
+    state.lastJson = ev.newValue;
+    render();
+    showToast('다른 창에서 바뀐 내용을 불러왔어요');
+  } catch (err) { console.error(err); }
+});
+
+function fmtSnapTime(ts) {
+  const d = new Date(ts);
+  return `${d.getMonth() + 1}월 ${d.getDate()}일 ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+}
+function fmtSize(chars) { const mb = chars / 1048576; return mb >= 1 ? `${mb.toFixed(1)}MB` : `${Math.max(1, Math.round(chars / 1024))}KB`; }
+function showGuardNotice(msg) {
+  const el = document.getElementById('guardNotice');
+  if (!el) return;
+  document.getElementById('guardNoticeText').textContent = msg;
+  el.style.display = 'flex';
+}
+function hideGuardNotice() { const el = document.getElementById('guardNotice'); if (el) el.style.display = 'none'; }
+// 기본 저장소에 못 쓰고 있을 때 계속 보이는 경고
+function updateStorageWarn() {
+  const el = document.getElementById('storageWarn');
+  if (el) el.style.display = state.lsFailed ? 'flex' : 'none';
+  renderGuardStatus();
+}
+// 설정 화면: 저장 상태
+function renderGuardStatus() {
+  const el = document.getElementById('guardStatus');
+  if (!el) return;
+  const size = (state.lastJson || '').length;
+  const rows = [
+    ['기본 저장소', state.lsFailed ? '⚠️ 저장 실패 중 (보조 저장소에 저장하고 있어요)' : `정상 · ${fmtSize(size)} 사용${size > 3.5e6 ? ' · 거의 가득 참' : ''}`],
+    ['기기 안 보조 저장소', state.idbOk === false || state.mirrorOk === false ? '⚠️ 사용할 수 없음' : (state.mirrorAt ? `정상 · ${fmtSnapTime(state.mirrorAt)} 저장` : '정상')],
+    ['영구 보관', state.persisted ? '허용됨 (브라우저가 함부로 지우지 않아요)' : '브라우저 기본 설정']
+  ];
+  el.innerHTML = rows.map(([k, v]) => `<div class="guard-row"><span>${k}</span><b>${escapeHTML(v)}</b></div>`).join('');
+  listSnaps().then(list => {
+    const s = document.getElementById('guardSnapCount');
+    if (s) s.textContent = list.length ? `자동 백업 ${list.length}개 · 마지막 ${fmtSnapTime(list[0].ts)}` : '아직 자동 백업이 없어요';
+  }).catch(() => {
+    const s = document.getElementById('guardSnapCount');
+    if (s) s.textContent = '자동 백업을 쓸 수 없는 환경이에요 (백업 파일을 꼭 받아두세요)';
+  });
+}
+// 자동 백업 목록 · 되돌리기
+function openSnapList() {
+  const box = document.getElementById('snapList');
+  box.innerHTML = '<div class="plan-empty" style="padding: 16px 0;">불러오는 중…</div>';
+  document.getElementById('snapModal').classList.add('active');
+  syncBodyScrollLock();
+  listSnaps().then(list => {
+    box.innerHTML = list.length ? list.map(m => `<div class="snap-row">
+        <div class="snap-body">
+          <div class="snap-time">${fmtSnapTime(m.ts)}</div>
+          <div class="snap-sub">${escapeHTML(SNAP_REASON[m.reason] || m.reason)} · ${m.count >= 0 ? `기록 ${m.count}개` : '읽을 수 없는 데이터'} · ${fmtSize(m.size || 0)}</div>
+        </div>
+        <button type="button" class="plan-mini-btn" onclick="exportSnap(${m.id})">파일</button>
+        ${m.count >= 0 ? `<button type="button" class="plan-mini-btn primary" onclick="restoreSnap(${m.id})">되돌리기</button>` : ''}
+      </div>`).join('') : '<div class="plan-empty" style="padding: 16px 0;">아직 자동 백업이 없어요</div>';
+  }).catch(() => { box.innerHTML = '<div class="plan-empty" style="padding: 16px 0;">이 환경에선 자동 백업을 쓸 수 없어요</div>'; });
+}
+function closeSnapList() { document.getElementById('snapModal').classList.remove('active'); syncBodyScrollLock(); }
+function restoreSnap(id) {
+  askConfirm('이 시점으로 되돌릴까요?', "지금 상태는 '되돌리기 전' 자동 백업으로 따로 보관돼서, 마음이 바뀌면 다시 돌아올 수 있어요.", '되돌리기', async () => {
+    closeConfirm();
+    const d = parseBackup(await readSnap(id).catch(() => null));
+    if (!d) { showToast('이 백업은 읽을 수 없어요'); return; }
+    await snapshotRaw('restore', currentJson());
+    const seq = state.saveSeq;
+    applyData(d);
+    state.saveSeq = seq;
+    save(true);
+    render();
+    closeSnapList();
+    renderGuardStatus();
+    showToast(`되돌렸어요 · 기록 ${state.items.length}개`);
+  });
+}
+async function exportSnap(id) {
+  const json = await readSnap(id).catch(() => null);
+  if (!json) { showToast('이 백업은 읽을 수 없어요'); return; }
+  const list = await listSnaps().catch(() => []);
+  const m = list.find(x => x.id === id);
+  const d = m ? new Date(m.ts) : new Date();
+  await deliverFile(json, `contents-archive-${ymdLocal(d)}-${String(d.getHours()).padStart(2, '0')}${String(d.getMinutes()).padStart(2, '0')}.json`, 'application/json');
+}
+function makeManualSnapshot() {
+  takeSnapshot('manual').then(id => {
+    showToast(id ? '지금 상태를 기기 안에 백업했어요' : '자동 백업을 쓸 수 없는 환경이에요 · 백업 파일을 받아두세요');
+    renderGuardStatus();
+  });
+}
+// 파일 내보내기: 휴대폰은 공유 시트(→ '파일에 저장'·iCloud Drive), 그 외엔 다운로드. 성공하면 true
+async function deliverFile(text, name, type, noShare) {
+  const blob = new Blob([text], { type });
+  const mobile = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+  if (!noShare && mobile && navigator.canShare && typeof File === 'function') {
+    try {
+      const file = new File([blob], name, { type });
+      if (navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: name });
+        return true;
+      }
+    } catch (err) {
+      if (err && err.name === 'AbortError') { showToast('백업을 취소했어요'); return false; }
+      // 공유가 안 되면 다운로드로
+    }
+  }
+  try {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+    return true;
+  } catch (err) {
+    showToast('파일을 만들지 못했어요');
+    return false;
+  }
+}
+
+// ----- 되돌리기 바 (방금 지운 것 살리기) -----
+let undoAction = null, undoTimer = null;
+function showUndo(msg, fn) {
+  const el = document.getElementById('undoBar');
+  if (!el) return;
+  document.getElementById('undoText').textContent = msg;
+  undoAction = fn;
+  el.classList.add('show');
+  clearTimeout(undoTimer);
+  undoTimer = setTimeout(hideUndo, 8000);
+}
+function hideUndo() { const el = document.getElementById('undoBar'); if (el) el.classList.remove('show'); undoAction = null; }
+function runUndo() { const f = undoAction; hideUndo(); if (f) f(); }
 
 // 저장 시각 표시 갱신. flash=true면 잠깐 초록색
 function updateSaveIndicator(flash) {
@@ -3739,6 +4248,130 @@ function epVerb(t) {
   return { q: '봤나요', did: '봤어요', ing: '보는 중', seen: '본', miss: '못 본', done: '봄' };
 }
 const NOVEL_PLATFORMS = ['포스타입', '네이버블로그'];
+
+// ----- 1부·2부 / 외전 -----
+// 본편 회차는 1부터 이어지는 번호(전체 기준). 부는 그 위에 붙는 이름표일 뿐이라
+// 진행·계획·기록은 전부 같은 번호로 계산하고, 보여줄 때만 '2부 5화'처럼 바꿔요.
+// 외전은 별도 번호: 외전 n화 = SIDE_BASE + n
+const SIDE_BASE = 1000000;
+function isSideEp(e) { return e > SIDE_BASE; }
+function hasSide(item) { return !!(item && isEpType(item.type) && item.hasSide); }
+function epParts(item) {
+  if (!item || !isEpType(item.type) || !Array.isArray(item.parts) || !item.parts.length) return null;
+  let start = 1;
+  const out = [];
+  item.parts.forEach((p, i) => {
+    const count = Math.max(0, parseInt(p && p.count, 10) || 0);
+    const last = i === item.parts.length - 1;
+    const end = count > 0 ? start + count - 1 : (last ? Infinity : start - 1);
+    out.push({ name: String((p && p.name) || `${i + 1}부`), count, start, end, i });
+    if (count > 0) start += count;
+  });
+  return out;
+}
+function partOf(item, e) {
+  const ps = epParts(item);
+  if (!ps) return null;
+  return ps.find(p => e >= p.start && e <= p.end) || null;
+}
+function sideTotalOf(item) { return hasSide(item) ? Math.max(0, parseInt(item.sideTotal, 10) || 0) : 0; }
+// 회차 하나의 이름: '5화' · '2부 5화' · '외전 3화' · 'EP5'
+function epLabel(item, e) {
+  if (item && item.type === 'podcast') return `EP${e}`;
+  if (isSideEp(e)) return `외전 ${e - SIDE_BASE}화`;
+  const p = item ? partOf(item, e) : null;
+  if (!p) return `${e}화`;
+  return `${p.name} ${item.partRestart === false ? e : e - p.start + 1}화`;
+}
+// 외전 본 회차 (1부터)
+function sideSet(item) {
+  const st = sideTotalOf(item);
+  return new Set((Array.isArray(item.sideWatched) ? item.sideWatched : []).map(Number).filter(n => n >= 1 && (!st || n <= st)));
+}
+function sideCur(item) { const s = sideSet(item); let c = 0; while (s.has(c + 1)) c++; return c; }
+// 본편 + 외전 전체 본 회차 (외전은 SIDE_BASE+n)
+function getAllWatchedSet(item) {
+  const main = getWatchedSet(item);
+  const out = new Set(main || []);
+  if (hasSide(item)) sideSet(item).forEach(n => out.add(SIDE_BASE + n));
+  return main || out.size ? out : null;
+}
+function setAllWatchedSet(item, set) {
+  const res = setWatchedSet(item, new Set([...set].filter(e => !isSideEp(e))));
+  if (hasSide(item)) {
+    const st = sideTotalOf(item);
+    item.sideWatched = [...set].filter(isSideEp).map(e => e - SIDE_BASE).filter(n => n >= 1 && (!st || n <= st)).sort((a, b) => a - b);
+  }
+  return res;
+}
+// 다 봤나? (외전이 있으면 외전까지)
+function isItemComplete(item, set) {
+  set = set || getAllWatchedSet(item) || new Set();
+  if (item.type === 'podcast') {
+    const t = item.totalPodEp || 0;
+    return t > 0 && [...set].filter(e => e >= 1 && e <= t).length >= t;
+  }
+  if (!isEpType(item.type)) return false;
+  const t = item.totalEp || 0;
+  if (!(t > 0)) return false;
+  let m = 0, s = 0;
+  const st = sideTotalOf(item);
+  set.forEach(e => { if (isSideEp(e)) { if (e - SIDE_BASE <= st) s++; } else if (e >= 1 && e <= t) m++; });
+  if (m < t) return false;
+  if (hasSide(item)) return st > 0 && s >= st;
+  return true;
+}
+function mainComplete(item) {
+  const t = item.totalEp || 0;
+  const m = getWatchedSet(item);
+  return t > 0 && !!m && [...m].filter(e => e <= t).length >= t;
+}
+// 계획·기록에서 쓰는 '트랙': 부마다 하나(또는 본편 하나) + 외전
+function epTracks(item) {
+  const f = progressSpec(item);
+  if (!f) return [];
+  const mk = t => {
+    t.open = t.end === Infinity;
+    t.count = t.open ? 0 : Math.max(0, t.end - t.start + 1);
+    t.big = t.open || t.count > EP_GRID_MAX;
+    t.toKey = k => t.restart ? t.start + k - 1 : k;
+    t.local = e => t.restart ? e - t.start + 1 : e;
+    return t;
+  };
+  if (item.type === 'podcast') return f.total > 0 ? [mk({ name: '', start: 1, end: f.total, restart: true })] : [];
+  const tr = [];
+  const mainEnd = f.open ? Infinity : f.total;
+  const ps = epParts(item);
+  if (ps) {
+    ps.forEach(p => {
+      const end = p.end === Infinity ? mainEnd : Math.min(p.end, mainEnd);
+      if (end >= p.start) tr.push(mk({ name: p.name, start: p.start, end, restart: item.partRestart !== false }));
+    });
+  } else if (mainEnd >= 1) {
+    tr.push(mk({ name: hasSide(item) ? '본편' : '', start: 1, end: mainEnd, restart: true }));
+  }
+  if (hasSide(item)) {
+    const st = sideTotalOf(item);
+    tr.push(mk({ name: '외전', side: true, start: SIDE_BASE + 1, end: st > 0 ? SIDE_BASE + st : Infinity, restart: true }));
+  }
+  return tr;
+}
+function trackOf(tracks, e) { return (tracks || []).find(t => e >= t.start && e <= t.end) || null; }
+// 회차 묶음 줄이기용: [1,2,4,5,6] → ['1','2','4~6']
+function epRuns(arr) {
+  const parts = [];
+  if (!arr.length) return parts;
+  let s = arr[0], p = arr[0];
+  for (let i = 1; i <= arr.length; i++) {
+    const v = arr[i];
+    if (v === p + 1) { p = v; continue; }
+    if (s === p) parts.push(`${s}`);
+    else if (p === s + 1) parts.push(`${s}`, `${p}`); // 두 개만 이어지면 13, 14화
+    else parts.push(`${s}~${p}`);                     // 세 개 이상은 13~15화
+    s = p = v;
+  }
+  return parts;
+}
 function statusName(s) { return {wishlist:'위시리스트', watching:'진행 중', done:'완료', dropped:'중단'}[s] || s; }
 
 function showToast(msg) {
@@ -3749,12 +4382,23 @@ function showToast(msg) {
 }
 
 function getProgress(item) {
+  if (isEpType(item.type) && item.totalEp > 0 && hasSide(item) && sideTotalOf(item) > 0) {
+    const m = (getWatchedSet(item) || new Set()).size, s = sideSet(item).size;
+    return Math.min(100, Math.round((m + s) / (item.totalEp + sideTotalOf(item)) * 100));
+  }
   if (isEpType(item.type) && item.totalEp > 0) return Math.min(100, Math.round((item.currentEp || 0) / item.totalEp * 100));
   if (item.type === 'podcast' && item.totalPodEp > 0) return Math.min(100, Math.round((item.currentPodEp || 0) / item.totalPodEp * 100));
   return null;
 }
 
 function progressText(item) {
+  if (isEpType(item.type) && (epParts(item) || hasSide(item))) {
+    const cur = item.currentEp || 0, t = item.totalEp || 0;
+    let s = t > 0 ? `${cur} / ${t} 회` : (cur > 0 ? `${epLabel(item, cur)}까지 · 연재 중` : '연재 중');
+    if (t > 0 && epParts(item) && cur > 0) s = `${epLabel(item, cur)} · ${s}`;
+    if (hasSide(item)) s += ` · 외전 ${sideSet(item).size}/${sideTotalOf(item) || '?'}`;
+    return s;
+  }
   if (isEpType(item.type) && item.totalEp > 0) return `${item.currentEp || 0} / ${item.totalEp} 회`;
   if (item.type === 'webnovel') return item.currentEp > 0 ? `${item.currentEp}화까지 · 연재 중` : '연재 중';
   if (item.type === 'podcast' && item.totalPodEp > 0) return `EP ${item.currentPodEp || 0} / ${item.totalPodEp}`;
@@ -3774,11 +4418,15 @@ function buildCopyText(item, withProgress) {
   const t = bracketTitle(item);
   if (!withProgress) return t;
   // 진행 상황 포함
+  if (isEpType(item.type) && hasSide(item) && mainComplete(item)) {
+    const st = sideTotalOf(item);
+    return `${t} 외전 ${Math.min(sideCur(item) + 1, st || Infinity)}화~`; // 본편 다 봤으면 외전
+  }
   if (isEpType(item.type) && item.totalEp > 0) {
     const next = Math.min((item.currentEp || 0) + 1, item.totalEp);
-    return `${t} ${next}화~`;
+    return `${t} ${epLabel(item, next)}~`;
   }
-  if (item.type === 'webnovel') return `${t} ${(item.currentEp || 0) + 1}화~`; // 연재 중
+  if (item.type === 'webnovel') return `${t} ${epLabel(item, (item.currentEp || 0) + 1)}~`; // 연재 중
   if (item.type === 'podcast') {
     const cur = item.currentPodEp || 0;
     const next = item.totalPodEp > 0 ? Math.min(cur + 1, item.totalPodEp) : cur + 1;
@@ -4447,7 +5095,7 @@ function renderTimeline() {
         return `<div class="home-poster" onclick="openDetail('${item.id}')">
           <div class="home-poster-thumb">${thumb}${dayBadge}</div>
           <div class="home-poster-title">${escapeHTML(item.title)}</div>
-          ${prog !== null ? `<div class="home-poster-bar"><div class="home-poster-fill" style="width:${prog}%"></div></div><div class="home-poster-pct">${prog}% (${ptxt})</div>` : `<div class="home-poster-pct">${item.type === 'webnovel' && item.currentEp > 0 ? `${item.currentEp}화까지 ${epVerb(item.type).done}` : verb(item.type)}</div>`}
+          ${prog !== null ? `<div class="home-poster-bar"><div class="home-poster-fill" style="width:${prog}%"></div></div><div class="home-poster-pct">${prog}% (${ptxt})</div>` : `<div class="home-poster-pct">${item.type === 'webnovel' && item.currentEp > 0 ? `${epLabel(item, item.currentEp)}까지 ${epVerb(item.type).done}` : verb(item.type)}</div>`}
         </div>`;
       }).join('');
   }
@@ -5002,8 +5650,105 @@ function closeAddModal(force) {
   document.body.style.overflow = '';
 }
 
+// ----- 부 나누기 · 외전 (폼) -----
+function partRowHTML(name, count) {
+  return `<div class="part-row">
+    <input type="text" class="form-input part-name" value="${escapeHTML(name || '')}" placeholder="예: 1부" oninput="syncPartsSummary()">
+    <input type="number" class="form-input part-count" value="${count || ''}" placeholder="회차 수" min="0" inputmode="numeric" oninput="syncPartsSummary()">
+    <button type="button" class="part-del" onclick="removePartRow(this)" aria-label="이 부 지우기">×</button>
+  </div>`;
+}
+function readPartRows() {
+  return [...document.querySelectorAll('#partsList .part-row')].map((r, i) => ({
+    name: r.querySelector('.part-name').value.trim() || `${i + 1}부`,
+    count: Math.max(0, parseInt(r.querySelector('.part-count').value, 10) || 0)
+  }));
+}
+function addPartRow() {
+  const n = document.querySelectorAll('#partsList .part-row').length;
+  document.getElementById('partsList').insertAdjacentHTML('beforeend', partRowHTML(`${n + 1}부`, ''));
+  syncPartsSummary();
+}
+function removePartRow(btn) {
+  if (document.querySelectorAll('#partsList .part-row').length <= 1) { showToast('부는 하나 이상 있어야 해요'); return; }
+  btn.closest('.part-row').remove();
+  syncPartsSummary();
+}
+function setPartNum(restart) {
+  document.getElementById('fPartRestart').value = restart ? '1' : '0';
+  document.querySelectorAll('#partNumPicker .seg-option').forEach(o => o.classList.toggle('active', (o.dataset.restart === '1') === restart));
+  syncPartsSummary();
+}
+// 부 목록 → 시작 번호 계산
+function partsWithStart(rows) {
+  let start = 1;
+  return rows.map((p, i) => {
+    const o = { name: p.name, count: p.count, start, end: p.count > 0 ? start + p.count - 1 : (i === rows.length - 1 ? Infinity : start - 1) };
+    if (p.count > 0) start += p.count;
+    return o;
+  });
+}
+function syncPartsSummary() {
+  const rows = readPartRows();
+  const restart = document.getElementById('fPartRestart').value === '1';
+  const ps = partsWithStart(rows);
+  const sum = rows.reduce((s, p) => s + p.count, 0);
+  const open = rows.length && rows[rows.length - 1].count === 0;
+  document.getElementById('partsSummary').textContent =
+    (open ? `마지막 부는 연재 중(회차 수 비움) · 지금까지 ${sum}화` : `전체 ${sum}화`) +
+    (restart ? '' : ` · ${ps.filter(p => p.count > 0).map(p => `${p.name} ${p.start}~${p.end}화`).join(', ')}`);
+  // 현재 위치 고르기 칸
+  const sel = document.getElementById('fCurPart');
+  const prev = sel.value;
+  sel.innerHTML = ps.map((p, i) => `<option value="${i}">${escapeHTML(p.name)}</option>`).join('');
+  if (prev !== '' && +prev < ps.length) sel.value = prev;
+  document.getElementById('fCurLocal').placeholder = restart ? '몇 화까지' : '몇 화까지 (전체 번호)';
+}
+function syncPartsUI(fromToggle) {
+  const on = document.getElementById('fUseParts').checked;
+  document.getElementById('partsBox').style.display = on ? '' : 'none';
+  document.getElementById('partCurRow').style.display = on ? '' : 'none';
+  document.getElementById('epPlainRow').style.display = on ? 'none' : '';
+  if (!fromToggle) return;
+  const restart = document.getElementById('fPartRestart').value === '1';
+  if (on) {
+    // 켤 때: 지금 숫자를 1부로 옮겨서 시작
+    if (!document.querySelectorAll('#partsList .part-row').length) {
+      const t = parseInt(document.getElementById('fTotalEp').value, 10) || 0;
+      document.getElementById('partsList').innerHTML = partRowHTML('1부', t || '') + partRowHTML('2부', '');
+    }
+    syncPartsSummary();
+    const g = parseInt(document.getElementById('fCurrentEp').value, 10) || 0;
+    const ps = partsWithStart(readPartRows());
+    const p = ps.find(x => g >= x.start && g <= x.end) || ps[0];
+    document.getElementById('fCurPart').value = String(ps.indexOf(p));
+    document.getElementById('fCurLocal').value = g ? (restart ? g - p.start + 1 : g) : '';
+  } else {
+    // 끌 때: 부 정보를 전체 번호로 되돌림
+    const g = formCurrentFromParts();
+    const rows = readPartRows();
+    document.getElementById('fCurrentEp').value = g || '';
+    if (rows.length && rows.every(p => p.count > 0)) document.getElementById('fTotalEp').value = rows.reduce((s, p) => s + p.count, 0);
+  }
+}
+function formCurrentFromParts() {
+  const ps = partsWithStart(readPartRows());
+  if (!ps.length) return 0;
+  const p = ps[parseInt(document.getElementById('fCurPart').value, 10)] || ps[0];
+  const v = parseInt(document.getElementById('fCurLocal').value, 10) || 0;
+  if (document.getElementById('fPartRestart').value !== '1') return v;
+  return v > 0 ? p.start + v - 1 : (p.start > 1 ? p.start - 1 : 0);
+}
+function syncSideUI() {
+  document.getElementById('sideBox').style.display = document.getElementById('fHasSide').checked ? '' : 'none';
+}
+
 function resetForm() {
   document.getElementById('contentForm').reset();
+  document.getElementById('partsList').innerHTML = '';
+  setPartNum(true);
+  syncPartsUI(false);
+  syncSideUI();
   document.getElementById('editId').value = '';
   state.selectedRating = 0;
   state.selectedType = 'youtube';
@@ -5038,6 +5783,21 @@ function fillForm(item) {
   document.getElementById('fTotalEp').value = item.totalEp || '';
   document.getElementById('fCurrentEp').value = item.currentEp || '';
   document.getElementById('fTotalPodEp').value = item.totalPodEp || '';
+  const fps = epParts(item);
+  document.getElementById('fUseParts').checked = !!fps;
+  document.getElementById('partsList').innerHTML = fps ? fps.map(p => partRowHTML(p.name, p.count || '')).join('') : '';
+  setPartNum(item.partRestart !== false);
+  if (fps) {
+    const g = item.currentEp || 0;
+    const p = partOf(item, g) || fps[0];
+    document.getElementById('fCurPart').value = String(p.i);
+    document.getElementById('fCurLocal').value = g ? (item.partRestart !== false ? g - p.start + 1 : g) : '';
+  }
+  syncPartsUI(false);
+  document.getElementById('fHasSide').checked = hasSide(item);
+  document.getElementById('fSideTotal').value = hasSide(item) && sideTotalOf(item) ? sideTotalOf(item) : '';
+  document.getElementById('fSideCur').value = hasSide(item) && sideCur(item) ? sideCur(item) : '';
+  syncSideUI();
   document.getElementById('fCurrentPodEp').value = item.currentPodEp || '';
   document.getElementById('fStartDate').value = item.startDate || '';
   document.getElementById('fEndDate').value = item.endDate || '';
@@ -5112,16 +5872,49 @@ function saveContent(e) {
     memo: document.getElementById('fMemo').value.trim(),
     updatedAt: Date.now()
   };
+  // 1부·2부 / 외전 (회차로 진행하는 유형만)
+  const epT = isEpType(form.type);
+  const useParts = epT && document.getElementById('fUseParts').checked;
+  if (useParts) {
+    let rows = readPartRows();
+    rows = rows.filter((p, i) => p.count > 0 || i === rows.length - 1); // 가운데 빈 부는 버림
+    form.parts = rows;
+    form.partRestart = document.getElementById('fPartRestart').value === '1';
+    const open = rows[rows.length - 1].count === 0;
+    form.totalEp = open ? 0 : rows.reduce((s, p) => s + p.count, 0);
+    let g = formCurrentFromParts();
+    if (form.totalEp > 0) g = Math.min(g, form.totalEp);
+    form.currentEp = Math.max(0, g);
+  }
+  const useSide = epT && document.getElementById('fHasSide').checked;
+  const sideTotalIn = Math.max(0, parseInt(document.getElementById('fSideTotal').value, 10) || 0);
+  const sideCurIn = Math.max(0, parseInt(document.getElementById('fSideCur').value, 10) || 0);
+  const applySideForm = (it, prevCur) => {
+    if (!useSide) { if (epT) { delete it.hasSide; delete it.sideTotal; delete it.sideWatched; } return; }
+    it.hasSide = true;
+    it.sideTotal = sideTotalIn;
+    const s = new Set((Array.isArray(it.sideWatched) ? it.sideWatched : []).map(Number).filter(n => n >= 1));
+    const want = sideTotalIn ? Math.min(sideCurIn, sideTotalIn) : sideCurIn;
+    if (want !== prevCur) {
+      if (want > prevCur) { for (let k = 1; k <= want; k++) s.add(k); }
+      else { for (let k = want + 1; k <= prevCur; k++) s.delete(k); }
+    }
+    it.sideWatched = [...s].filter(n => !sideTotalIn || n <= sideTotalIn).sort((a, b) => a - b);
+  };
   if (isEdit && existing) {
     // 폼에 없는 값(작품 기록장, 회차별 체크, 체크 방식, 메모 등)은 절대 버리지 않고 그대로 둔 채 덮어쓰기
     const prev = { ep: existing.currentEp || 0, pod: existing.currentPodEp || 0 };
+    const prevSide = hasSide(existing) ? sideCur(existing) : 0;
     Object.assign(existing, form);
+    if (epT && !useParts) { delete existing.parts; delete existing.partRestart; }
     if (!existing.createdAt) existing.createdAt = Date.now();
     if (!Array.isArray(existing.notes)) existing.notes = [];
     applyFormProgress(existing, prev);
+    applySideForm(existing, prevSide);
   } else {
     form.notes = [];
     form.createdAt = Date.now();
+    applySideForm(form, 0);
     state.items.unshift(form);
   }
   save(true);
@@ -5144,15 +5937,19 @@ function openDetail(id) {
     const watchedSet = new Set(item.epWatched || []);
     const seqMode = item.epSeqMode !== false; // 기본은 순차 모드(기존 동작 유지)
     const watchedCount = seqMode ? (item.currentEp || 0) : watchedSet.size;
+    const ps = epParts(item);
     let grid = '';
     for (let i = 1; i <= item.totalEp; i++) {
       const on = seqMode ? (i <= (item.currentEp || 0)) : watchedSet.has(i);
-      grid += `<button class="ep-btn ${on ? 'watched' : ''}" onclick="toggleEpisode('${item.id}', ${i})">${i}</button>`;
+      const p = ps ? ps.find(x => x.start === i && x.count > 0) : null;
+      if (p) grid += `<div class="ep-part-head">${escapeHTML(p.name)}${item.partRestart === false ? ` <span>${p.start}~${p.end === Infinity ? '' : p.end}화</span>` : ''}</div>`;
+      const lb = ps && item.partRestart !== false ? (() => { const q = partOf(item, i); return q ? i - q.start + 1 : i; })() : i;
+      grid += `<button class="ep-btn ${on ? 'watched' : ''}" onclick="toggleEpisode('${item.id}', ${i})">${lb}</button>`;
     }
     const pct = Math.min(100, Math.round(watchedCount / item.totalEp * 100));
     episodesHTML = `<div class="episodes-section">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px;">
-        <div class="detail-label" style="margin-bottom:0;">회차 진행 (${watchedCount} / ${item.totalEp})</div>
+        <div class="detail-label" style="margin-bottom:0;">${hasSide(item) ? '본편' : '회차 진행'} (${watchedCount} / ${item.totalEp})</div>
         <div class="ep-mode-toggle">
           <button class="ep-mode-btn ${!seqMode ? 'active' : ''}" onclick="setEpMode('${item.id}', false)">개별</button>
           <button class="ep-mode-btn ${seqMode ? 'active' : ''}" onclick="setEpMode('${item.id}', true)">순차</button>
@@ -5163,6 +5960,7 @@ function openDetail(id) {
       <div class="episodes-grid">${grid}</div>
     </div>`;
   }
+  if (hasSide(item)) episodesHTML += sideSectionHTML(item);
   // 팟캐스트: 전체 EP가 있으면 그리드(개별/순차 모드 토글)
   if (item.type === 'podcast' && item.totalPodEp > 0) {
     const watchedSet = new Set(item.podWatched || []);
@@ -5302,15 +6100,20 @@ function epCompactHTML(item) {
   const seen = getWatchedSet(item);
   const count = seen ? seen.size : cur;
   const pct = total > 0 ? Math.min(100, Math.round(count / total * 100)) : 0;
+  const ps = epParts(item);
+  const restart = item.partRestart !== false;
+  const curPart = ps ? (partOf(item, Math.max(cur, 1)) || ps[0]) : null;
+  const curLocal = curPart && restart ? Math.max(0, cur - curPart.start + 1) : cur;
   return `<div class="episodes-section">
-    <div class="detail-label">${v.seen} 회차</div>
-    <div class="detail-value" style="font-size: 17px; font-weight: 700;">${cur}화까지 ${v.done}
+    <div class="detail-label">${hasSide(item) ? '본편' : `${v.seen} 회차`}</div>
+    <div class="detail-value" style="font-size: 17px; font-weight: 700;">${cur ? escapeHTML(epLabel(item, cur)) : '0화'}까지 ${v.done}
       <span style="font-size: 12px; font-weight: 500; color: var(--ink-mute);">${total ? `/ 전체 ${total}화` : '· 연재 중'}</span></div>
     ${count > cur ? `<div style="font-size: 11px; color: var(--ink-mute); margin-top: 2px;">띄엄띄엄 ${v.seen} 회차까지 합치면 ${count}화</div>` : ''}
     ${total ? `<div class="progress-bar" style="margin-top: 8px;"><div class="progress-fill" style="width: ${pct}%"></div></div>` : ''}
     <div style="margin-top: 10px; display: flex; gap: 8px;">
       <button type="button" class="btn" onclick="bumpEp('${item.id}', 1)" style="flex: 1; padding: 12px;">+1화</button>
-      <input type="number" id="quickEp" value="${cur}" min="0" inputmode="numeric" class="form-input" style="flex: 1; min-width: 0;">
+      ${ps ? `<select id="quickEpPart" class="form-input" style="flex: 1; min-width: 0; padding: 10px 8px;">${ps.map((p, i) => `<option value="${i}" ${p.i === curPart.i ? 'selected' : ''}>${escapeHTML(p.name)}</option>`).join('')}</select>` : ''}
+      <input type="number" id="quickEp" value="${curLocal}" min="0" inputmode="numeric" class="form-input" style="flex: 1; min-width: 0;">
       <button type="button" class="btn btn-primary" onclick="setEpFromInput('${item.id}')" style="flex: 1; padding: 12px;">업데이트</button>
     </div>
     ${!total && item.type === 'webnovel' ? `<div style="font-size: 11px; color: var(--ink-mute); margin-top: 8px;">완결되면 '기록 수정'에서 전체 회차를 넣어주세요</div>` : ''}
@@ -5326,7 +6129,7 @@ function setEpProgress(id, n) {
   applyFormProgress(item, prev); // 개별 체크 방식이면 체크 목록도 맞춤
   item.updatedAt = Date.now();
   let becameDone = false;
-  if (item.totalEp > 0 && n >= item.totalEp && item.status !== 'done') {
+  if (isItemComplete(item) && item.status !== 'done') {
     item.status = 'done';
     if (!item.endDate) item.endDate = today();
     becameDone = true;
@@ -5334,7 +6137,7 @@ function setEpProgress(id, n) {
   save(true);
   render();
   openDetail(id);
-  showToast(`${n}화까지 ${epVerb(item.type).done}`);
+  showToast(n ? `${epLabel(item, n)}까지 ${epVerb(item.type).done}${!becameDone && hasSide(item) && mainComplete(item) ? ' · 이제 외전이 남았어요' : ''}` : '처음으로 되돌렸어요');
   if (becameDone) setTimeout(() => promptDoneReview(id), 300);
 }
 function bumpEp(id, d) {
@@ -5344,7 +6147,87 @@ function bumpEp(id, d) {
 function setEpFromInput(id) {
   const v = parseInt(document.getElementById('quickEp').value, 10);
   if (isNaN(v)) { showToast('회차 숫자를 넣어주세요'); return; }
+  const item = state.items.find(i => i.id === id);
+  const sel = document.getElementById('quickEpPart');
+  const ps = item ? epParts(item) : null;
+  if (ps && sel) {
+    const p = ps[parseInt(sel.value, 10)] || ps[0];
+    if (item.partRestart !== false) { setEpProgress(id, v > 0 ? p.start + v - 1 : p.start - 1); return; }
+  }
   setEpProgress(id, v);
+}
+
+// ----- 외전 칸 (상세) -----
+function sideSectionHTML(item) {
+  const v = epVerb(item.type);
+  const st = sideTotalOf(item);
+  const set = sideSet(item);
+  const cur = sideCur(item);
+  const head = `<div class="detail-label" style="margin-bottom:0;">외전 (${set.size} / ${st || '?'})</div>`;
+  if (st > 0 && st <= EP_GRID_MAX) {
+    let grid = '';
+    for (let n = 1; n <= st; n++) grid += `<button class="ep-btn ${set.has(n) ? 'watched' : ''}" onclick="toggleSideEp('${item.id}', ${n})">${n}</button>`;
+    return `<div class="episodes-section side">
+      ${head}
+      <div style="font-size:11px;color:var(--ink-mute);margin:4px 0 8px;">${v.seen} 외전만 하나씩 탭해서 체크해요</div>
+      <div class="progress-bar"><div class="progress-fill" style="width: ${Math.round(set.size / st * 100)}%"></div></div>
+      <div class="episodes-grid">${grid}</div>
+    </div>`;
+  }
+  return `<div class="episodes-section side">
+    ${head}
+    <div class="detail-value" style="font-size: 16px; font-weight: 700; margin-top: 4px;">외전 ${cur}화까지 ${v.done}
+      <span style="font-size: 12px; font-weight: 500; color: var(--ink-mute);">${st ? `/ 전체 ${st}화` : '· 전체 미정'}</span></div>
+    <div style="margin-top: 10px; display: flex; gap: 8px;">
+      <button type="button" class="btn" onclick="bumpSide('${item.id}', 1)" style="flex: 1; padding: 12px;">+1화</button>
+      <input type="number" id="quickSideEp" value="${cur}" min="0" inputmode="numeric" class="form-input" style="flex: 1; min-width: 0;">
+      <button type="button" class="btn btn-primary" onclick="setSideFromInput('${item.id}')" style="flex: 1; padding: 12px;">업데이트</button>
+    </div>
+  </div>`;
+}
+function afterSideChange(item) {
+  item.updatedAt = Date.now();
+  let becameDone = false;
+  if (isItemComplete(item) && item.status !== 'done') {
+    item.status = 'done';
+    if (!item.endDate) item.endDate = today();
+    becameDone = true;
+  }
+  save(true);
+  render();
+  openDetail(item.id);
+  if (becameDone) setTimeout(() => promptDoneReview(item.id), 300);
+}
+function toggleSideEp(id, n) {
+  const item = state.items.find(i => i.id === id);
+  if (!item) return;
+  const s = sideSet(item);
+  if (s.has(n)) s.delete(n); else s.add(n);
+  item.sideWatched = [...s].sort((a, b) => a - b);
+  afterSideChange(item);
+}
+function setSideProgress(id, n) {
+  const item = state.items.find(i => i.id === id);
+  if (!item) return;
+  const st = sideTotalOf(item);
+  n = Math.max(0, Math.floor(Number(n)) || 0);
+  if (st) n = Math.min(n, st);
+  const before = sideCur(item);
+  const s = sideSet(item);
+  if (n > before) { for (let k = 1; k <= n; k++) s.add(k); }
+  else { for (let k = n + 1; k <= before; k++) s.delete(k); }
+  item.sideWatched = [...s].sort((a, b) => a - b);
+  showToast(`외전 ${n}화까지 ${epVerb(item.type).done}`);
+  afterSideChange(item);
+}
+function bumpSide(id, d) {
+  const item = state.items.find(i => i.id === id);
+  if (item) setSideProgress(id, sideCur(item) + d);
+}
+function setSideFromInput(id) {
+  const v = parseInt(document.getElementById('quickSideEp').value, 10);
+  if (isNaN(v)) { showToast('회차 숫자를 넣어주세요'); return; }
+  setSideProgress(id, v);
 }
 
 function closeDetailModal() {
@@ -5378,6 +6261,7 @@ function markDone(id) {
     item.currentEp = item.totalEp;
     item.epWatched = Array.from({length: item.totalEp}, (_, i) => i + 1);
   }
+  if (hasSide(item) && sideTotalOf(item) > 0) item.sideWatched = Array.from({ length: sideTotalOf(item) }, (_, i) => i + 1);
   if (item.type === 'podcast' && item.totalPodEp > 0) {
     item.currentPodEp = item.totalPodEp;
     // 개별 모드면 전체 EP를 들은 것으로
@@ -5393,6 +6277,7 @@ function markDone(id) {
 function toggleEpisode(id, ep) {
   const item = state.items.find(i => i.id === id);
   if (!item) return;
+  const wasMain = mainComplete(item);
   const seqMode = item.epSeqMode !== false; // 기본 순차
   if (seqMode) {
     // 순차 모드: 탭하면 거기까지
@@ -5408,9 +6293,8 @@ function toggleEpisode(id, ep) {
     item.currentEp = cur;
   }
   item.updatedAt = Date.now();
-  const watchedCount = seqMode ? (item.currentEp || 0) : (item.epWatched || []).length;
   let becameDone = false;
-  if (item.totalEp > 0 && watchedCount >= item.totalEp && item.status !== 'done') {
+  if (isItemComplete(item) && item.status !== 'done') {
     item.status = 'done';
     if (!item.endDate) item.endDate = today();
     becameDone = true;
@@ -5418,6 +6302,7 @@ function toggleEpisode(id, ep) {
   save(true);
   render();
   openDetail(id);
+  if (!becameDone && !wasMain && hasSide(item) && mainComplete(item) && item.status !== 'done') showToast('본편 끝! 이제 외전이 남았어요');
   if (becameDone) setTimeout(() => promptDoneReview(id), 300);
 }
 
@@ -5815,12 +6700,23 @@ function confirmDeleteNote() {
   document.getElementById('confirmDesc').textContent = `"${note.title}"이(가) 영구적으로 삭제됩니다.`;
   confirmCallback = () => {
     cancelAutoSave('note');
+    const nIdx = item.notes.findIndex(n => n.id === state.noteEditingNoteId);
+    const removedNote = item.notes[nIdx];
     item.notes = item.notes.filter(n => n.id !== state.noteEditingNoteId);
     item.updatedAt = Date.now();
     save(true);
     render();
     closeConfirm();
     closeNoteModal(true);
+    if (removedNote) showUndo('메모를 삭제했어요', () => {
+      const it = state.items.find(i => i.id === item.id);
+      if (!it || (it.notes || []).some(n => n.id === removedNote.id)) return;
+      it.notes.splice(Math.min(nIdx, it.notes.length), 0, removedNote);
+      it.updatedAt = Date.now();
+      save(true);
+      render();
+      showToast('메모를 되살렸어요');
+    });
     setTimeout(() => openDetail(item.id), 100);
     showToast('메모가 삭제되었습니다');
   };
@@ -6790,8 +7686,10 @@ function exportExcel() {
         '별점': item.rating || '',
         '시작일': item.startDate || '',
         '완료일': item.endDate || '',
-        '현재 회차': item.currentEp || '',
+        '현재 회차': item.currentEp ? (epParts(item) ? `${item.currentEp} (${epLabel(item, item.currentEp)})` : item.currentEp) : '',
         '전체 회차': item.totalEp || '',
+        '부 구성': epParts(item) ? item.parts.map(p => `${p.name} ${p.count || '연재중'}`).join(', ') : '',
+        '외전': hasSide(item) ? `${sideSet(item).size}/${sideTotalOf(item) || '?'}` : '',
         '현재 EP': item.currentPodEp || '',
         '전체 EP': item.totalPodEp || '',
         '진행률(%)': getProgress(item) ?? '',
@@ -6904,24 +7802,35 @@ function confirmDelete(id) {
   document.getElementById('confirmTitle').textContent = '정말 삭제할까요?';
   document.getElementById('confirmDesc').textContent = `"${item.title}"이(가) 영구적으로 삭제됩니다.`;
   confirmCallback = () => {
+    takeSnapshot('delete');
+    const idx = state.items.findIndex(i => i.id === id);
+    const removed = state.items[idx];
     state.items = state.items.filter(i => i.id !== id);
     save(true);
     render();
     closeDetailModal();
     closeConfirm();
-    showToast('삭제되었습니다');
+    showUndo(`"${mmClip(removed.title || '', 14)}"을(를) 삭제했어요`, () => {
+      if (state.items.some(i => i.id === removed.id)) return;
+      state.items.splice(Math.min(idx, state.items.length), 0, removed);
+      save(true);
+      render();
+      showToast('되살렸어요');
+    });
   };
   document.getElementById('confirmModal').classList.add('active');
 }
 
 function confirmClearAll() {
   document.getElementById('confirmTitle').textContent = '모든 데이터를 삭제할까요?';
-  document.getElementById('confirmDesc').textContent = `${state.items.length}개의 기록이 모두 삭제됩니다. 템플릿/OTT도 함께 초기화됩니다.`;
+  document.getElementById('confirmDesc').textContent = `${state.items.length}개의 기록과 계획이 모두 삭제됩니다. 템플릿/OTT도 함께 초기화돼요. (지우기 직전 상태는 자동 백업에 남아요)`;
   confirmCallback = () => {
+    takeSnapshot('clear');
     state.items = [];
+    state.plans = [];
     state.templates = DEFAULT_TEMPLATES.map(t => ({ ...t, createdAt: Date.now() }));
     state.ottPlatforms = DEFAULT_OTT.map((o, i) => ({ ...o, order: i, createdAt: Date.now() }));
-    save();
+    save(true);
     render();
     closeConfirm();
     showToast('모든 데이터가 삭제되었습니다');
@@ -7004,31 +7913,20 @@ document.addEventListener('visibilitychange', () => { if (document.visibilitySta
 window.addEventListener('pagehide', flushAutoSaves);
 
 // ============ JSON IMPORT/EXPORT ============
-function exportData() {
-  const data = {
-    items: state.items,
-    templates: state.templates,
-    ottPlatforms: state.ottPlatforms,
-    countries: state.countries,
-    plans: state.plans,
-    exportedAt: new Date().toISOString(),
-    version: 3
-  };
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `contents-archive-${new Date().toISOString().slice(0, 10)}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
-  // Reset backup tracking
+async function exportData() {
+  const payload = buildPayload(state.lastSavedAt || Date.now());
+  payload.exportedAt = new Date().toISOString();
+  payload.version = 4;
+  const ok = await deliverFile(JSON.stringify(payload, null, 2), `contents-archive-${ymdLocal(new Date())}.json`, 'application/json');
+  if (!ok) return;
+  // 백업 기록
   state.lastBackupAt = Date.now();
   state.changesSinceBackup = 0;
   state.bannerDismissedAt = null;
   save();
   updateBackupBanner();
   renderBackupStatus();
-  showToast('백업 파일이 다운로드됩니다');
+  showToast('백업 파일을 저장했어요 · 안전한 곳(파일 앱·iCloud 등)에 보관하세요');
 }
 
 // ============ BACKUP REMINDER ============
@@ -7087,6 +7985,7 @@ function dismissBackupBanner() {
 }
 
 function renderBackupStatus() {
+  renderGuardStatus();
   const el = document.getElementById('backupStatus');
   if (!el) return;
   if (!state.lastBackupAt) {
@@ -7148,6 +8047,7 @@ function cleanDuplicates() {
   document.getElementById('confirmTitle').textContent = '중복 기록을 정리할까요?';
   document.getElementById('confirmDesc').textContent = `같은 유형·제목의 기록 ${dup}개가 발견됐어요. 더 최근 것만 남기고 합칩니다 (메모는 모두 보존).`;
   confirmCallback = () => {
+    takeSnapshot('dedupe');
     const before = state.items.length;
     state.items = dedupeItems(state.items);
     save(true);
@@ -7171,6 +8071,7 @@ function importData(event) {
         const oCount = data.ottPlatforms ? data.ottPlatforms.length : 0;
         document.getElementById('confirmDesc').textContent = `${data.items.length}개 항목, ${tCount}개 템플릿, ${oCount}개 OTT가 현재 기록과 합쳐집니다. 같은 유형·제목의 기록은 중복 없이 하나로 합쳐져요.`;
         confirmCallback = () => {
+          takeSnapshot('import');
           const existing = new Map(state.items.map(i => [i.id, i]));
           data.items.forEach(i => {
             if (!Array.isArray(i.notes)) i.notes = [];
@@ -7304,7 +8205,7 @@ function peekRecord(item) { return item && item.record ? getRecord(item) : null;
 function recItem() { return state.items.find(i => i.id === rec.itemId); }
 function recEpisodic(item) { return isEpType(item.type) || item.type === 'podcast'; }
 function recEpTotal(item) { return item.type === 'podcast' ? (item.totalPodEp || 0) : (item.totalEp || 0); }
-function recEpLabel(item, n) { return item.type === 'podcast' ? `EP${n}` : `${n}화`; }
+function recEpLabel(item, n) { return epLabel(item, n); }
 function recTabs(item) {
   const t = [];
   if (item.type !== 'youtube') t.push({ k: 'chars', n: item.type === 'podcast' ? '출연자' : '인물 관계도' });
@@ -7321,7 +8222,7 @@ function recordCardHTML(item) {
   const chips = [];
   if (tabs.includes('chars')) chips.push(`${item.type === 'podcast' ? '출연자' : '인물'} ${r.chars.length}`, `관계 ${r.rels.length}`);
   if (tabs.includes('eps')) {
-    const n = Object.keys(r.eps).length, tot = recEpTotal(item);
+    const n = Object.keys(r.eps).length, tot = recEpTotal(item) ? recEpTotal(item) + sideTotalOf(item) : 0;
     chips.push(`회차 기록 ${n}${tot ? '/' + tot : ''}`);
   }
   chips.push(item.memo ? '총평 ✓' : '총평 없음');
@@ -8344,9 +9245,9 @@ function mmSaveImage() {
 const REC_EP_TEMPLATE = '**줄거리**\n- \n\n**인상 깊은 장면**\n- \n\n**한마디**\n';
 
 function recLatestWatched(item) {
-  const set = getWatchedSet(item);
+  const set = getAllWatchedSet(item);
   if (!set || !set.size) return null;
-  return Math.max(...set);
+  return Math.max(...set); // 외전 번호가 본편보다 커서 '가장 최근'이 됨
 }
 
 function renderRecEps() {
@@ -8354,39 +9255,74 @@ function renderRecEps() {
   if (!item) return;
   const r = getRecord(item);
   const total = recEpTotal(item);
-  const watched = getWatchedSet(item) || new Set();
+  const watched = getAllWatchedSet(item) || new Set();
   const recorded = Object.keys(r.eps).map(Number).filter(n => n > 0).sort((a, b) => a - b);
   const latest = recLatestWatched(item);
+  const side = hasSide(item), st = sideTotalOf(item);
+  const ps = epParts(item);
   let nums;
   if (rec.epFilter === 'has' || !total) nums = recorded;
-  else nums = Array.from(new Set([...Array.from({ length: total }, (_, i) => i + 1), ...recorded])).sort((a, b) => a - b);
-  const body = document.getElementById('recordBody');
-  body.innerHTML = `
-    <div class="rec-actions">
-      ${latest ? `<button type="button" class="plan-mini-btn primary" onclick="openEpEditor(${latest})">✍️ 최근 ${epVerb(item.type).seen} ${recEpLabel(item, latest)} 기록</button>` : ''}
-      <button type="button" class="plan-mini-btn" onclick="copyRecEps()" ${recorded.length ? '' : 'disabled'}>📋 복사</button>
-    </div>
-    ${total ? `<div class="filter-row" style="margin-bottom: 10px;">
-      <button class="pill ${rec.epFilter === 'all' ? 'active' : ''}" onclick="rec.epFilter='all';renderRecEps()">전체 ${total}</button>
-      <button class="pill ${rec.epFilter === 'has' ? 'active' : ''}" onclick="rec.epFilter='has';renderRecEps()">기록한 회차 ${recorded.length}</button>
-    </div>` : `<div class="form-row" style="margin-bottom: 12px;">
-      <input type="number" class="form-input" id="recEpNew" placeholder="회차 번호" min="1" inputmode="numeric">
-      <button type="button" class="btn" onclick="recAddEp()" style="padding: 12px;">기록 쓰기</button>
-    </div>`}
-    ${nums.length ? `<div class="rec-list">${nums.map(n => {
-      const e = r.eps[n];
-      const pv = e ? mdPreviewLine(e.text, 60) : '';
-      return `<button type="button" class="rec-ep-row ${e ? 'has' : ''}" onclick="openEpEditor(${n})">
-        <span class="rec-ep-num">${recEpLabel(item, n)}</span>
+  else {
+    const all = Array.from({ length: total }, (_, i) => i + 1);
+    if (side && st) for (let k = 1; k <= st; k++) all.push(SIDE_BASE + k);
+    nums = Array.from(new Set([...all, ...recorded])).sort((a, b) => a - b);
+  }
+  // 부·외전 머리글
+  const groupOf = n => isSideEp(n) ? '외전' : (ps ? ((partOf(item, n) || {}).name || '') : (side ? '본편' : ''));
+  const multi = new Set(nums.map(groupOf)).size > 1 || (ps && nums.length);
+  let lastG = null;
+  const rows = nums.map(n => {
+    const e = r.eps[n];
+    const pv = e ? mdPreviewLine(e.text, 60) : '';
+    const g = groupOf(n);
+    const head = multi && g !== lastG && g ? `<div class="rec-sub-title" style="margin: 10px 2px 6px;">${escapeHTML(g)}</div>` : '';
+    lastG = g;
+    return head + `<button type="button" class="rec-ep-row ${e ? 'has' : ''}" onclick="openEpEditor(${n})">
+        <span class="rec-ep-num">${escapeHTML(recEpLabel(item, n))}</span>
         <span class="rec-ep-text">${e ? escapeHTML(pv || '(내용 없음)') : '기록 없음'}</span>
         ${watched.has(n) ? `<span class="rec-ep-seen">✓ ${epVerb(item.type).done}</span>` : ''}
       </button>`;
-    }).join('')}</div>` : `<div class="plan-empty" style="padding: 18px 0; text-align: center;">${total ? '아직 기록한 회차가 없어요' : '회차 번호를 넣고 기록을 써보세요'}</div>`}`;
+  });
+  // 번호로 바로 쓰기 (연재 중이거나 부·외전이 있을 때)
+  const tracks = item.type === 'podcast' ? [] : recTrackOptions(item);
+  const needInput = !total || side || ps;
+  const body = document.getElementById('recordBody');
+  body.innerHTML = `
+    <div class="rec-actions">
+      ${latest ? `<button type="button" class="plan-mini-btn primary" onclick="openEpEditor(${latest})">✍️ 최근 ${epVerb(item.type).seen} ${escapeHTML(recEpLabel(item, latest))} 기록</button>` : ''}
+      <button type="button" class="plan-mini-btn" onclick="copyRecEps()" ${recorded.length ? '' : 'disabled'}>📋 복사</button>
+    </div>
+    ${total ? `<div class="filter-row" style="margin-bottom: 10px;">
+      <button class="pill ${rec.epFilter === 'all' ? 'active' : ''}" onclick="rec.epFilter='all';renderRecEps()">전체 ${total + (side ? st : 0)}</button>
+      <button class="pill ${rec.epFilter === 'has' ? 'active' : ''}" onclick="rec.epFilter='has';renderRecEps()">기록한 회차 ${recorded.length}</button>
+    </div>` : ''}
+    ${needInput ? `<div class="rec-ep-new" style="margin-bottom: 12px;">
+      ${tracks.length > 1 ? `<select class="form-input" id="recEpTrack">${tracks.map((t, i) => `<option value="${i}">${escapeHTML(t.name)}</option>`).join('')}</select>` : ''}
+      <input type="number" class="form-input" id="recEpNew" placeholder="회차 번호" min="1" inputmode="numeric">
+      <button type="button" class="btn" onclick="recAddEp()" style="padding: 12px;">기록 쓰기</button>
+    </div>` : ''}
+    ${nums.length ? `<div class="rec-list">${rows.join('')}</div>` : `<div class="plan-empty" style="padding: 18px 0; text-align: center;">${total ? '아직 기록한 회차가 없어요' : '회차 번호를 넣고 기록을 써보세요'}</div>`}`;
+}
+// 기록 쓰기 번호 입력용: 부(또는 본편) + 외전
+function recTrackOptions(item) {
+  const out = [];
+  const ps = epParts(item);
+  const restart = item.partRestart !== false;
+  if (ps) ps.forEach(p => out.push({ name: p.name, toKey: k => restart ? p.start + k - 1 : k }));
+  else out.push({ name: '본편', toKey: k => k });
+  if (hasSide(item)) out.push({ name: '외전', toKey: k => SIDE_BASE + k });
+  return out;
 }
 
 function recAddEp() {
   const n = parseInt(document.getElementById('recEpNew').value, 10);
   if (!(n > 0)) { showToast('회차 번호를 입력하세요'); return; }
+  const item = recItem();
+  const sel = document.getElementById('recEpTrack');
+  if (item && sel) {
+    const t = recTrackOptions(item)[parseInt(sel.value, 10)];
+    if (t) { openEpEditor(t.toKey(n)); return; }
+  }
   openEpEditor(n);
 }
 
@@ -8397,17 +9333,20 @@ function openEpEditor(n) {
   rec.epNum = n;
   const e = r.eps[n];
   rec.epOrig = e ? e.text : '';
-  const watched = getWatchedSet(item);
+  const watched = getAllWatchedSet(item);
   const total = recEpTotal(item);
+  // 이전·다음은 같은 묶음(본편/외전) 안에서만
+  const lo = isSideEp(n) ? SIDE_BASE + 1 : 1;
+  const hi = isSideEp(n) ? (sideTotalOf(item) ? SIDE_BASE + sideTotalOf(item) : Infinity) : (total || Infinity);
   document.getElementById('epModalTitle').textContent = `${bracketTitle(item)} ${recEpLabel(item, n)}`;
   document.getElementById('epStatus').innerHTML = watched && watched.has(n)
     ? `<span class="rec-ep-seen">✓ ${epVerb(item.type).seen} 회차</span>` : `<span class="rec-chip">아직 안 ${epVerb(item.type).seen} 회차</span>`;
   document.getElementById('recEpText').value = rec.epOrig;
   setMdPreview('recEpText', !!rec.epOrig);
-  document.getElementById('epPrevBtn').disabled = n <= 1;
-  document.getElementById('epPrevBtn').textContent = n > 1 ? `‹ ${recEpLabel(item, n - 1)}` : '‹';
-  document.getElementById('epNextBtn').disabled = !!total && n >= total;
-  document.getElementById('epNextBtn').textContent = !total || n < total ? `${recEpLabel(item, n + 1)} ›` : '›';
+  document.getElementById('epPrevBtn').disabled = n <= lo;
+  document.getElementById('epPrevBtn').textContent = n > lo ? `‹ ${recEpLabel(item, n - 1)}` : '‹';
+  document.getElementById('epNextBtn').disabled = n >= hi;
+  document.getElementById('epNextBtn').textContent = n < hi ? `${recEpLabel(item, n + 1)} ›` : '›';
   document.getElementById('epDeleteBtn').style.display = e ? '' : 'none';
   setSaveState('epSaveState', '쓰는 동안 자동으로 저장돼요');
   document.getElementById('epModal').classList.add('active');
@@ -8437,7 +9376,7 @@ function closeEpEditor(skipSave) {
 }
 function moveEp(d) {
   const n = rec.epNum + d;
-  if (n < 1) return;
+  if (n < 1 || (isSideEp(rec.epNum) && !isSideEp(n))) return;
   cancelAutoSave('ep');
   const changed = saveEpRecord();
   if (changed) showToast('저장했어요');
@@ -9002,20 +9941,30 @@ function weekStartYmd(s) { const d = parseYmd(s); d.setDate(d.getDate() - ((d.ge
 function fmtPlanDay(s) { const d = parseYmd(s); return `${d.getMonth() + 1}월 ${d.getDate()}일 (${DOW_KO[d.getDay()]})`; }
 
 // 회차 배열 → "3~5화" / "1, 3~5화" / "EP3~5, EP7"
-function formatEpRanges(eps, isPodcast) {
+function formatEpRanges(eps, isPodcast, item) {
   const arr = [...new Set(eps || [])].map(Number).filter(n => n > 0).sort((a, b) => a - b);
   if (!arr.length) return '';
-  const parts = [];
-  let s = arr[0], p = arr[0];
-  for (let i = 1; i <= arr.length; i++) {
-    const v = arr[i];
-    if (v === p + 1) { p = v; continue; }
-    if (s === p) parts.push(`${s}`);
-    else if (p === s + 1) parts.push(`${s}`, `${p}`); // 두 개만 이어지면 13, 14화
-    else parts.push(`${s}~${p}`);                     // 세 개 이상은 13~15화
-    s = p = v;
+  if (isPodcast) return 'EP' + epRuns(arr).join(', EP');
+  const main = arr.filter(e => !isSideEp(e));
+  const side = arr.filter(isSideEp).map(e => e - SIDE_BASE);
+  const segs = [];
+  const ps = item ? epParts(item) : null;
+  if (main.length) {
+    if (ps) {
+      const used = new Set();
+      ps.forEach(p => {
+        const inP = main.filter(e => e >= p.start && e <= p.end);
+        inP.forEach(e => used.add(e));
+        if (inP.length) segs.push(`${p.name} ${epRuns(inP.map(e => item.partRestart === false ? e : e - p.start + 1)).join(', ')}화`);
+      });
+      const rest = main.filter(e => !used.has(e));
+      if (rest.length) segs.push(epRuns(rest).join(', ') + '화');
+    } else {
+      segs.push(epRuns(main).join(', ') + '화');
+    }
   }
-  return isPodcast ? 'EP' + parts.join(', EP') : parts.join(', ') + '화';
+  if (side.length) segs.push(`외전 ${epRuns(side).join(', ')}화`);
+  return segs.join(', ');
 }
 
 function planLine(plan) {
@@ -9023,7 +9972,7 @@ function planLine(plan) {
   const title = item ? item.title : (plan.titleSnap || '삭제된 기록');
   const type = item ? item.type : plan.typeSnap;
   let line = bracketTitle({ title, type });
-  const ep = formatEpRanges(plan.eps, type === 'podcast');
+  const ep = formatEpRanges(plan.eps, type === 'podcast', item);
   if (ep) line += ' ' + ep;
   if (plan.text) line += ' ' + plan.text;
   if (plan.done && plan.check && !plan.check.simple && (plan.check.watchedEps || []).length === 0) line += ' (못 봄)';
@@ -9036,7 +9985,7 @@ function planRowNote(p) {
     const t = (state.plans || []).find(x => x.id === p.check.carry.planId);
     const item = state.items.find(i => i.id === p.itemId);
     const pod = (item ? item.type : p.typeSnap) === 'podcast';
-    bits.push(`↪ ${formatEpRanges(p.check.carry.eps, pod)} → ${t ? fmtPlanDay(t.date) : '다음 계획'}로 넘김`);
+    bits.push(`↪ ${formatEpRanges(p.check.carry.eps, pod, item)} → ${t ? fmtPlanDay(t.date) : '다음 계획'}로 넘김`);
   }
   if (p.done && p.check && (p.check.extraEps || []).length) {
     const item = state.items.find(i => i.id === p.itemId);
@@ -9272,7 +10221,7 @@ function planEpsElsewhere(itemId) {
 
 function openPlanEditor(day, planId) {
   const plan = planId ? (state.plans || []).find(p => p.id === planId) : null;
-  planEdit = { id: plan ? plan.id : null, itemId: plan ? plan.itemId : null, eps: plan ? [...(plan.eps || [])] : [] };
+  planEdit = { id: plan ? plan.id : null, itemId: plan ? plan.itemId : null, eps: plan ? [...(plan.eps || [])] : [], track: null };
   document.getElementById('planEditorTitle').textContent = plan ? '계획 수정' : '계획 추가';
   document.getElementById('planDate').value = plan ? plan.date : day;
   document.getElementById('planText').value = plan ? (plan.text || '') : '';
@@ -9302,7 +10251,7 @@ function renderPlanItemList() {
 }
 
 function selectPlanItem(id) {
-  if (planEdit.itemId !== id) { planEdit.itemId = id; planEdit.eps = []; }
+  if (planEdit.itemId !== id) { planEdit.itemId = id; planEdit.eps = []; planEdit.track = null; }
   renderPlanItemList();
   renderPlanEpPicker();
   updatePlanPreview();
@@ -9317,19 +10266,41 @@ function renderPlanEpPicker() {
   const unit = info.podcast ? '편' : '화';
   document.getElementById('planEpLabel').textContent = info.podcast ? '들을 에피소드 선택' : info.type === 'webnovel' ? '읽을 회차 선택' : '볼 회차 선택';
   const elsewhere = planEpsElsewhere(item.id);
+  // 부·외전 고르기
+  const tracks = info.tracks;
+  if (planEdit.track == null || planEdit.track >= tracks.length) {
+    // 아직 안 본 첫 회차가 있는 곳
+    let ti = 0;
+    for (let i = 0; i < tracks.length; i++) {
+      const t = tracks[i];
+      let e = t.start, found = false;
+      for (let k = 0; k < 200000 && e <= t.end; k++, e++) { if (!info.seen.has(e)) { found = true; break; } }
+      if (found) { ti = i; break; }
+    }
+    planEdit.track = ti;
+  }
+  const tr = tracks[planEdit.track];
+  document.getElementById('planTrackRow').innerHTML = tracks.length > 1
+    ? tracks.map((t, i) => `<button type="button" class="plan-mini-btn ${i === planEdit.track ? 'primary' : ''}" onclick="planPickTrack(${i})">${escapeHTML(t.name)}</button>`).join('')
+    : '';
+  const bigUI = tr.big;
+  const pko = document.getElementById('planPickedOther');
+  if (pko) pko.textContent = '';
   document.getElementById('planQuick').innerHTML =
-    (info.big ? [1, 3, 5, 10] : [1, 2, 3]).map(n => `<button type="button" class="plan-mini-btn primary" onclick="planQuickPick(${n})">다음 ${n}${unit}</button>`).join('') +
+    (bigUI ? [1, 3, 5, 10] : [1, 2, 3]).map(n => `<button type="button" class="plan-mini-btn primary" onclick="planQuickPick(${n})">다음 ${n}${unit}</button>`).join('') +
     (planEdit.eps.length ? `<button type="button" class="plan-mini-btn" onclick="planClearEps()">선택 해제</button>` : '');
   const gridEl = document.getElementById('planEpGrid'), rangeEl = document.getElementById('planEpRange'), legend = document.getElementById('planLegend');
-  if (info.big) {
-    // 회차가 많거나 연재 중: 버튼 대신 숫자로
+  if (bigUI) {
+    // 회차가 많거나 연재 중: 버튼 대신 숫자로 (지금 고른 부·외전 기준 번호)
     gridEl.style.display = 'none'; legend.style.display = 'none'; rangeEl.style.display = 'block';
     const v = epVerb(info.type);
     const seen = info.seen || new Set();
-    let cur = 0; while (seen.has(cur + 1)) cur++;
-    const extra = seen.size - cur;
-    const info1 = `${cur ? `${cur}화까지 ${v.done}` : `아직 ${v.seen} 회차 없음`}${extra > 0 ? ` (+ 띄엄띄엄 ${extra}화)` : ''}${info.open ? ' · 연재 중' : ` · 전체 ${info.total}화`}`;
-    const info2 = elsewhere.size ? `다른 날 계획: ${formatEpRanges([...elsewhere], info.podcast)}` : '';
+    let cur = tr.start - 1; while (seen.has(cur + 1) && cur + 1 <= tr.end) cur++;
+    let inTr = 0; seen.forEach(e => { if (e >= tr.start && e <= tr.end) inTr++; });
+    const extra = inTr - (cur - tr.start + 1);
+    const nm = tr.name ? tr.name + ' ' : '';
+    const info1 = `${cur >= tr.start ? `${nm}${tr.local(cur)}화까지 ${v.done}` : `${nm}아직 ${v.seen} 회차 없음`}${extra > 0 ? ` (+ 띄엄띄엄 ${extra}화)` : ''}${tr.open ? (tr.side ? ' · 전체 미정' : ' · 연재 중') : ` · ${tr.restart ? `${tr.count}화` : `${tr.start}~${tr.end}화`}`}`;
+    const info2 = elsewhere.size ? `다른 날 계획: ${formatEpRanges([...elsewhere], info.podcast, item)}` : '';
     rangeEl.innerHTML = `<div class="plan-range-info">${escapeHTML(info1)}${info2 ? '<br>' + escapeHTML(info2) : ''}</div>
       <div class="plan-range-row">
         <input type="number" class="form-input" id="planRangeFrom" placeholder="시작 화" min="1" inputmode="numeric">
@@ -9337,35 +10308,46 @@ function renderPlanEpPicker() {
         <input type="number" class="form-input" id="planRangeTo" placeholder="끝 화" min="1" inputmode="numeric">
         <button type="button" class="btn" onclick="planAddRange()">추가</button>
       </div>
-      ${planEdit.eps.length ? `<div class="plan-range-picked">선택: ${escapeHTML(formatEpRanges(planEdit.eps, info.podcast))}</div>` : ''}`;
+      ${planEdit.eps.length ? `<div class="plan-range-picked">선택: ${escapeHTML(formatEpRanges(planEdit.eps, info.podcast, item))}</div>` : ''}`;
     return;
   }
   gridEl.style.display = ''; legend.style.display = ''; rangeEl.style.display = 'none'; rangeEl.innerHTML = '';
   let grid = '';
-  for (let e = 1; e <= info.total; e++) {
+  for (let e = tr.start; e <= tr.end; e++) {
     const cls = ['ep-btn'];
     if (info.seen.has(e)) cls.push('seen');
     if (elsewhere.has(e)) cls.push('elsewhere');
     if (planEdit.eps.includes(e)) cls.push('planned');
-    grid += `<button type="button" class="${cls.join(' ')}" onclick="togglePlanEp(${e})">${e}</button>`;
+    grid += `<button type="button" class="${cls.join(' ')}" onclick="togglePlanEp(${e})">${tr.local(e)}</button>`;
   }
   document.getElementById('planEpGrid').innerHTML = grid;
+  // 다른 부·외전에서 고른 것도 보이게
+  const others = planEdit.eps.filter(e => !(e >= tr.start && e <= tr.end));
+  const pk = document.getElementById('planPickedOther');
+  if (pk) pk.textContent = others.length ? `다른 곳에서 고른 회차: ${formatEpRanges(others, info.podcast, item)}` : '';
 }
+function planPickTrack(i) { planEdit.track = i; renderPlanEpPicker(); }
 
 // 회차 범위 넣기 (예: 120 ~ 125)
 function planAddRange() {
   const item = state.items.find(i => i.id === planEdit.itemId);
   const info = planEpInfo(item);
   if (!info) return;
+  const tr = info.tracks[planEdit.track || 0] || info.tracks[0];
   const a = parseInt(document.getElementById('planRangeFrom').value, 10);
   let b = parseInt(document.getElementById('planRangeTo').value, 10);
   if (!(a >= 1)) { showToast('시작 회차를 넣어주세요'); return; }
   if (isNaN(b)) b = a;
   if (b < a) { showToast('끝 회차가 시작보다 작아요'); return; }
-  if (!info.open && b > info.total) { showToast(`전체 ${info.total}화까지만 고를 수 있어요`); return; }
+  const ka = tr.toKey(a), kb = tr.toKey(b);
+  if (ka < tr.start) { showToast(`${tr.name ? tr.name + '는 ' : ''}${tr.start}화부터예요`); return; }
+  if (kb > tr.end) {
+    showToast(tr.restart ? `${tr.name ? tr.name + '는 ' : ''}${tr.count}화까지만 고를 수 있어요` : `${tr.name ? tr.name + '는 ' : ''}${tr.end}화까지만 고를 수 있어요`);
+    return;
+  }
   if (b - a >= 300) { showToast('한 번에 300화까지만 넣을 수 있어요'); return; }
   const set = new Set(planEdit.eps);
-  for (let e = a; e <= b; e++) set.add(e);
+  for (let e = ka; e <= kb; e++) set.add(e);
   planEdit.eps = [...set].sort((x, y) => x - y);
   renderPlanEpPicker();
   updatePlanPreview();
@@ -9386,11 +10368,18 @@ function planQuickPick(n) {
   if (!info) return;
   const elsewhere = planEpsElsewhere(item.id);
   const picked = [];
-  for (let e = 1; e <= info.total && picked.length < n; e++) {
-    if (!info.seen.has(e) && !elsewhere.has(e)) picked.push(e);
+  // 본편(부 순서대로) → 외전 순으로 아직 안 본 회차
+  for (const t of info.tracks) {
+    let e = t.start;
+    for (let k = 0; k < 200000 && e <= t.end && picked.length < n; k++, e++) {
+      if (!info.seen.has(e) && !elsewhere.has(e)) picked.push(e);
+    }
+    if (picked.length >= n || t.open) break;
   }
   if (!picked.length) { showToast('남은 회차가 없어요'); return; }
   planEdit.eps = picked;
+  const ti = info.tracks.findIndex(t => picked[0] >= t.start && picked[0] <= t.end);
+  if (ti >= 0) planEdit.track = ti;
   renderPlanEpPicker();
   updatePlanPreview();
 }
@@ -9510,18 +10499,25 @@ function setWatchedSet(item, set) {
 function planEpInfo(item) {
   const f = progressSpec(item);
   if (!f || !(f.total > 0)) return null;
-  return { total: f.total, seen: getWatchedSet(item), podcast: item.type === 'podcast', seq: f.seq, open: !!f.open, big: !!f.open || f.total > EP_GRID_MAX, type: item.type };
+  const tracks = epTracks(item);
+  if (!tracks.length) return null;
+  return { total: f.total, seen: getAllWatchedSet(item) || new Set(), podcast: item.type === 'podcast', seq: f.seq, open: !!f.open,
+    big: !!f.open || f.total > EP_GRID_MAX, type: item.type, item, tracks };
 }
+// 계획에 넣을 수 있는 회차인가 (본편 범위 또는 외전)
+function epValid(info, e) { return !!(info && trackOf(info.tracks, e)); }
 
 function snapshotProgress(item) {
   const f = progressSpec(item);
-  return {
+  const s = {
     mode: item[f.mode],
     cur: item[f.cur],
     list: Array.isArray(item[f.list]) ? [...item[f.list]] : item[f.list],
     status: item.status,
     endDate: item.endDate
   };
+  if (hasSide(item)) s.side = Array.isArray(item.sideWatched) ? [...item.sideWatched] : [];
+  return s;
 }
 
 function restoreProgress(item, snap) {
@@ -9531,6 +10527,7 @@ function restoreProgress(item, snap) {
   item[f.list] = Array.isArray(snap.list) ? [...snap.list] : snap.list;
   item.status = snap.status;
   item.endDate = snap.endDate;
+  if ('side' in snap) item.sideWatched = Array.isArray(snap.side) ? [...snap.side] : [];
 }
 
 // 같은 콘텐츠의 "다음" 미완료 계획 (날짜 → 만든 순서)
@@ -9558,7 +10555,7 @@ function onPlanCheck(id) {
   if (p.done) { confirmUncheckPlan(p); return; }
   const item = state.items.find(i => i.id === p.itemId);
   const info = planEpInfo(item);
-  const eps = (p.eps || []).filter(e => info && e <= info.total);
+  const eps = (p.eps || []).filter(e => epValid(info, e));
   if (!info || eps.length === 0) {
     // 회차가 없는 계획(영화·직접 입력)은 바로 체크
     p.done = true;
@@ -9575,7 +10572,8 @@ function onPlanCheck(id) {
   [1, 3, 5].forEach(n => { document.getElementById('planMore' + n).textContent = `+${n}${u}`; });
   const upTo = document.getElementById('planCheckUpTo');
   upTo.value = '';
-  upTo.placeholder = info.podcast ? '몇 EP까지' : '몇 화까지';
+  const lastTr = trackOf(info.tracks, Math.max(...eps));
+  upTo.placeholder = info.podcast ? '몇 EP까지' : `${lastTr && lastTr.name ? lastTr.name + ' ' : ''}몇 화까지`;
   document.getElementById('planCheckTitle').textContent = `어디까지 ${vb.q}?`;
   document.getElementById('planCheckAllBtn').textContent = `전부 ${vb.did}`;
   document.getElementById('planCheckNoneBtn').textContent = `하나도 못 ${vb.did}`;
@@ -9597,7 +10595,7 @@ function planCheckPlanned() {
   const p = (state.plans || []).find(x => x.id === planCheck.planId);
   const item = p && state.items.find(i => i.id === p.itemId);
   const info = planEpInfo(item);
-  return { p, item, info, eps: p ? [...(p.eps || [])].filter(e => info && e <= info.total).sort((a, b) => a - b) : [] };
+  return { p, item, info, eps: p ? [...(p.eps || [])].filter(e => epValid(info, e)).sort((a, b) => a - b) : [] };
 }
 
 function planCheckTap(e) {
@@ -9625,9 +10623,11 @@ function planCheckAll(all) {
 }
 
 // 계획보다 더 본 회차: 계획 마지막 다음부터 extraEnd까지
-function planExtraCap(info, end) {
+function planExtraCap(info, end, last) {
   let v = Math.floor(Number(end)) || 0;
-  if (!info.open && info.total > 0) v = Math.min(v, info.total);
+  const t = last ? trackOf(info.tracks, last) : null;
+  if (t) { if (t.end !== Infinity) v = Math.min(v, t.end); }   // 마지막으로 계획한 부·외전 안에서
+  else if (!info.open && info.total > 0) v = Math.min(v, info.total);
   return v;
 }
 function planCheckMore(n) {
@@ -9635,21 +10635,24 @@ function planCheckMore(n) {
   if (!info || !eps.length) return;
   const last = Math.max(...eps);
   const base = planCheck.extraEnd > last ? planCheck.extraEnd : last;
-  const next = planExtraCap(info, Math.min(base + n, last + 500));
+  const next = planExtraCap(info, Math.min(base + n, last + 500), last);
   if (next <= last) { showToast('마지막 회차까지 계획돼 있어요'); return; }
   planCheck.extraEnd = next;
   planCheck.picked = [...eps]; // 더 봤다면 계획한 건 다 본 것
-  document.getElementById('planCheckUpTo').value = next;
+  const t = trackOf(info.tracks, last);
+  document.getElementById('planCheckUpTo').value = t ? t.local(next) : next;
   renderPlanCheck();
 }
 function planCheckSetUpTo(v) {
   const { eps, info } = planCheckPlanned();
   if (!info || !eps.length) return;
-  const n = parseInt(v, 10);
+  const raw = parseInt(v, 10);
   const last = Math.max(...eps);
-  if (isNaN(n)) { planCheck.extraEnd = 0; renderPlanCheck(); return; }
+  if (isNaN(raw)) { planCheck.extraEnd = 0; renderPlanCheck(); return; }
+  const t = trackOf(info.tracks, last);
+  const n = t ? t.toKey(raw) : raw; // '2부 몇 화까지'의 숫자 → 전체 번호
   if (n > last) {
-    planCheck.extraEnd = planExtraCap(info, Math.min(n, last + 500));
+    planCheck.extraEnd = planExtraCap(info, Math.min(n, last + 500), last);
     planCheck.picked = [...eps];
   } else {
     planCheck.extraEnd = 0;
@@ -9666,14 +10669,14 @@ function planCheckClearExtra() {
 // 체크 결과 미리 계산 (모달 미리보기와 실제 저장이 같은 계산을 써요)
 function computePlanCheck(p, item, picked, extraEnd) {
   const info = planEpInfo(item);
-  const planned = [...(p.eps || [])].filter(e => e <= info.total).sort((a, b) => a - b);
+  const planned = [...(p.eps || [])].filter(e => epValid(info, e)).sort((a, b) => a - b);
   // 계획보다 더 본 회차
   const extra = [];
   const last = planned.length ? planned[planned.length - 1] : 0;
-  const end = planExtraCap(info, extraEnd || 0);
+  const end = planExtraCap(info, extraEnd || 0, last);
   for (let e = last + 1; e <= end && extra.length < 500; e++) extra.push(e);
   const watched = [...planned.filter(e => picked.includes(e)), ...extra];
-  const before = getWatchedSet(item);
+  const before = getAllWatchedSet(item) || new Set();
   const after = new Set([...before, ...watched]);
   const added = watched.filter(e => !before.has(e));
   const leftover = planned.filter(e => !watched.includes(e) && !after.has(e));
@@ -9690,7 +10693,7 @@ function computePlanCheck(p, item, picked, extraEnd) {
       const getsCarry = next && next.id === x.id && leftover.length > 0;
       return { plan: x, eps, empty: rest.length === 0 && !x.text && !getsCarry };
     }) : [];
-  return { planned, watched, extra, added, leftover, next, after, trims, total: info.total, podcast: info.podcast };
+  return { planned, watched, extra, added, leftover, next, after, trims, total: info.total, podcast: info.podcast, complete: isItemComplete(item, after) };
 }
 
 function renderPlanCheck() {
@@ -9698,13 +10701,19 @@ function renderPlanCheck() {
   if (!p || !info) return;
   const picked = planCheck.picked;
   const r = computePlanCheck(p, item, picked, planCheck.extraEnd);
-  const fmt = arr => formatEpRanges(arr, r.podcast);
+  const fmt = arr => formatEpRanges(arr, r.podcast, item);
   const vb = epVerb(item.type);
-  document.getElementById('planCheckGrid').innerHTML = eps.map(e =>
-    `<button type="button" class="ep-btn ${picked.includes(e) ? 'planned' : ''}" onclick="planCheckTap(${e})">${e}</button>`
-  ).join('') + (r.extra.length
+  const segN = new Set(eps.map(e => (trackOf(info.tracks, e) || {}).start)).size;
+  let lastT = null;
+  document.getElementById('planCheckGrid').innerHTML = eps.map(e => {
+    const t = trackOf(info.tracks, e);
+    let head = '';
+    if (segN > 1 && t !== lastT && t && t.name) head = `<div class="ep-part-head">${escapeHTML(t.name)}</div>`;
+    lastT = t;
+    return head + `<button type="button" class="ep-btn ${picked.includes(e) ? 'planned' : ''}" onclick="planCheckTap(${e})">${t ? t.local(e) : e}</button>`;
+  }).join('') + (r.extra.length
     ? (r.extra.length <= 24
-      ? r.extra.map(e => `<button type="button" class="ep-btn extra" onclick="planCheckClearExtra()" title="더 본 회차">${e}</button>`).join('')
+      ? r.extra.map(e => { const t = trackOf(info.tracks, e); return `<button type="button" class="ep-btn extra" onclick="planCheckClearExtra()" title="더 본 회차">${t ? t.local(e) : e}</button>`; }).join('')
       : `<button type="button" class="ep-btn extra" style="width:auto;padding:0 10px;" onclick="planCheckClearExtra()">+${fmt(r.extra)}</button>`)
     : '');
   document.getElementById('planCheckExtraState').innerHTML = r.extra.length
@@ -9722,7 +10731,7 @@ function renderPlanCheck() {
   }
   if (r.extra.length) lines.push(`＋ 계획보다 ${r.extra.length}${r.podcast ? '편' : '화'} 더 → 이 계획은 ${planLine({ itemId: p.itemId, eps: r.watched, text: p.text })}(으)로 남아요`);
   r.trims.forEach(t => lines.push(`↷ ${fmtPlanDay(t.plan.date)} 계획의 ${fmt(t.eps)}는 이미 ${vb.seen} 거라 빠져요${t.empty ? ' (빈 계획은 지워요)' : ''}`));
-  if (r.after.size >= r.total && item.status !== 'done') lines.push('🎉 마지막 회차까지 다 보면 완료로 바뀌어요');
+  if (r.complete && item.status !== 'done') lines.push(hasSide(item) ? '🎉 외전까지 다 보면 완료로 바뀌어요' : '🎉 마지막 회차까지 다 보면 완료로 바뀌어요');
   document.getElementById('planCheckPreview').innerHTML = lines.length
     ? lines.map(l => `<div>${escapeHTML(l)}</div>`).join('')
     : '<div>선택한 회차가 없어요</div>';
@@ -9744,10 +10753,10 @@ function confirmPlanCheck() {
   // 1) 진행중 기록에 반영
   let converted = false;
   if (r.added.length) {
-    converted = setWatchedSet(item, r.after).converted;
+    converted = setAllWatchedSet(item, r.after).converted;
   }
   let becameDone = false;
-  if (!wasDone && r.after.size >= r.total) {
+  if (!wasDone && r.complete) {
     item.status = 'done';
     if (!item.endDate) item.endDate = today();
     becameDone = true;
@@ -9809,8 +10818,8 @@ function confirmPlanCheck() {
   closePlanCheck();
   render();
   const msgs = [];
-  if (r.added.length) msgs.push(`${formatEpRanges(r.added, r.podcast)} 체크됨`);
-  if (carry) msgs.push(`${formatEpRanges(r.leftover, r.podcast)}는 ${fmtPlanDay(state.plans.find(x => x.id === carry.planId).date)}로 넘겼어요`);
+  if (r.added.length) msgs.push(`${formatEpRanges(r.added, r.podcast, item)} 체크됨`);
+  if (carry) msgs.push(`${formatEpRanges(r.leftover, r.podcast, item)}는 ${fmtPlanDay(state.plans.find(x => x.id === carry.planId).date)}로 넘겼어요`);
   if (r.extra.length) msgs.push(`계획보다 ${r.extra.length}${r.podcast ? '편' : '화'} 더`);
   if (trims.length) msgs.push(`다른 계획 ${trims.length}개 정리`);
   if (converted) msgs.push('띄엄띄엄 봐서 개별 모드로 바뀌었어요');
@@ -9832,8 +10841,8 @@ function confirmUncheckPlan(p) {
   const item = state.items.find(i => i.id === p.itemId);
   const pod = (item ? item.type : p.typeSnap) === 'podcast';
   const parts = [];
-  if (c.addedEps && c.addedEps.length) parts.push(`진행 기록에 체크된 ${formatEpRanges(c.addedEps, pod)}를 해제`);
-  if (c.carry && c.carry.eps.length) parts.push(`다음 계획으로 넘긴 ${formatEpRanges(c.carry.eps, pod)}를 원래대로`);
+  if (c.addedEps && c.addedEps.length) parts.push(`진행 기록에 체크된 ${formatEpRanges(c.addedEps, pod, item)}를 해제`);
+  if (c.carry && c.carry.eps.length) parts.push(`다음 계획으로 넘긴 ${formatEpRanges(c.carry.eps, pod, item)}를 원래대로`);
   if (c.trims && c.trims.length) parts.push(`다른 계획에서 뺀 회차를 원래대로`);
   document.getElementById('confirmTitle').textContent = '체크를 취소할까요?';
   document.getElementById('confirmDesc').textContent = parts.length ? parts.join('하고, ') + ' 돌려요.' : '계획을 다시 미완료로 돌려요.';
@@ -9854,10 +10863,10 @@ function uncheckPlan(id) {
       restoreProgress(item, c.prev);
     } else {
       // 그 사이 다른 회차를 체크했다면, 이 체크로 추가된 회차만 빼기
-      const set = getWatchedSet(item);
+      const set = getAllWatchedSet(item);
       if (set) {
         (c.addedEps || []).forEach(e => set.delete(e));
-        setWatchedSet(item, set);
+        setAllWatchedSet(item, set);
       }
       if (c.madeDone && item.status === 'done') {
         item.status = 'watching';
@@ -9952,6 +10961,7 @@ updateBackupBanner();
 renderBackupStatus();
 updateSaveIndicator(false);
 mdFillToolbars();
+guardianStart();
 syncCopyDefaultPicker();
 syncYtApiKey();
 checkVersionUpdate();
