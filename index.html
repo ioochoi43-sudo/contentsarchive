@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#fafaf9">
+<script>try { var __a = localStorage.getItem('contentsArchive_accent'); if (__a) document.documentElement.setAttribute('data-accent', __a); var __s = localStorage.getItem('contentsArchive_style'); if (__s) document.documentElement.setAttribute('data-style', __s); document.documentElement.setAttribute('data-page', 'timeline'); } catch (e) {}</script>
 <title>Contents Archive</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css" />
@@ -21,8 +22,16 @@
     --ink: #17181c;
     --ink-dim: #5b5e6b;
     --ink-mute: #9a9daa;
-    --accent: #3d4cc8;
-    --accent-soft: #e7e9fa;
+    /* 포인트 색 (기본: 네온그린) */
+    --accent: #0B8139;        /* 흰 바탕 위 글자·테두리 — 읽히는 초록 */
+    --accent-fill: #2EF26B;   /* 버튼·진행 막대·체크 칸을 채우는 네온 */
+    --on-accent: #0c1a10;     /* 네온 위 글자 */
+    --accent-soft: #E3FCE9;
+    --accent-grad: #B4FF52;   /* 진행 막대 끝 색 */
+    --accent-glow: rgba(46, 242, 107, 0.42);
+    --accent-bar: #2EF26B;    /* 검은 알림 바 위 버튼 글자 */
+    --brand-ink: #17181c;
+    --brand-mark: linear-gradient(transparent 52%, var(--accent-fill) 52%, var(--accent-fill) 92%, transparent 92%);
     --red: #c4543a;
     --red-soft: #fae6df;
     --green: #5a7a3c;
@@ -33,6 +42,15 @@
     --yellow-soft: #f6ead0;
     --highlight: #fff3a6;
     --sans: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  }
+  :root[data-accent="soft"] {
+    --accent: #2D7A4F; --accent-fill: #86E3A5; --on-accent: #0c1a10; --accent-soft: #E9F7EE;
+    --accent-grad: #CDEFA9; --accent-glow: rgba(110, 200, 140, 0.4); --accent-bar: #86E3A5;
+  }
+  :root[data-accent="blue"] {
+    --accent: #3d4cc8; --accent-fill: #3d4cc8; --on-accent: #ffffff; --accent-soft: #e7e9fa;
+    --accent-grad: #d99860; --accent-glow: rgba(61, 76, 200, 0.35); --accent-bar: #9fb0ff;
+    --brand-ink: #3d4cc8; --brand-mark: none;
   }
 
   body { padding-bottom: calc(74px + env(safe-area-inset-bottom, 0px)); }
@@ -66,7 +84,8 @@
   }
 
   .brand-title { font-weight: 700; font-size: 24px; letter-spacing: -0.03em; line-height: 1; color: var(--ink); }
-  .brand-title span { color: var(--accent); }
+  /* 제목 'Archive': 그린 테마는 검은 글자 + 네온 형광펜, 파랑 테마는 예전처럼 파란 글자 */
+  .brand-title span { color: var(--brand-ink); background: var(--brand-mark); padding: 0 3px; margin: 0 -1px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
 
   .brand-meta {
     font-size: 11px;
@@ -268,7 +287,7 @@
     overflow: hidden;
     margin-bottom: 5px;
   }
-  .home-poster-fill { height: 100%; background: var(--accent); border-radius: 3px; }
+  .home-poster-fill { height: 100%; background: var(--accent-fill); border-radius: 3px; }
   .home-poster-pct { font-size: 12px; color: var(--ink-mute); font-weight: 500; font-variant-numeric: tabular-nums; }
 
   .controls-row {
@@ -469,7 +488,7 @@
   }
   .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--accent), #d99860);
+    background: linear-gradient(90deg, var(--accent-fill), var(--accent-grad));
     border-radius: 100px;
     transition: width 0.4s ease;
   }
@@ -550,13 +569,13 @@
     width: 56px;
     height: 56px;
     border-radius: 50%;
-    background: var(--accent);
-    color: #fff;
+    background: var(--accent-fill);
+    color: var(--on-accent);
     border: none;
     font-size: 28px;
     font-weight: 300;
     cursor: pointer;
-    box-shadow: 0 10px 28px rgba(61, 76, 200, 0.35), 0 4px 10px rgba(61, 76, 200, 0.18);
+    box-shadow: 0 10px 28px var(--accent-glow), 0 4px 10px rgba(0, 0, 0, 0.10);
     z-index: 100;
     line-height: 1;
     display: flex;
@@ -885,7 +904,7 @@
     font-family: var(--sans);
     font-variant-numeric: tabular-nums;
   }
-  .ep-btn.watched { background: var(--accent); color: white; border-color: var(--accent); }
+  .ep-btn.watched { background: var(--accent-fill); color: var(--on-accent); border-color: var(--accent-fill); font-weight: 700; }
   .ep-btn:active { transform: scale(0.92); }
 
   /* PLANNER */
@@ -930,7 +949,7 @@
   .plan-day-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
   .plan-day-title { font-size: 15px; font-weight: 700; letter-spacing: -0.02em; color: var(--ink); }
   .plan-today-badge {
-    font-size: 10px; font-weight: 700; background: var(--accent); color: #fff;
+    font-size: 10px; font-weight: 700; background: var(--accent-fill); color: var(--on-accent);
     border-radius: 100px; padding: 2px 8px; margin-left: 6px; vertical-align: 2px;
   }
   .plan-day-actions { display: flex; gap: 6px; flex-shrink: 0; }
@@ -947,7 +966,7 @@
     color: #fff; font-size: 12px; font-weight: 700; cursor: pointer; flex-shrink: 0;
     display: flex; align-items: center; justify-content: center;
   }
-  .plan-row.done .plan-check { background: var(--accent); border-color: var(--accent); }
+  .plan-row.done .plan-check { background: var(--accent-fill); border-color: var(--accent-fill); color: var(--on-accent); }
   .plan-row-text { flex: 1; min-width: 0; font-size: 14px; color: var(--ink); cursor: pointer; word-break: keep-all; line-height: 1.45; }
   .plan-row.done .plan-row-text { color: var(--ink-mute); }
   .plan-row.done .plan-row-line { text-decoration: line-through; }
@@ -968,16 +987,16 @@
   .plan-cell.out { opacity: 0.35; }
   .plan-cell-num { font-size: 14px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
   .plan-cell.today .plan-cell-num { color: var(--accent); font-weight: 800; }
-  .plan-cell.selected { background: var(--accent); }
-  .plan-cell.selected .plan-cell-num { color: #fff; }
+  .plan-cell.selected { background: var(--accent-fill); }
+  .plan-cell.selected .plan-cell-num { color: var(--on-accent); }
   .plan-cell-badge {
     min-width: 16px; height: 16px; border-radius: 8px; padding: 0 4px;
-    background: var(--accent); color: #fff; font-size: 10px; font-weight: 700;
+    background: var(--accent-fill); color: var(--on-accent); font-size: 10px; font-weight: 700;
     display: flex; align-items: center; justify-content: center;
   }
   .plan-cell-badge.empty { background: transparent; }
   .plan-cell-badge.done { background: #3f9a6b; }
-  .plan-cell.selected .plan-cell-badge:not(.empty) { background: #fff; color: var(--accent); }
+  .plan-cell.selected .plan-cell-badge:not(.empty) { background: var(--on-accent); color: var(--accent-fill); }
   .plan-item-list { display: flex; flex-direction: column; gap: 6px; max-height: 230px; overflow-y: auto; }
   .plan-pick {
     display: flex; align-items: center; gap: 10px; width: 100%;
@@ -990,11 +1009,11 @@
   .plan-quick { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 2px; }
   .ep-btn.seen { background: var(--bg-soft); color: var(--ink-mute); border-color: transparent; }
   .ep-btn.elsewhere { border: 1.5px dashed var(--accent); }
-  .ep-btn.planned { background: var(--accent); color: #fff; border: 1px solid var(--accent); }
+  .ep-btn.planned { background: var(--accent-fill); color: var(--on-accent); border: 1px solid var(--accent-fill); font-weight: 700; }
   .plan-legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; font-size: 11px; color: var(--ink-mute); }
   .plan-legend span { display: inline-flex; align-items: center; gap: 5px; }
   .plan-legend .lg { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
-  .plan-legend .lg.planned { background: var(--accent); }
+  .plan-legend .lg.planned { background: var(--accent-fill); }
   .plan-legend .lg.seen { background: var(--bg-soft); border: 1px solid var(--line); }
   .plan-legend .lg.elsewhere { border: 1.5px dashed var(--accent); }
   .plan-preview-box { background: var(--bg-soft); border-radius: 12px; padding: 12px 14px; }
@@ -1410,7 +1429,25 @@
   .rec-ep-text { flex: 1; min-width: 0; font-size: 13px; color: var(--ink-mute); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .rec-ep-row.has .rec-ep-text { color: var(--ink); }
   .rec-ep-seen { font-size: 11px; font-weight: 700; color: #2f8f6a; background: #e3f3ec; border-radius: 100px; padding: 2px 8px; flex-shrink: 0; }
-  .ep-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .ep-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .ep-mark { border: 1.5px solid var(--line); background: var(--bg-elev); color: var(--ink-dim); border-radius: 100px; padding: 6px 12px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: var(--sans); white-space: nowrap; }
+  .ep-mark.on { border-color: var(--accent); background: var(--accent-soft, #eceefb); color: var(--accent); }
+  .ep-mark-hint { font-size: 11px; color: var(--ink-mute); margin: -4px 0 10px; }
+  .ep-mark-hint:empty { display: none; }
+  .home-rec-btn { position: absolute; right: 8px; bottom: 8px; width: 36px; height: 36px; border-radius: 50%; border: 0; background: rgba(255,255,255,.94); box-shadow: 0 2px 10px rgba(0,0,0,.16); font-size: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
+  .home-rec-btn:active { transform: scale(0.9); }
+  .quick-rec { display: flex; gap: 8px; margin: 4px 0 18px; }
+  .quick-rec button { border-radius: 12px; cursor: pointer; font-family: var(--sans); text-align: left; display: flex; flex-direction: column; gap: 2px; padding: 11px 14px; }
+  .quick-rec button span { font-size: 11px; font-weight: 500; }
+  .quick-rec-main { flex: 1; min-width: 0; border: 0; background: var(--accent-fill); color: var(--on-accent); font-size: 14px; font-weight: 700; }
+  .quick-rec-main span { color: var(--on-accent); opacity: .72; }
+  .quick-rec-sub { flex-shrink: 0; border: 1px solid var(--line); background: var(--bg-elev); color: var(--ink); font-size: 13px; font-weight: 700; }
+  .quick-rec-sub span { color: var(--ink-mute); }
+  .accent-picker { display: flex; gap: 8px; }
+  .accent-opt { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px 6px 10px; border-radius: 12px; border: 1.5px solid var(--line); background: var(--bg-elev); cursor: pointer; font-family: var(--sans); font-size: 12px; font-weight: 600; color: var(--ink-dim); }
+  .accent-opt.active { border-color: var(--ink); color: var(--ink); }
+  .accent-opt i { display: block; width: 30px; height: 30px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0,0,0,.08); }
+  .copy-opt-preview.multi { white-space: pre-line; text-align: left; font-size: 12px; line-height: 1.5; color: var(--ink-dim); display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; }
   .ep-nav { display: flex; gap: 8px; margin-top: 16px; }
   .ep-nav .btn:disabled { opacity: 0.35; }
   .ep-del { display: block; margin: 14px auto 0; background: none; border: none; color: #c4543a; font-size: 12px; font-weight: 600; cursor: pointer; font-family: var(--sans); }
@@ -1716,7 +1753,7 @@
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: var(--accent);
+    background: var(--accent-fill);
     flex-shrink: 0;
   }
 
@@ -1895,7 +1932,7 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    background: var(--accent-soft);
+    background: #fbf5ea; /* 백업 알림은 포인트 색과 상관없이 따뜻한 미색 */
     border: 1px solid #ecd9bf;
     border-radius: 12px;
     padding: 12px 14px;
@@ -1920,7 +1957,7 @@
   }
   .undo-bar.show { opacity: 1; pointer-events: auto; transform: translateY(0); }
   .undo-bar span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .undo-bar button { border: 0; background: none; color: #9fb0ff; font-weight: 700; font-size: 13px; cursor: pointer; flex-shrink: 0; font-family: var(--sans); }
+  .undo-bar button { border: 0; background: none; color: var(--accent-bar); font-weight: 700; font-size: 13px; cursor: pointer; flex-shrink: 0; font-family: var(--sans); }
   .backup-banner-icon {
     font-size: 22px;
     flex-shrink: 0;
@@ -1942,8 +1979,8 @@
   .backup-banner-btn {
     flex-shrink: 0;
     padding: 8px 16px;
-    background: var(--accent);
-    color: white;
+    background: var(--accent-fill);
+    color: var(--on-accent);
     border: none;
     border-radius: 100px;
     font-size: 13px;
@@ -2090,7 +2127,10 @@
     overflow: hidden;
     position: relative;
   }
+  .bar-fill.t-star { background: linear-gradient(90deg, var(--accent-fill), var(--accent-grad)); }
+  .bar-fill.t-youtube, .bar-fill.t-movie, .bar-fill.t-drama, .bar-fill.t-anime, .bar-fill.t-podcast, .bar-fill.t-webnovel { background: var(--c); }
   .bar-fill {
+    display: block; /* span이라 이게 없으면 너비가 안 먹어서 막대가 안 보였음 */
     height: 100%;
     border-radius: 6px;
     transition: width 0.5s cubic-bezier(0.16,1,0.3,1);
@@ -2124,7 +2164,7 @@
   .col-bar {
     width: 100%;
     max-width: 28px;
-    background: linear-gradient(180deg, var(--accent), #d99860);
+    background: linear-gradient(180deg, var(--accent-fill), var(--accent-grad));
     border-radius: 5px 5px 0 0;
     min-height: 2px;
     transition: height 0.5s cubic-bezier(0.16,1,0.3,1);
@@ -2270,6 +2310,223 @@
     flex-wrap: wrap;
     align-items: center;
   }
+  /* ===== 그린 테마: 애매한 진한 초록 대신 '읽히는 네온' =====
+     네온 글자는 흰 바탕에서 안 보여서 세 가지로 입힘:
+     ① 네온 바탕 + 검은 글자 (칩·선택 상태)  ② 검은 글자 + 네온 형광펜/밑줄 (숫자·링크)  ③ 별은 네온 + 얇은 테두리 */
+  .accent-mark { color: var(--accent); }
+  :root:not([data-accent="blue"]) { --mark: linear-gradient(transparent 56%, var(--accent-fill) 56%, var(--accent-fill) 92%, transparent 92%); }
+
+  /* ① 칩·선택 상태 */
+  :root:not([data-accent="blue"]) .status-option.active, :root:not([data-accent="blue"]) .plan-mini-btn.primary, :root:not([data-accent="blue"]) .ep-mark.on, :root:not([data-accent="blue"]) .sort-menu-item.active, :root:not([data-accent="blue"]) .ott-picker-item.selected,
+  :root:not([data-accent="blue"]) .template-pill.manage, :root:not([data-accent="blue"]) .card-link, :root:not([data-accent="blue"]) .plan-range-picked, :root:not([data-accent="blue"]) .rec-ep-seen, :root:not([data-accent="blue"]) .notes-add, :root:not([data-accent="blue"]) .badge-note {
+    background: var(--accent-fill); color: var(--on-accent); border-color: var(--accent-fill);
+  }
+  :root:not([data-accent="blue"]) .plan-day.slim .plan-mini-btn.primary { background: var(--bg-elev); color: var(--ink); }
+  :root:not([data-accent="blue"]) .pf-chip.on { background: var(--accent-fill); color: var(--on-accent); border-color: var(--accent-fill); box-shadow: none; }
+  :root:not([data-accent="blue"]) .pf-chip.on .pf-count { background: var(--on-accent); color: var(--accent-fill); }
+  :root:not([data-accent="blue"]) .plan-pick.selected { border-color: var(--accent-fill); box-shadow: inset 0 0 0 1px var(--accent-fill); }
+  :root:not([data-accent="blue"]) .ep-btn.extra { background: var(--accent-fill); color: var(--on-accent); border: 1.5px dashed var(--on-accent); }
+  :root:not([data-accent="blue"]) .ep-btn.elsewhere, :root:not([data-accent="blue"]) .plan-legend .lg.elsewhere { border: 2px dashed var(--accent-fill); }
+  :root:not([data-accent="blue"]) .plan-day.today, :root:not([data-accent="blue"]) .plan-day.slim.today { border: 2px solid var(--accent-fill); }
+  :root:not([data-accent="blue"]) .plan-cell-badge.done { background: var(--on-accent); color: var(--accent-fill); }
+  :root:not([data-accent="blue"]) .chron-item::before { background: var(--accent-fill); box-shadow: 0 0 0 1px var(--on-accent); }
+  :root:not([data-accent="blue"]) .mm-group-apply input, :root:not([data-accent="blue"]) .rec-x-row input { accent-color: var(--accent-fill); }
+
+  /* ② 글자: 검은 글자 + 네온 형광펜 / 밑줄 */
+  :root:not([data-accent="blue"]) .tab.active { color: var(--ink); }
+  :root:not([data-accent="blue"]) .tab.active .tab-icon { background: var(--accent-fill); border-radius: 100px; padding: 3px 16px; margin: -3px 0; }
+  :root:not([data-accent="blue"]) .tab.active .tab-count, :root:not([data-accent="blue"]) .ep-mode-btn.active, :root:not([data-accent="blue"]) .timeline-hero-label, :root:not([data-accent="blue"]) .col-bar-val, :root:not([data-accent="blue"]) .rec-arrow, :root:not([data-accent="blue"]) .sort-menu-item-check,
+  :root:not([data-accent="blue"]) .plan-row-note, :root:not([data-accent="blue"]) .plan-extra-state, :root:not([data-accent="blue"]) .guard-snap, :root:not([data-accent="blue"]) .ott-manage-btn.edit { color: var(--ink); }
+  :root:not([data-accent="blue"]) .progress-percent, :root:not([data-accent="blue"]) .timeline-hero-num span, :root:not([data-accent="blue"]) .stat-tile-num span, :root:not([data-accent="blue"]) .ott-group-stat b, :root:not([data-accent="blue"]) .chron-month-count,
+  :root:not([data-accent="blue"]) .plan-cell.today .plan-cell-num, :root:not([data-accent="blue"]) .accent-mark {
+    color: var(--ink); background: var(--mark); padding: 0 2px;
+  }
+  :root:not([data-accent="blue"]) .md-link, :root:not([data-accent="blue"]) .md-pv-btn {
+    color: var(--ink); text-decoration: underline; text-decoration-color: var(--accent-fill);
+    text-decoration-thickness: 3px; text-underline-offset: 3px;
+  }
+  :root:not([data-accent="blue"]) .plan-dow.sat { color: #3b6fd6; } /* 토요일은 테마와 상관없이 파랑 (달력 관례) */
+  :root:not([data-accent="blue"]) .save-indicator.flash { color: var(--ink); }
+  :root:not([data-accent="blue"]) .save-indicator.flash::before { background: var(--accent-fill); box-shadow: 0 0 0 2px var(--accent-soft); }
+
+  /* ③ 별: 네온 + 얇은 테두리 */
+  :root:not([data-accent="blue"]) .card-stars, :root:not([data-accent="blue"]) .detail-stars, :root:not([data-accent="blue"]) .hall-stars, :root:not([data-accent="blue"]) .star.filled, :root:not([data-accent="blue"]) .star-dist-label {
+    color: var(--accent-fill); -webkit-text-stroke: 0.7px var(--on-accent);
+  }
+  :root:not([data-accent="blue"]) .star-off { color: #c9ccd6; -webkit-text-stroke: 0; }
+  :root:not([data-accent="blue"]) .star-dist-label { width: 66px; letter-spacing: 0; }
+
+  /* ===================== 포닝(Y2K) 스타일 =====================
+     굵은 검은 테두리 + 위에서 흰색으로 번지는 형광 배경 + 반짝이는 라임 알약 버튼.
+     '깔끔'을 고르면(data-style="clean") 이 블록은 전부 빠지고 예전 모습 그대로 */
+  :root {
+    --ol: #121212;
+    --gloss: linear-gradient(180deg, #f6ffe8 0%, #ccf590 40%, #8fe24a 100%);
+    --gloss-ink: #121212;
+    --band: #3af23c;
+    --card-g: linear-gradient(180deg, #ffffff 0%, #f3ffe4 52%, #d2f7a2 100%);
+    --card-b: linear-gradient(180deg, #ffffff 0%, #e6f1ff 52%, #b6d6ff 100%);
+    --card-y: linear-gradient(180deg, #ffffff 0%, #fffbdb 52%, #fff28c 100%);
+  }
+  :root[data-accent="soft"] { --gloss: linear-gradient(180deg, #f6fff8 0%, #cdf3da 40%, #8ee0aa 100%); }
+  :root[data-accent="blue"] { --gloss: linear-gradient(180deg, #ffffff 0%, #d6e8ff 40%, #9cc7ff 100%); }
+  /* 화면마다 배경색 (포닝처럼 초록 · 파랑 · 노랑) */
+  :root[data-page="all"], :root[data-page="stats"] { --band: #4e9cff; }
+  :root[data-page="plan"], :root[data-page="settings"] { --band: #fff22e; }
+  :root:not([data-style="clean"]):not([data-accent="soft"]):not([data-accent="blue"]) {
+    --accent-fill: #8fe24a; --accent-grad: #ccf590; --accent-bar: #a6f05e; --accent-soft: #eefcdc; --accent-glow: rgba(143, 226, 74, 0.4);
+  }
+  :root:not([data-style="clean"])[data-accent="blue"] { --accent-fill: #8ab9ff; --on-accent: #121212; --accent-grad: #d6e8ff; --accent-bar: #9cc7ff; }
+
+  /* 바탕: 위·아래 형광 띠 */
+  :root:not([data-style="clean"]) { background: #fff; }
+  :root:not([data-style="clean"]) body { background: transparent; padding-bottom: calc(104px + env(safe-area-inset-bottom, 0px)); }
+  :root:not([data-style="clean"]) body::before {
+    content: ''; position: fixed; left: 0; right: 0; top: 0; height: 340px; z-index: -1; pointer-events: none;
+    background:
+      repeating-linear-gradient(180deg, rgba(255,255,255,0) 0 4px, rgba(255,255,255,.26) 4px 6px) 0 120px / 100% 150px no-repeat,
+      linear-gradient(180deg, var(--band) 0%, var(--band) 26%, rgba(255,255,255,0) 100%);
+    transition: background .3s;
+  }
+  :root:not([data-style="clean"]) body::after {
+    content: ''; position: fixed; left: 0; right: 0; bottom: 0; height: calc(64px + env(safe-area-inset-bottom, 0px)); z-index: -1; pointer-events: none;
+    background: linear-gradient(0deg, var(--band) 0%, rgba(255,255,255,0) 100%);
+  }
+  :root:not([data-style="clean"]) header { background: transparent; border-bottom: none; }
+  :root:not([data-style="clean"]) .brand-title span { color: #fff; background: none; padding: 0 2px; text-shadow: -1.6px -1.6px 0 var(--ol), 1.6px -1.6px 0 var(--ol), -1.6px 1.6px 0 var(--ol), 1.6px 1.6px 0 var(--ol), 0px 1.8px 0 var(--ol), 0px -1.8px 0 var(--ol), 1.8px 0px 0 var(--ol), -1.8px 0px 0 var(--ol), 2px 3px 0 var(--ol); }
+  :root:not([data-style="clean"]) .brand-meta, :root:not([data-style="clean"]) .header-sub, :root:not([data-style="clean"]) .save-indicator { color: rgba(18,18,18,.66); }
+  :root:not([data-style="clean"]) .section-sub { color: rgba(18,18,18,.6); }
+  :root:not([data-style="clean"]) .chron-month-head { background: transparent; }
+  :root:not([data-style="clean"]) .ott-select-btn { border: 2px solid var(--ol); border-radius: 100px; }
+  :root:not([data-style="clean"]) .guard-box .btn { white-space: nowrap; font-size: 13px; padding: 11px 6px; }
+
+  /* 아래 탭: 떠 있는 테두리 바 */
+  :root:not([data-style="clean"]) .tabs {
+    left: 12px; right: 12px; bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    border: 2px solid var(--ol); border-radius: 100px; background: rgba(255,255,255,.97); padding: 0; overflow: hidden;
+  }
+  :root:not([data-style="clean"]) .tab { border-radius: 0; padding: 8px 2px 7px; color: #9a9daa; }
+  /* 하단 탭: 칸을 채우지 않음. 안 고른 탭은 회색, 고른 탭만 아이콘 원래 색 + 검은 글자 */
+  :root:not([data-style="clean"]) .tab.active { background: none; box-shadow: none; color: var(--ol); font-weight: 800; }
+  :root:not([data-style="clean"]) .tab.active .tab-icon { filter: none; }
+  :root:not([data-style="clean"]) .tab.active { color: var(--ol); }
+  :root:not([data-style="clean"]) .tab.active .tab-icon { background: none; box-shadow: none; padding: 0; margin: 0; }
+  :root:not([data-style="clean"]) .tab.active .tab-count { color: var(--ol); }
+  :root:not([data-style="clean"]) .fab {
+    background: var(--gloss); color: var(--ol); border: 2px solid var(--ol); box-shadow: 0 6px 18px var(--accent-glow);
+    bottom: calc(96px + env(safe-area-inset-bottom, 0px)); font-weight: 400;
+  }
+  :root:not([data-style="clean"]) .toast { background: #fff; color: var(--ol); border: 2px solid var(--ol); box-shadow: none; font-weight: 600; bottom: calc(88px + env(safe-area-inset-bottom, 0px)); }
+  :root:not([data-style="clean"]) .undo-bar { background: #fff; color: var(--ol); border: 2px solid var(--ol); box-shadow: 0 6px 18px rgba(0,0,0,.12);
+    border-radius: 100px; padding: 0 0 0 18px; min-height: 46px; align-items: stretch; overflow: hidden; }
+  :root:not([data-style="clean"]) .undo-bar span { align-self: center; }
+  :root:not([data-style="clean"]) .undo-bar button { background: var(--gloss); color: var(--ol); border: none; box-shadow: 0 0 0 2px var(--ol); border-radius: 100px; padding: 0 18px; }
+
+  /* 카드: 흰 바탕 + 굵은 테두리 (몇 개는 포닝처럼 아래로 물드는 그라데이션) */
+  :root:not([data-style="clean"]) .card, :root:not([data-style="clean"]) .entry-card, :root:not([data-style="clean"]) .plan-day, :root:not([data-style="clean"]) .rec-card, :root:not([data-style="clean"]) .stat-card, :root:not([data-style="clean"]) .stat-tile, :root:not([data-style="clean"]) .copy-opt-btn, :root:not([data-style="clean"]) .menu-item, :root:not([data-style="clean"]) .note-item,
+  :root:not([data-style="clean"]) .template-list-item, :root:not([data-style="clean"]) .ott-manage-item, :root:not([data-style="clean"]) .hall-item, :root:not([data-style="clean"]) .timeline-hero, :root:not([data-style="clean"]) .guard-box, :root:not([data-style="clean"]) .plan-summary, :root:not([data-style="clean"]) .backup-banner,
+  :root:not([data-style="clean"]) .confirm-content, :root:not([data-style="clean"]) .sort-menu, :root:not([data-style="clean"]) .parts-box {
+    border: 2px solid var(--ol); box-shadow: none; border-radius: 22px;
+  }
+  :root:not([data-style="clean"]) .copy-opt-btn, :root:not([data-style="clean"]) .menu-item, :root:not([data-style="clean"]) .note-item, :root:not([data-style="clean"]) .template-list-item, :root:not([data-style="clean"]) .ott-manage-item, :root:not([data-style="clean"]) .stat-tile, :root:not([data-style="clean"]) .parts-box { border-radius: 18px; }
+  :root:not([data-style="clean"]) .entry-card { background: var(--card-b); }
+  :root:not([data-style="clean"]) .rec-card, :root:not([data-style="clean"]) .hall-item, :root:not([data-style="clean"]) .backup-banner { background: var(--card-y); }
+  :root:not([data-style="clean"]) .backup-banner.warn { background: linear-gradient(180deg, #ffffff 0%, #ffece6 52%, #ffc9b9 100%); }
+  :root:not([data-style="clean"]) .plan-summary, :root:not([data-style="clean"]) .plan-day.today, :root:not([data-style="clean"]) .plan-day.slim.today { background: var(--card-g); border: 2px solid var(--ol); }
+  :root:not([data-style="clean"]) .plan-day.slim { border-width: 1.5px; border-color: rgba(18,18,18,.35); }
+  :root:not([data-style="clean"]) .plan-summary-row { border: 1.5px solid var(--ol); border-radius: 16px; }
+  :root:not([data-style="clean"]) .guard-box { background: #fff; }
+  :root:not([data-style="clean"]) .entry-icon { background: #fff; border: 2px solid var(--ol); border-radius: 50%; box-shadow: none; }
+  :root:not([data-style="clean"]) .rec-row, :root:not([data-style="clean"]) .rec-ep-row, :root:not([data-style="clean"]) .rec-x-row, :root:not([data-style="clean"]) .plan-pick, :root:not([data-style="clean"]) .quick-rec-sub, :root:not([data-style="clean"]) .accent-opt { border: 2px solid var(--ol); box-shadow: none; }
+  :root:not([data-style="clean"]) .accent-opt.active, :root:not([data-style="clean"]) .plan-pick.selected { background: var(--gloss); }
+
+  /* 홈 포스터 */
+  :root:not([data-style="clean"]) .home-poster-thumb { border: 2px solid var(--ol); border-radius: 24px; background: var(--card-b); }
+  :root:not([data-style="clean"]) .home-day-badge, :root:not([data-style="clean"]) .home-rec-btn { border: 1.5px solid var(--ol); box-shadow: none; background: #fff; }
+  :root:not([data-style="clean"]) .home-rec-btn { border-width: 2px; }
+  :root:not([data-style="clean"]) .home-poster-bar, :root:not([data-style="clean"]) .progress-bar { height: 10px; background: #fff; border: 1.5px solid var(--ol); border-radius: 100px; }
+  :root:not([data-style="clean"]) .home-poster-fill, :root:not([data-style="clean"]) .progress-fill { background: var(--gloss); border-radius: 100px; box-shadow: 0 0 0 1.5px var(--ol); }
+  :root:not([data-style="clean"]) .home-poster-bar, :root:not([data-style="clean"]) .progress-bar, :root:not([data-style="clean"]) .bar-track { overflow: hidden; }
+  :root:not([data-style="clean"]) .card-thumb, :root:not([data-style="clean"]) .hall-thumb, :root:not([data-style="clean"]) .detail-thumb, :root:not([data-style="clean"]) .note-photo-item { border: 1.5px solid var(--ol); }
+
+  /* 버튼 · 알약 · 고르기 */
+  :root:not([data-style="clean"]) .btn { border: 2px solid var(--ol); border-radius: 100px; font-weight: 700; }
+  :root:not([data-style="clean"]) .btn-primary { background: var(--gloss); color: var(--gloss-ink); border-color: var(--ol); }
+  :root:not([data-style="clean"]) .btn-danger { border-color: var(--red); }
+  :root:not([data-style="clean"]) .pill, :root:not([data-style="clean"]) .sort-btn { border: 1.5px solid var(--ol); color: var(--ol); font-weight: 600; }
+  :root:not([data-style="clean"]) .pill.active, :root:not([data-style="clean"]) .type-option.active, :root:not([data-style="clean"]) .status-option.active, :root:not([data-style="clean"]) .pf-chip.on, :root:not([data-style="clean"]) .sort-menu-item.active, :root:not([data-style="clean"]) .ott-picker-item.selected,
+  :root:not([data-style="clean"]) .rec-tab.active, :root:not([data-style="clean"]) .ep-mark.on, :root:not([data-style="clean"]) .plan-mini-btn.primary, :root:not([data-style="clean"]) .quick-rec-main, :root:not([data-style="clean"]) .backup-banner-btn, :root:not([data-style="clean"]) .card-link,
+  :root:not([data-style="clean"]) .badge-note, :root:not([data-style="clean"]) .rec-ep-seen, :root:not([data-style="clean"]) .plan-today-badge, :root:not([data-style="clean"]) .notes-add, :root:not([data-style="clean"]) .template-pill.manage, :root:not([data-style="clean"]) .plan-range-picked {
+    background: var(--gloss); color: var(--ol); border-color: var(--ol);
+  }
+  :root:not([data-style="clean"]) .plan-day.slim .plan-mini-btn.primary { background: #fff; }
+  :root:not([data-style="clean"]) .type-option, :root:not([data-style="clean"]) .status-option { border: 2px solid var(--ol); border-radius: 18px; color: var(--ol); }
+  :root:not([data-style="clean"]) .seg-picker, :root:not([data-style="clean"]) .ep-mode-toggle, :root:not([data-style="clean"]) .preview-toggle {
+    background: #ececf1; border: 2px solid var(--ol); border-radius: 100px; padding: 0; gap: 0; overflow: hidden;
+  }
+  :root:not([data-style="clean"]) .seg-option, :root:not([data-style="clean"]) .ep-mode-btn, :root:not([data-style="clean"]) .preview-toggle button { color: #6b6e7a; border-radius: 100px; font-weight: 600; }
+  :root:not([data-style="clean"]) .seg-option { padding: 10px 8px; }
+  :root:not([data-style="clean"]) .ep-mode-btn { padding: 6px 14px; }
+  :root:not([data-style="clean"]) .preview-toggle button { padding: 10px 8px; }
+  :root:not([data-style="clean"]) .seg-option.active, :root:not([data-style="clean"]) .ep-mode-btn.active, :root:not([data-style="clean"]) .preview-toggle button.active {
+    background: var(--gloss); color: var(--ol); box-shadow: 0 0 0 2px var(--ol); font-weight: 700; position: relative; z-index: 1;
+  }
+
+  :root:not([data-style="clean"]) .rec-tab { border: 2px solid var(--ol); background: #fff; color: var(--ol); border-radius: 100px; }
+  :root:not([data-style="clean"]) .plan-mini-btn, :root:not([data-style="clean"]) .card-copy-btn, :root:not([data-style="clean"]) .template-pill, :root:not([data-style="clean"]) .ott-chip, :root:not([data-style="clean"]) .pf-chip, :root:not([data-style="clean"]) .ott-picker-item, :root:not([data-style="clean"]) .ep-mark { border: 1.5px solid var(--ol); color: var(--ol); }
+  :root:not([data-style="clean"]) .plan-mini-btn, :root:not([data-style="clean"]) .card-copy-btn { background: #fff; }
+  :root:not([data-style="clean"]) .badge-note, :root:not([data-style="clean"]) .rec-ep-seen, :root:not([data-style="clean"]) .plan-today-badge, :root:not([data-style="clean"]) .notes-add, :root:not([data-style="clean"]) .card-link, :root:not([data-style="clean"]) .plan-range-picked, :root:not([data-style="clean"]) .quick-rec-main, :root:not([data-style="clean"]) .backup-banner-btn { border: 1.5px solid var(--ol); }
+  :root:not([data-style="clean"]) .quick-rec-main { border-width: 2px; }
+  :root:not([data-style="clean"]) .pf-count, :root:not([data-style="clean"]) .pf-chip.on .pf-count { background: none; padding: 0; color: inherit; opacity: .6; }
+  :root:not([data-style="clean"]) .pill.active .pill-count { color: rgba(18,18,18,.55); }
+  :root:not([data-style="clean"]) .card-type { border: 1.5px solid currentColor; }
+  :root:not([data-style="clean"]) .plan-nav-btn { border: 2px solid var(--ol); border-radius: 100px; color: var(--ol); }
+  :root:not([data-style="clean"]) .modal-close {
+    width: 38px; height: 38px; border: 2px solid var(--ol); border-radius: 50%; background: #fff; color: var(--ol);
+    font-size: 22px; font-weight: 400; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  :root:not([data-style="clean"]) .mdt { border: 1.5px solid var(--ol); background: #fff; color: var(--ol); }
+  :root:not([data-style="clean"]) .mdt.mk { background: #fff08a; }
+  :root:not([data-style="clean"]) .md-toolbar { border: 2px solid var(--ol); border-bottom: none; border-radius: 16px 16px 0 0; background: #fff; }
+
+  /* 회차 칸 · 계획 */
+  :root:not([data-style="clean"]) .ep-btn { border: 1.5px solid var(--ol); border-radius: 12px; color: var(--ol); }
+  :root:not([data-style="clean"]) .ep-btn.watched, :root:not([data-style="clean"]) .ep-btn.planned { background: var(--gloss); color: var(--ol); border: 1.5px solid var(--ol); }
+  :root:not([data-style="clean"]) .ep-btn.seen { border-color: #c9ccd6; color: #9a9daa; }
+  :root:not([data-style="clean"]) .ep-btn.extra { background: var(--gloss); color: var(--ol); border: 1.5px dashed var(--ol); }
+  :root:not([data-style="clean"]) .ep-btn.elsewhere, :root:not([data-style="clean"]) .plan-legend .lg.elsewhere { border: 2px dashed var(--ol); }
+  :root:not([data-style="clean"]) .plan-legend .lg.planned { background: var(--gloss); box-shadow: inset 0 0 0 1px var(--ol); }
+  :root:not([data-style="clean"]) .plan-check { border: 2px solid var(--ol); }
+  :root:not([data-style="clean"]) .plan-row.done .plan-check { background: var(--gloss); color: var(--ol); border-color: var(--ol); }
+  :root:not([data-style="clean"]) .plan-cell { border: 1.5px solid transparent; }
+  :root:not([data-style="clean"]) .plan-cell.today { border-color: var(--ol); }
+  :root:not([data-style="clean"]) .plan-cell.selected { background: var(--gloss); border-color: var(--ol); }
+  :root:not([data-style="clean"]) .plan-cell-badge:not(.empty) { box-shadow: 0 0 0 1px var(--ol); }
+
+  /* 입력칸 */
+  :root:not([data-style="clean"]) .form-input, :root:not([data-style="clean"]) .form-select, :root:not([data-style="clean"]) .form-textarea, :root:not([data-style="clean"]) .note-title-input, :root:not([data-style="clean"]) .note-textarea, :root:not([data-style="clean"]) .md-pv-box { border: 2px solid var(--ol); border-radius: 16px; }
+  :root:not([data-style="clean"]) input.form-input { border-radius: 100px; padding-left: 16px; padding-right: 16px; }
+  :root:not([data-style="clean"]) .md-tools-slot + .form-textarea, :root:not([data-style="clean"]) .md-tools-slot + textarea { border-radius: 0 0 16px 16px; }
+
+  /* 창 (아래에서 올라오는 시트) */
+  :root:not([data-style="clean"]) .modal-content { border: 2px solid var(--ol); border-bottom: none; border-radius: 26px 26px 0 0; }
+  :root:not([data-style="clean"]) .modal-header { border-bottom: 1.5px solid #ececf1; }
+  :root:not([data-style="clean"]) .confirm-content { border-radius: 26px; }
+
+  /* 통계 */
+  :root:not([data-style="clean"]) .bar-track { border: 1.5px solid var(--ol); background: #fff; border-radius: 100px; }
+  :root:not([data-style="clean"]) .bar-fill { border-radius: 100px; box-shadow: 0 0 0 1.5px var(--ol); background: var(--gloss); }
+  :root:not([data-style="clean"]) .bar-fill[style^="width: 0%"] { display: none; }
+  :root:not([data-style="clean"]) .bar-fill.t-youtube { background: linear-gradient(180deg, #ffe6ea 0%, #ff9fad 42%, #ff5d73 100%); }
+  :root:not([data-style="clean"]) .bar-fill.t-movie { background: linear-gradient(180deg, #eef5ff 0%, #a6ccff 42%, #4e9cff 100%); }
+  :root:not([data-style="clean"]) .bar-fill.t-drama { background: linear-gradient(180deg, #fffde6 0%, #fff384 42%, #ffd61a 100%); }
+  :root:not([data-style="clean"]) .bar-fill.t-anime { background: linear-gradient(180deg, #ffeaf7 0%, #ffaee0 42%, #ff6ec7 100%); }
+  :root:not([data-style="clean"]) .bar-fill.t-podcast { background: linear-gradient(180deg, #f3ecff 0%, #cbb2ff 42%, #9b75ff 100%); }
+  :root:not([data-style="clean"]) .bar-fill.t-webnovel { background: linear-gradient(180deg, #f6ffe8 0%, #ccf590 42%, #8fe24a 100%); }
+  :root:not([data-style="clean"]) .col-bar { background: var(--gloss); border: 1.5px solid var(--ol); border-bottom: none; }
+  :root:not([data-style="clean"]) .chron-item::before { background: var(--accent-fill); box-shadow: 0 0 0 1.5px var(--ol); }
+  :root:not([data-style="clean"]) .mm-wrap { border: 2px solid var(--ol); }
+
 </style>
 </head>
 <body>
@@ -2504,6 +2761,20 @@
     </div>
 
     <div style="margin-top: 24px;">
+      <h3 style="font-size: 13px; font-weight: 600; color: var(--ink-mute); letter-spacing: 0.04em; margin-bottom: 10px;">모양</h3>
+      <div class="accent-picker" id="stylePicker" style="margin-bottom: 18px;">
+        <button type="button" class="accent-opt" data-style="y2k"><i style="background: linear-gradient(180deg, #3af23c, #fff); box-shadow: inset 0 0 0 2px #121212;"></i>포닝 스타일</button>
+        <button type="button" class="accent-opt" data-style="clean"><i style="background: #f4f5f8; box-shadow: inset 0 0 0 1px #e9eaef;"></i>깔끔 (예전)</button>
+      </div>
+      <h3 style="font-size: 13px; font-weight: 600; color: var(--ink-mute); letter-spacing: 0.04em; margin-bottom: 10px;">포인트 색</h3>
+      <div class="accent-picker" id="accentPicker">
+        <button type="button" class="accent-opt" data-accent="neon"><i style="background:#2EF26B"></i>네온그린</button>
+        <button type="button" class="accent-opt" data-accent="soft"><i style="background:#86E3A5"></i>연한 그린</button>
+        <button type="button" class="accent-opt" data-accent="blue"><i style="background:#3d4cc8"></i>파랑 (예전)</button>
+      </div>
+    </div>
+
+    <div style="margin-top: 24px;">
       <h3 style="font-size: 13px; font-weight: 600; color: var(--ink-mute); letter-spacing: 0.04em; margin-bottom: 10px;">복사 설정</h3>
       <div style="font-size: 12px; color: var(--ink-dim); line-height: 1.6; margin-bottom: 10px;">카드의 <strong>복사</strong> 버튼을 눌렀을 때 기본으로 복사할 형식이에요. (상세 화면에서는 매번 골라서 복사할 수 있어요)</div>
       <div class="seg-picker" id="copyDefaultPicker">
@@ -2511,6 +2782,16 @@
         <button type="button" class="seg-option" data-mode="title">제목만</button>
       </div>
       <div style="font-size: 11px; color: var(--ink-mute); margin-top: 8px;">예시 — 진행 상황: <span id="copyExampleProgress">〈드라마〉 9화~</span> · 제목만: 〈드라마〉</div>
+    </div>
+
+    <div style="margin-top: 24px;">
+      <h3 style="font-size: 13px; font-weight: 600; color: var(--ink-mute); letter-spacing: 0.04em; margin-bottom: 10px;">회차 기록</h3>
+      <div style="font-size: 12px; color: var(--ink-dim); line-height: 1.6; margin-bottom: 10px;">회차를 체크했을 때(상세 화면·<strong>+1화</strong>·계획 체크) 그 회차 기록을 어떻게 쓸지 골라요. 홈 포스터의 <strong>✍️</strong> 버튼으로는 언제든 바로 쓸 수 있어요.</div>
+      <div class="seg-picker" id="epRecPromptPicker">
+        <button type="button" class="seg-option active" data-mode="bar">기록 버튼 띄우기</button>
+        <button type="button" class="seg-option" data-mode="open">바로 기록 창</button>
+        <button type="button" class="seg-option" data-mode="off">안 함</button>
+      </div>
     </div>
 
     <div style="margin-top: 24px;">
@@ -2549,7 +2830,7 @@
     </div>
 
     <div id="versionText" style="text-align: center; margin-top: 40px; font-size: 11px; color: var(--ink-mute); letter-spacing: 0.04em; font-weight: 500;">
-      v5.1 · 데이터는 브라우저에 저장됩니다
+      v5.4 · 데이터는 브라우저에 저장됩니다
     </div>
   </section>
 </main>
@@ -3155,6 +3436,7 @@
     </div>
     <div class="modal-body">
       <div class="ep-top"><span id="epStatus"></span><button type="button" class="plan-mini-btn" onclick="insertEpTemplate()">📋 기본 틀</button></div>
+      <div class="ep-mark-hint" id="epMarkHint"></div>
       <div class="md-field">
         <div class="md-field-head"><label class="form-label" style="margin:0;">기록</label><button type="button" class="md-pv-btn" id="recEpText_pvbtn" onclick="toggleMdPreview('recEpText')">미리보기</button></div>
         <div class="md-tools-slot" data-for="recEpText"></div>
@@ -3284,7 +3566,7 @@
     <div style="text-align: center; font-size: 34px; margin-bottom: 6px;">🎉</div>
     <div class="confirm-title" style="text-align: center;">업데이트 완료</div>
     <div class="confirm-desc" style="text-align: center; margin-bottom: 16px;">
-      <span id="updateVersionText" style="font-weight: 700; color: var(--accent);"></span> 버전으로 새로워졌어요
+      <span id="updateVersionText" class="accent-mark" style="font-weight: 700;"></span> 버전으로 새로워졌어요
     </div>
     <ul id="updateNotes" style="margin: 0 0 18px 18px; padding: 0; font-size: 13px; color: var(--ink-dim); line-height: 1.7; max-height: 52vh; overflow-y: auto; -webkit-overflow-scrolling: touch;"></ul>
     <button class="btn btn-primary" onclick="closeUpdateModal()" style="width: 100%;">확인</button>
@@ -3465,7 +3747,7 @@
 </div>
 
 <div class="toast" id="toast"></div>
-<div class="undo-bar" id="undoBar"><span id="undoText"></span><button type="button" onclick="runUndo()">되돌리기</button></div>
+<div class="undo-bar" id="undoBar"><span id="undoText"></span><button type="button" id="undoBtn" onclick="runUndo()">되돌리기</button></div>
 
 <!-- SNAPSHOT LIST -->
 <div class="modal" id="snapModal" style="z-index: 260;">
@@ -3522,9 +3804,25 @@ const DEFAULT_OTT = [
 ];
 
 // ============ VERSION ============
-const APP_VERSION = '5.1';
+const APP_VERSION = '5.4';
 const VERSION_KEY = 'contentsArchive_seenVersion';
 const VERSION_NOTES = {
+  '5.4': [
+    '포닝 스타일로 새 옷을 입었어요 💚💙💛 — 굵은 테두리, 형광 배경, 반짝이는 버튼',
+    '탭마다 배경색이 달라요 (홈·모아보기 초록 · 전체·통계 파랑 · 계획·더보기 노랑)',
+    '더보기 → 모양에서 \'깔끔 (예전)\'으로 언제든 돌아갈 수 있어요'
+  ],
+  '5.3': [
+    '포인트 색이 네온그린으로 바뀌었어요 🌿 — 보는 시간이 휴식이니까',
+    '더보기 → 포인트 색에서 연한 그린이나 예전 파랑으로 언제든 바꿀 수 있어요',
+    'PDF·이미지·Word로 내보낼 때 제목 색도 고른 색을 따라가요'
+  ],
+  '5.2': [
+    '✍️ 빠른 회차 기록: 홈 포스터·진행중 카드·상세 화면의 ✍️ 버튼으로 다음 회차 기록을 바로 써요',
+    '빠른 기록에서 내용을 쓰면 그 회차가 \'본 회차\'로 같이 체크돼요 (기록 창의 ☑ 버튼으로 끄고 켤 수 있어요)',
+    '회차를 체크하면 \'✍️ 기록 쓰기\' 버튼이 잠깐 떠요 — 더보기 → 회차 기록에서 \'바로 기록 창\'·\'안 함\'으로 바꿀 수 있어요',
+    '상세 → 복사하기 → 회차 기록 + 총평: \'1화: …\' 한 줄씩, 마지막에 총평까지 서식 없이 한 번에 복사'
+  ],
   '5.1': [
     '데이터 지킴이: 저장할 때마다 기기 안 보조 저장소에도 한 번 더 저장해요 (기본 저장소가 가득 차거나 깨져도 복구)',
     '자동 백업(복원 지점)이 30분마다·앱 열 때·지우기 직전에 남아요 — 더보기 → 데이터 지킴이에서 그 시점으로 되돌리기',
@@ -3619,6 +3917,9 @@ let state = {
   typeFilter: 'all',
   statusFilter: 'all',
   copyDefaultProgress: true,
+  epRecPrompt: 'bar',
+  accentTheme: 'neon',
+  uiStyle: 'y2k',
   lastSavedAt: null,
   templateFilter: 'all',
   sortBy: 'updated',
@@ -3765,6 +4066,9 @@ function applyData(data) {
     state.changesSinceBackup = data.settings.changesSinceBackup || 0;
     state.bannerDismissedAt = data.settings.bannerDismissedAt || null;
     if (data.settings.copyDefaultProgress !== undefined) state.copyDefaultProgress = data.settings.copyDefaultProgress;
+    if (['bar', 'open', 'off'].includes(data.settings.epRecPrompt)) state.epRecPrompt = data.settings.epRecPrompt;
+    if (ACCENTS.includes(data.settings.accentTheme)) { state.accentTheme = data.settings.accentTheme; applyAccent(state.accentTheme); }
+    if (STYLES.includes(data.settings.uiStyle)) { state.uiStyle = data.settings.uiStyle; applyStyle(state.uiStyle); }
     if (data.settings.timelineSort) state.timelineSort = data.settings.timelineSort;
     if (typeof data.settings.ytApiKey === 'string') state.ytApiKey = data.settings.ytApiKey;
     if (data.settings.planView) state.planView = data.settings.planView;
@@ -3786,6 +4090,9 @@ function buildPayload(now) {
     changesSinceBackup: state.changesSinceBackup,
     bannerDismissedAt: state.bannerDismissedAt,
     copyDefaultProgress: state.copyDefaultProgress,
+    epRecPrompt: state.epRecPrompt,
+    accentTheme: state.accentTheme,
+    uiStyle: state.uiStyle,
     timelineSort: state.timelineSort,
     ytApiKey: state.ytApiKey,
     planView: state.planView,
@@ -4142,17 +4449,22 @@ async function deliverFile(text, name, type, noShare) {
 }
 
 // ----- 되돌리기 바 (방금 지운 것 살리기) -----
-let undoAction = null, undoTimer = null;
-function showUndo(msg, fn) {
+let undoAction = null, undoTimer = null, actionBarTag = null;
+// 아래쪽 검은 바: 문구 + 버튼 하나 (되돌리기, 기록 쓰기 등). tag로 어떤 바인지 구분
+function showActionBar(msg, label, fn, ms, tag) {
   const el = document.getElementById('undoBar');
   if (!el) return;
   document.getElementById('undoText').textContent = msg;
+  const b = document.getElementById('undoBtn');
+  if (b) b.textContent = label || '되돌리기';
   undoAction = fn;
+  actionBarTag = tag || null;
   el.classList.add('show');
   clearTimeout(undoTimer);
-  undoTimer = setTimeout(hideUndo, 8000);
+  undoTimer = setTimeout(hideUndo, ms || 8000);
 }
-function hideUndo() { const el = document.getElementById('undoBar'); if (el) el.classList.remove('show'); undoAction = null; }
+function showUndo(msg, fn) { showActionBar(msg, '되돌리기', fn, 8000, 'undo'); }
+function hideUndo() { const el = document.getElementById('undoBar'); if (el) el.classList.remove('show'); undoAction = null; actionBarTag = null; }
 function runUndo() { const f = undoAction; hideUndo(); if (f) f(); }
 
 // 저장 시각 표시 갱신. flash=true면 잠깐 초록색
@@ -4406,6 +4718,8 @@ function progressText(item) {
 }
 
 function starString(n) { return n ? '★'.repeat(n) + '☆'.repeat(5 - n) : ''; }
+// 화면용: 빈 별은 따로 감싸서 색을 다르게 (네온 테마에서 빈 별이 찬 별처럼 보이지 않게)
+function starHTML(n) { return n ? '★'.repeat(n) + (n < 5 ? `<span class="star-off">${'☆'.repeat(5 - n)}</span>` : '') : ''; }
 
 // ============ COPY TEXT ============
 // 제목을 유형에 맞는 괄호로 감싸기 (영상물 〈 〉, 웹소설 《 》)
@@ -4574,6 +4888,15 @@ function mdParse(md) {
   return blocks;
 }
 
+// 지금 포인트 색 (흰 종이 위 글자용). 내보내기에서 씀
+function accentInk() {
+  try { const v = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim(); if (/^#[0-9a-f]{6}$/i.test(v)) return v; } catch (e) {}
+  return '#0B8139';
+}
+function accentSoftInk() {
+  try { const v = getComputedStyle(document.documentElement).getPropertyValue('--accent-soft').trim(); if (/^#[0-9a-f]{6}$/i.test(v)) return v; } catch (e) {}
+  return '#E3FCE9';
+}
 const MD_EXPORT_STYLE = {
   code: 'font-family: Menlo, Consolas, monospace; font-size: 0.9em; background: #f1f2f6; padding: 1px 5px; border-radius: 4px;',
   mark: 'background: #fff3a6; padding: 0 3px; border-radius: 2px;',
@@ -4581,7 +4904,7 @@ const MD_EXPORT_STYLE = {
   under: 'text-decoration: underline;',
   italic: 'font-style: italic;',
   bold: 'font-weight: 700;',
-  link: 'color: #3d4cc8; text-decoration: underline;'
+  get link() { return `color: ${accentInk()}; text-decoration: underline;`; }
 };
 
 function mdInlineHTML(text, styled) {
@@ -5092,8 +5415,9 @@ function renderTimeline() {
         const thumb = item.thumb
           ? `<img src="${escapeHTML(item.thumb)}" alt="" loading="lazy" style="${thumbFitStyle(item)}">`
           : `<div class="home-poster-fallback">${typeEmoji[item.type] || '📌'}</div>`;
+        const recBtn = recEpisodic(item) ? `<button type="button" class="home-rec-btn" onclick="quickRecordFor('${item.id}', event)" aria-label="회차 기록 쓰기">✍️</button>` : '';
         return `<div class="home-poster" onclick="openDetail('${item.id}')">
-          <div class="home-poster-thumb">${thumb}${dayBadge}</div>
+          <div class="home-poster-thumb">${thumb}${dayBadge}${recBtn}</div>
           <div class="home-poster-title">${escapeHTML(item.title)}</div>
           ${prog !== null ? `<div class="home-poster-bar"><div class="home-poster-fill" style="width:${prog}%"></div></div><div class="home-poster-pct">${prog}% (${ptxt})</div>` : `<div class="home-poster-pct">${item.type === 'webnovel' && item.currentEp > 0 ? `${epLabel(item, item.currentEp)}까지 ${epVerb(item.type).done}` : verb(item.type)}</div>`}
         </div>`;
@@ -5253,7 +5577,7 @@ function renderStatsView() {
       const pct = Math.round(c / maxType * 100);
       return `<div class="bar-row">
         <span class="bar-label">${typeName(t)}</span>
-        <span class="bar-track"><span class="bar-fill" style="width: ${c > 0 ? pct : 0}%; background: ${typeColors[t]};"></span></span>
+        <span class="bar-track"><span class="bar-fill t-${t}" style="width: ${c > 0 ? pct : 0}%; --c: ${typeColors[t]};"></span></span>
         <span class="bar-val">${c}</span>
       </div>`;
     }).join('')}
@@ -5299,7 +5623,7 @@ function renderStatsView() {
         const pct = Math.round(c / maxStar * 100);
         return `<div class="star-dist-row">
           <span class="star-dist-label">${'★'.repeat(s)}</span>
-          <span class="bar-track"><span class="bar-fill" style="width: ${c > 0 ? pct : 0}%; background: linear-gradient(90deg, var(--accent), #d99860);"></span></span>
+          <span class="bar-track"><span class="bar-fill t-star" style="width: ${c > 0 ? pct : 0}%;"></span></span>
           <span class="bar-val">${c}</span>
         </div>`;
       }).join('')}
@@ -5309,7 +5633,7 @@ function renderStatsView() {
   // notes count
   html += `<div class="stat-card" style="display: flex; justify-content: space-between; align-items: center;">
     <div class="stat-card-title" style="margin-bottom: 0;">작성한 메모</div>
-    <div style="font-size: 22px; font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums;">${totalNotes}<span style="font-size: 13px; color: var(--ink-mute); font-weight: 500;"> 개</span></div>
+    <div style="font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums;"><span class="accent-mark">${totalNotes}</span><span style="font-size: 13px; color: var(--ink-mute); font-weight: 500;"> 개</span></div>
   </div>`;
 
   container.innerHTML = html;
@@ -5337,7 +5661,7 @@ function renderHallView() {
       <div class="hall-body">
         <div class="hall-title">${escapeHTML(item.title)}</div>
         ${item.creator ? `<div class="hall-creator">${escapeHTML(item.creator)}</div>` : ''}
-        <div class="hall-stars">${starString(item.rating)}</div>
+        <div class="hall-stars">${starHTML(item.rating)}</div>
       </div>
       <div class="card-type ${item.type}">${typeName(item.type)}</div>
     </div>`;
@@ -5380,7 +5704,7 @@ function renderCalendarView() {
           const d = new Date(i[dateField]);
           const meta = [];
           meta.push(`<span class="card-type ${i.type}" style="padding: 1px 7px; font-size: 9px;">${typeName(i.type)}</span>`);
-          if (i.rating > 0) meta.push(`<span class="card-stars" style="font-size: 11px;">${starString(i.rating)}</span>`);
+          if (i.rating > 0) meta.push(`<span class="card-stars" style="font-size: 11px;">${starHTML(i.rating)}</span>`);
           (i.otts || []).forEach(oid => { const o = getOttById(oid); if (o) meta.push(`<span class="ott-chip"><span class="ott-chip-dot" style="background:${escapeHTML(o.color||'#9e9a93')}"></span>${escapeHTML(o.name)}</span>`); });
           return `<div class="chron-item" onclick="openDetail('${i.id}')">
             <div class="chron-day">${d.getMonth()+1}.${String(d.getDate()).padStart(2,'0')} ${calendarBasis === 'start' ? '시작' : '완료'}</div>
@@ -5404,7 +5728,7 @@ function cardHTML(item) {
   const meta = [];
   if (item.startDate) meta.push(`<span>${fmtDate(item.startDate)} 시작</span>`);
   if (item.endDate && item.status === 'done') meta.push(`<span>${fmtDate(item.endDate)} 완료</span>`);
-  if (item.rating > 0) meta.push(`<span class="card-stars">${starString(item.rating)}</span>`);
+  if (item.rating > 0) meta.push(`<span class="card-stars">${starHTML(item.rating)}</span>`);
   if (item.status !== 'watching') meta.push(`<span>${statusName(item.status)}</span>`);
   if ((item.type === 'podcast' || item.type === 'webnovel') && item.platform) meta.push(`<span>${escapeHTML(item.platform)}</span>`);
   if (item.country) { const c = getCountryById(item.country); if (c) meta.push(`<span>${escapeHTML(c.name)}</span>`); }
@@ -5437,7 +5761,10 @@ function cardHTML(item) {
       </div>
       <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0;">
         <div class="card-type ${item.type}">${typeName(item.type)}</div>
-        <button class="card-copy-btn" onclick="copyItemDefault('${item.id}', event)" title="복사">⧉ 복사</button>
+        <div style="display: flex; gap: 4px;">
+          ${item.status === 'watching' && recEpisodic(item) ? `<button class="card-copy-btn" onclick="quickRecordFor('${item.id}', event)" title="회차 기록 쓰기">✍️ 기록</button>` : ''}
+          <button class="card-copy-btn" onclick="copyItemDefault('${item.id}', event)" title="복사">⧉ 복사</button>
+        </div>
       </div>
     </div>
     ${extra}
@@ -5454,6 +5781,7 @@ function goTab(name) {
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === navName));
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   state.currentTab = name;
+  document.documentElement.setAttribute('data-page', navName); // 탭마다 배경색 (포닝 스타일)
   const view = document.getElementById('view-' + name);
   if (view) view.classList.add('active');
   const fab = document.querySelector('.fab');
@@ -5524,6 +5852,52 @@ function syncYtApiKey() {
   if (!input || !status) return;
   input.value = state.ytApiKey || '';
   status.textContent = state.ytApiKey ? '✓ 키가 저장돼 있어요 (이 기기에만 저장됩니다)' : '키 없이도 대부분 동작해요';
+}
+
+document.getElementById('epRecPromptPicker').addEventListener('click', (e) => {
+  const opt = e.target.closest('.seg-option');
+  if (!opt) return;
+  state.epRecPrompt = opt.dataset.mode;
+  syncEpRecPromptPicker();
+  save();
+  showToast(state.epRecPrompt === 'open' ? '회차를 체크하면 기록 창이 바로 열려요' : state.epRecPrompt === 'off' ? '체크해도 기록을 묻지 않아요' : '회차를 체크하면 기록 버튼이 떠요');
+});
+// 포인트 색: 화면에 바로 적용 + 다음에 열 때 깜빡이지 않게 따로 기억
+const ACCENTS = ['neon', 'soft', 'blue'];
+function applyAccent(a) {
+  if (!ACCENTS.includes(a)) a = 'neon';
+  document.documentElement.setAttribute('data-accent', a);
+  try { localStorage.setItem('contentsArchive_accent', a); } catch (e) {}
+  document.querySelectorAll('#accentPicker .accent-opt').forEach(o => o.classList.toggle('active', o.dataset.accent === a));
+}
+// 모양: 포닝(Y2K) / 깔끔
+const STYLES = ['y2k', 'clean'];
+function applyStyle(s) {
+  if (!STYLES.includes(s)) s = 'y2k';
+  document.documentElement.setAttribute('data-style', s);
+  try { localStorage.setItem('contentsArchive_style', s); } catch (e) {}
+  document.querySelectorAll('#stylePicker .accent-opt').forEach(o => o.classList.toggle('active', o.dataset.style === s));
+}
+document.getElementById('stylePicker').addEventListener('click', (e) => {
+  const opt = e.target.closest('.accent-opt');
+  if (!opt) return;
+  state.uiStyle = opt.dataset.style;
+  applyStyle(state.uiStyle);
+  save();
+});
+document.getElementById('accentPicker').addEventListener('click', (e) => {
+  const opt = e.target.closest('.accent-opt');
+  if (!opt) return;
+  state.accentTheme = opt.dataset.accent;
+  applyAccent(state.accentTheme);
+  save();
+});
+
+function syncEpRecPromptPicker() {
+  const picker = document.getElementById('epRecPromptPicker');
+  if (!picker) return;
+  const mode = state.epRecPrompt || 'bar';
+  picker.querySelectorAll('.seg-option').forEach(o => o.classList.toggle('active', o.dataset.mode === mode));
 }
 
 function syncCopyDefaultPicker() {
@@ -6019,7 +6393,7 @@ function openDetail(id) {
       ? `<div style="color: var(--ink-mute); font-size: 12px; padding: 16px; text-align: center; background: var(--bg-soft); border-radius: 8px;">아직 메모가 없어요. 보면서 참고할 점을 남겨보세요.</div>`
       : notes.map(n => {
           const preview = mdPreviewLine(n.content || '', 80);
-          const photoBadge = (Array.isArray(n.images) && n.images.length > 0) ? ` <span style="color: var(--accent); font-size: 11px;">📷${n.images.length}</span>` : '';
+          const photoBadge = (Array.isArray(n.images) && n.images.length > 0) ? ` <span class="accent-mark" style="font-size: 11px;">📷${n.images.length}</span>` : '';
           return `<div class="note-item" onclick="openNoteRead('${item.id}', '${n.id}')">
             <div class="note-item-title">
               <span style="flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHTML(n.title || '제목 없음')}${photoBadge}</span>
@@ -6051,11 +6425,12 @@ function openDetail(id) {
       return `<div class="detail-section"><div class="detail-label">OTT 플랫폼</div><div class="detail-value" style="display:flex;flex-wrap:wrap;gap:6px;">${sel.map(ott => `<span class="ott-chip" style="font-size: 12px; padding: 4px 10px;"><span class="ott-chip-dot" style="background: ${escapeHTML(ott.color || '#9e9a93')}"></span>${escapeHTML(ott.name)}</span>`).join('')}</div></div>`;
     })()}
     ${(() => { if (!item.country) return ''; const c = getCountryById(item.country); if (!c) return ''; return `<div class="detail-section"><div class="detail-label">국가</div><div class="detail-value">${escapeHTML(c.name)}</div></div>`; })()}
-    ${item.rating > 0 ? `<div class="detail-section"><div class="detail-label">별점</div><div class="detail-stars">${starString(item.rating)}</div></div>` : ''}
+    ${item.rating > 0 ? `<div class="detail-section"><div class="detail-label">별점</div><div class="detail-stars">${starHTML(item.rating)}</div></div>` : ''}
     ${(item.startDate || item.endDate) ? `<div class="detail-section"><div class="detail-label">기간</div><div class="detail-value">${item.startDate ? fmtDate(item.startDate) : '?'} → ${item.endDate ? fmtDate(item.endDate) : '진행중'}</div></div>` : ''}
 
     ${progressHTML}
     ${episodesHTML}
+    ${quickRecHTML(item)}
 
     ${item.type === 'youtube' && item.link ? `<div class="detail-section"><div class="detail-label">링크</div><a href="${escapeHTML(item.link)}" target="_blank" rel="noopener" class="card-link" style="margin-top: 4px;">▶ 영상 열기</a></div>` : ''}
     ${recordCardHTML(item)}
@@ -6075,6 +6450,15 @@ function openDetail(id) {
             <span class="copy-opt-label">제목만</span>
             <span class="copy-opt-preview">${escapeHTML(titleOnly)}</span>
           </button>
+          ${(() => {
+            const all = recAllPlainText(item);
+            if (!all) return '';
+            const lines = all.split('\n').filter(l => l.trim());
+            return `<button class="copy-opt-btn" onclick="copyRecAll('${item.id}', event)" style="flex-direction: column; align-items: stretch; gap: 6px;">
+              <span class="copy-opt-label">회차 기록 + 총평 <span style="font-weight: 500;">· 서식 없이 한 번에</span></span>
+              <span class="copy-opt-preview multi">${escapeHTML(lines.slice(0, 4).join('\n'))}${lines.length > 4 ? '\n…' : ''}</span>
+            </button>`;
+          })()}
         </div>
       </div>`;
     })()}
@@ -6795,7 +7179,7 @@ function noteLayout(item, note, env, photos, opts) {
     env.y += 30;
   }
   env.ensure(50 + 44);
-  env.text([{ text: '📝 ' + (note.title || '제목 없음'), bold: true }], 34, 50, '#3d4cc8');
+  env.text([{ text: '📝 ' + (note.title || '제목 없음'), bold: true }], 34, 50, accentInk());
   const meta = [];
   if (opts.header !== false) {
     if (item.rating > 0) meta.push('★'.repeat(item.rating));
@@ -7657,11 +8041,13 @@ function saveDoneReview() {
   document.getElementById('doneReviewModal').classList.remove('active');
   doneReviewItemId = null;
   showToast('저장되었습니다');
+  flushEpOffer();
 }
 
 function skipDoneReview() {
   document.getElementById('doneReviewModal').classList.remove('active');
   doneReviewItemId = null;
+  flushEpOffer();
 }
 
 // ============ EXCEL EXPORT ============
@@ -7904,6 +8290,7 @@ document.addEventListener('input', e => {
 function flushAutoSaves() {
   Object.keys(autoSaveTimers).forEach(cancelAutoSave);
   try { autoSaveEp(); } catch (e) { console.error(e); }
+  try { if (isModalOpen('epModal') && applyEpMark({ quiet: true })) renderEpStatus(); } catch (e) { console.error(e); }
   try { autoSaveComment(); } catch (e) { console.error(e); }
   try { autoSaveNote(); } catch (e) { console.error(e); }
   try { if (isModalOpen('charModal') && charDirty()) persistChar(); } catch (e) { console.error(e); }
@@ -8144,7 +8531,7 @@ document.querySelectorAll('.modal').forEach(modal => {
 // ============ 작품 기록장 (인물 관계도 · 회차 기록 · 총평) ============
 // item.record = { chars:[{id,name,group,desc,x,y}], rels:[{id,a,b,label,dir}], eps:{ '3': {text, updatedAt} }, manual }
 // 총평은 item.memo (예전 '한줄 메모'와 같은 칸)
-let rec = { itemId: null, tab: null, epFilter: 'all', epNum: null, epOrig: '' };
+let rec = { itemId: null, tab: null, epFilter: 'all', epNum: null, epOrig: '', epMark: 'off', quick: null, pendingDone: null };
 let mmPos = {};
 let mmDrag = null;
 
@@ -9241,6 +9628,136 @@ function mmSaveImage() {
   }
 }
 
+// ---------- 빠른 회차 기록 (기록장을 거치지 않고 바로) ----------
+// 본 회차 전부 (전체 회차를 모르는 경우엔 'N까지'를 1..N으로)
+function watchedKeys(item) {
+  const out = new Set(getAllWatchedSet(item) || []);
+  const spec = progressSpec(item);
+  if (spec && !(spec.total > 0)) {
+    const c = Math.min(Math.max(parseInt(item[spec.cur], 10) || 0, 0), OPEN_EP_TOTAL);
+    for (let k = 1; k <= c; k++) out.add(k);
+  }
+  return out;
+}
+// 다음에 볼 회차(next)와 마지막으로 본 회차(last). 본편을 다 봤으면 next는 외전
+function epNextLast(item) {
+  const spec = progressSpec(item);
+  if (!spec || !recEpisodic(item)) return { next: null, last: null };
+  const set = watchedKeys(item);
+  let mainMax = 0, sideMax = 0;
+  set.forEach(e => { if (isSideEp(e)) sideMax = Math.max(sideMax, e - SIDE_BASE); else mainMax = Math.max(mainMax, e); });
+  const total = spec.open || !(spec.total > 0) ? 0 : spec.total;
+  let next = null;
+  if (!total || mainMax < total) next = mainMax + 1;
+  else if (hasSide(item)) {
+    const st = sideTotalOf(item);
+    if (!st || sideMax < st) next = SIDE_BASE + sideMax + 1;
+  }
+  const last = sideMax ? SIDE_BASE + sideMax : (mainMax || null);
+  return { next, last };
+}
+// 회차를 본 것으로 추가 (순차인데 띄엄띄엄이면 개별 모드로 바꿔 보존)
+function addWatchedEps(item, eps) {
+  const spec = progressSpec(item);
+  if (!spec || !eps.length) return { converted: false };
+  if (spec.total > 0) {
+    const set = getAllWatchedSet(item) || new Set();
+    eps.forEach(e => set.add(e));
+    return setAllWatchedSet(item, set);
+  }
+  const main = eps.filter(e => !isSideEp(e));
+  if (main.length) item[spec.cur] = Math.max(parseInt(item[spec.cur], 10) || 0, ...main);
+  if (hasSide(item)) {
+    const s = sideSet(item);
+    eps.filter(isSideEp).forEach(e => s.add(e - SIDE_BASE));
+    item.sideWatched = [...s].sort((a, b) => a - b);
+  }
+  return { converted: false };
+}
+// 홈·카드·상세의 ✍️: 다음 회차 기록 (쓰면 본 회차로 체크). 다 봤으면 마지막 회차
+function quickRecordFor(id, ev) {
+  if (ev) ev.stopPropagation();
+  const item = state.items.find(i => i.id === id);
+  if (!item) return;
+  const t = epNextLast(item);
+  if (!t.next && !t.last) { openQuickEpRecord(id, 1, { mark: true }); return; }
+  openQuickEpRecord(id, t.next || t.last, { mark: !!t.next });
+}
+function openQuickEpRecord(id, n, opts) {
+  const item = state.items.find(i => i.id === id);
+  if (!item || !recEpisodic(item) || !(n > 0)) return;
+  if (isModalOpen('recordModal') && rec.itemId !== id) return;
+  if (isModalOpen('epModal')) closeEpEditor();
+  if (actionBarTag && actionBarTag.indexOf('epoffer') === 0) hideUndo();
+  getRecord(item);
+  rec.itemId = id;
+  rec.quick = { markEp: opts && opts.mark ? n : null };
+  rec.pendingDone = null;
+  document.body.style.overflow = 'hidden';
+  openEpEditor(n);
+}
+// 상세 화면: 회차 칸 바로 아래 ✍️ 버튼
+function quickRecHTML(item) {
+  if (!recEpisodic(item) || item.status === 'wishlist') return '';
+  const t = epNextLast(item);
+  if (!t.next && !t.last) return '';
+  const v = epVerb(item.type);
+  const r = peekRecord(item);
+  const has = n => !!(r && r.eps[n]);
+  const main = t.next || t.last;
+  const mainBtn = `<button type="button" class="quick-rec-main" onclick="${t.next ? `quickRecordFor('${item.id}')` : `openQuickEpRecord('${item.id}', ${main})`}">✍️ ${escapeHTML(epLabel(item, main))} 기록 ${has(main) ? '이어 쓰기' : '쓰기'}<span>${t.next ? `쓰면 '${v.seen} 회차'로 체크돼요` : `마지막으로 ${v.seen} 회차`}</span></button>`;
+  const subBtn = t.next && t.last ? `<button type="button" class="quick-rec-sub" onclick="openQuickEpRecord('${item.id}', ${t.last})">${escapeHTML(epLabel(item, t.last))}${has(t.last) ? ' ✓' : ''}<span>마지막으로 ${v.seen}</span></button>` : '';
+  return `<div class="quick-rec">${mainBtn}${subBtn}</div>`;
+}
+
+// ----- 회차를 체크하면 '기록 쓰기' 제안 -----
+let pendingEpOffer = null;
+function offerEpRecord(item, added, becameDone) {
+  if (!item || !recEpisodic(item)) return;
+  if (!added || !added.length) {
+    if (actionBarTag === 'epoffer:' + item.id) hideUndo(); // 체크를 풀었으면 제안도 거둠
+    return;
+  }
+  const mode = state.epRecPrompt || 'bar';
+  if (mode === 'off') return;
+  const n = Math.max(...added);
+  if (becameDone) { // 감상 창이 닫힌 뒤에
+    pendingEpOffer = { id: item.id, n };
+    if (actionBarTag && actionBarTag.indexOf('epoffer') === 0) hideUndo();
+    return;
+  }
+  showEpOffer(item.id, n, mode === 'open');
+}
+function showEpOffer(id, n, open) {
+  const item = state.items.find(i => i.id === id);
+  if (!item) return;
+  const go = () => openQuickEpRecord(id, n);
+  if (open) { setTimeout(() => { if (!isModalOpen('doneReviewModal') && !isModalOpen('confirmModal')) go(); }, 280); return; }
+  const r = peekRecord(item);
+  showActionBar(`${epLabel(item, n)} 기록${r && r.eps[n] ? '을 이어 쓸까요?' : '을 남길까요?'}`, '✍️ 기록 쓰기', go, 10000, 'epoffer:' + id);
+}
+function flushEpOffer() {
+  const p = pendingEpOffer;
+  pendingEpOffer = null;
+  if (p) setTimeout(() => showEpOffer(p.id, p.n, false), 350);
+}
+// 진행을 바꾸는 함수를 감싸서, 새로 본 회차가 생기면 기록 제안
+function withEpOffer(fn) {
+  return function (id, ...rest) {
+    const item = state.items.find(i => i.id === id);
+    const before = item && recEpisodic(item) ? watchedKeys(item) : null;
+    const wasDone = !!item && item.status === 'done';
+    const out = fn.call(this, id, ...rest);
+    try {
+      if (before && state.items.includes(item)) {
+        const after = watchedKeys(item);
+        offerEpRecord(item, [...after].filter(e => !before.has(e)), !wasDone && item.status === 'done');
+      }
+    } catch (e) { console.error(e); }
+    return out;
+  };
+}
+
 // ---------- 회차 기록 ----------
 const REC_EP_TEMPLATE = '**줄거리**\n- \n\n**인상 깊은 장면**\n- \n\n**한마디**\n';
 
@@ -9290,7 +9807,7 @@ function renderRecEps() {
   body.innerHTML = `
     <div class="rec-actions">
       ${latest ? `<button type="button" class="plan-mini-btn primary" onclick="openEpEditor(${latest})">✍️ 최근 ${epVerb(item.type).seen} ${escapeHTML(recEpLabel(item, latest))} 기록</button>` : ''}
-      <button type="button" class="plan-mini-btn" onclick="copyRecEps()" ${recorded.length ? '' : 'disabled'}>📋 복사</button>
+      <button type="button" class="plan-mini-btn" onclick="copyRecEps()" ${recorded.length || item.memo ? '' : 'disabled'}>📋 총평까지 복사</button>
     </div>
     ${total ? `<div class="filter-row" style="margin-bottom: 10px;">
       <button class="pill ${rec.epFilter === 'all' ? 'active' : ''}" onclick="rec.epFilter='all';renderRecEps()">전체 ${total + (side ? st : 0)}</button>
@@ -9339,8 +9856,9 @@ function openEpEditor(n) {
   const lo = isSideEp(n) ? SIDE_BASE + 1 : 1;
   const hi = isSideEp(n) ? (sideTotalOf(item) ? SIDE_BASE + sideTotalOf(item) : Infinity) : (total || Infinity);
   document.getElementById('epModalTitle').textContent = `${bracketTitle(item)} ${recEpLabel(item, n)}`;
-  document.getElementById('epStatus').innerHTML = watched && watched.has(n)
-    ? `<span class="rec-ep-seen">✓ ${epVerb(item.type).seen} 회차</span>` : `<span class="rec-chip">아직 안 ${epVerb(item.type).seen} 회차</span>`;
+  // 빠른 기록으로 연 '다음 회차'는 기록을 쓰면 본 회차로 체크 (auto). 그 밖엔 직접 켜야 체크 (on/off)
+  rec.epMark = (rec.quick && rec.quick.markEp === n && !watchedKeys(item).has(n)) ? 'auto' : 'off';
+  renderEpStatus();
   document.getElementById('recEpText').value = rec.epOrig;
   setMdPreview('recEpText', !!rec.epOrig);
   document.getElementById('epPrevBtn').disabled = n <= lo;
@@ -9350,6 +9868,75 @@ function openEpEditor(n) {
   document.getElementById('epDeleteBtn').style.display = e ? '' : 'none';
   setSaveState('epSaveState', '쓰는 동안 자동으로 저장돼요');
   document.getElementById('epModal').classList.add('active');
+}
+
+// 기록 창 위쪽: 본 회차 표시 또는 '본 회차로 체크' 버튼
+function renderEpStatus() {
+  const item = recItem();
+  const n = rec.epNum;
+  const el = document.getElementById('epStatus');
+  const hint = document.getElementById('epMarkHint');
+  if (!item || n == null || !el) return;
+  const v = epVerb(item.type);
+  if (watchedKeys(item).has(n)) {
+    rec.epMark = 'off';
+    el.innerHTML = `<span class="rec-ep-seen">✓ ${v.seen} 회차</span>`;
+    if (hint) hint.textContent = '';
+    return;
+  }
+  const on = rec.epMark === 'auto' || rec.epMark === 'on';
+  el.innerHTML = `<button type="button" class="ep-mark ${on ? 'on' : ''}" onclick="toggleEpMark()">${on ? '☑' : '☐'} ${v.seen} 회차로 체크</button>`;
+  if (hint) hint.textContent = rec.epMark === 'auto' ? `기록을 쓰면 '${v.seen} 회차'로 체크돼요` : rec.epMark === 'on' ? `닫거나 넘길 때 '${v.seen} 회차'로 체크돼요` : '';
+}
+function toggleEpMark() {
+  rec.epMark = (rec.epMark === 'auto' || rec.epMark === 'on') ? 'off' : 'on';
+  renderEpStatus();
+}
+// 체크 예약을 실제로 반영. 반영했으면 true
+function applyEpMark(opts) {
+  opts = opts || {};
+  const item = recItem();
+  const n = rec.epNum;
+  const mode = rec.epMark;
+  if (!item || n == null || !mode || mode === 'off') return false;
+  if (mode === 'auto') {
+    const e = getRecord(item).eps[n];
+    if (!e || !String(e.text || '').trim()) return false; // 아무것도 안 썼으면 체크하지 않음
+  }
+  rec.epMark = 'off';
+  if (watchedKeys(item).has(n)) return false;
+  const snap = snapshotProgress(item);
+  const wasDone = item.status === 'done';
+  const wasMain = hasSide(item) && mainComplete(item);
+  const res = addWatchedEps(item, [n]);
+  item.updatedAt = Date.now();
+  let becameDone = false;
+  if (!wasDone && isItemComplete(item)) {
+    item.status = 'done';
+    if (!item.endDate) item.endDate = today();
+    becameDone = true;
+  }
+  save(true);
+  render();
+  if (isModalOpen('detailModal')) openDetail(item.id);
+  const v = epVerb(item.type);
+  if (!opts.quiet) {
+    const hasText = !!(getRecord(item).eps[n]);
+    showUndo(`${epLabel(item, n)} ${hasText ? `기록 저장 · ${v.seen} 회차로 체크` : `${v.seen} 회차로 체크했어요`}${res.converted ? ' · 개별 모드로 바뀜' : ''}`, () => {
+      const it = state.items.find(i => i.id === item.id);
+      if (!it) return;
+      restoreProgress(it, snap);
+      it.updatedAt = Date.now();
+      save(true);
+      render();
+      if (isModalOpen('detailModal')) openDetail(it.id);
+      if (isModalOpen('epModal') && rec.itemId === it.id) renderEpStatus();
+      showToast('체크를 되돌렸어요');
+    });
+  }
+  if (becameDone) rec.pendingDone = item.id;
+  else if (!opts.quiet && !wasMain && hasSide(item) && mainComplete(item)) setTimeout(() => showToast('본편 끝! 이제 외전이 남았어요'), 900);
+  return true;
 }
 
 // 저장 (내용을 비우면 그 회차 기록 삭제). 바뀐 게 있으면 true
@@ -9369,19 +9956,37 @@ function saveEpRecord() {
 function closeEpEditor(skipSave) {
   cancelAutoSave('ep');
   const changed = skipSave ? false : saveEpRecord();
+  const marked = skipSave ? false : applyEpMark();
   document.getElementById('epModal').classList.remove('active');
   rec.epNum = null;
-  if (rec.tab === 'eps') renderRecEps();
-  if (changed) showToast('저장했어요');
+  rec.epMark = 'off';
+  const quick = rec.quick;
+  rec.quick = null;
+  const id = rec.itemId;
+  if (isModalOpen('recordModal')) {
+    if (rec.tab === 'eps') renderRecEps();
+  } else if (quick) {
+    // 기록장을 거치지 않고 연 빠른 기록: 원래 화면으로
+    rec.itemId = null;
+    if (isModalOpen('detailModal')) { if (id && state.items.some(i => i.id === id)) openDetail(id); }
+    else if (!isModalOpen('planCheckModal')) document.body.style.overflow = '';
+  }
+  if (changed && !marked) showToast('저장했어요'); // 체크했으면 아래 바가 같이 알려줌
+  const pd = rec.pendingDone;
+  rec.pendingDone = null;
+  if (pd) setTimeout(() => promptDoneReview(pd), 320);
 }
 function moveEp(d) {
   const n = rec.epNum + d;
   if (n < 1 || (isSideEp(rec.epNum) && !isSideEp(n))) return;
   cancelAutoSave('ep');
   const changed = saveEpRecord();
-  if (changed) showToast('저장했어요');
+  const marked = applyEpMark();
+  // 빠른 기록에서 기록 쓰고 다음 회차로 넘어가면, 다음 회차도 쓰면 체크되게 (몰아보기)
+  if (rec.quick && d > 0 && marked) rec.quick.markEp = n;
+  if (changed && !marked) showToast('저장했어요');
   openEpEditor(n);
-  if (rec.tab === 'eps') renderRecEps();
+  if (isModalOpen('recordModal') && rec.tab === 'eps') renderRecEps();
 }
 function insertEpTemplate() {
   const ta = document.getElementById('recEpText');
@@ -9400,6 +10005,7 @@ function deleteEpRecord() {
   confirmCallback = () => {
     cancelAutoSave('ep');
     delete getRecord(item).eps[n];
+    rec.epMark = 'off';
     recTouch(item);
     closeConfirm();
     closeEpEditor(true);
@@ -9415,7 +10021,49 @@ function recEpsText(item) {
 }
 function copyRecEps() {
   const item = recItem();
-  if (item) copyPlain(`${bracketTitle(item)} 회차 기록\n\n` + recEpsText(item), '회차 기록을 복사했어요');
+  if (item) copyRecAll(item.id);
+}
+
+// 회차 기록 + 총평을 서식 없이: '1화: …' 한 줄씩, 마지막에 '총평: …' (다른 앱에 옮겨 적기용)
+function recPlainClean(md) {
+  return stripMarkdownText(md || '').split('\n')
+    .map(l => l.replace(/\s+$/, ''))
+    .filter(l => { const t = l.trim(); return t && t !== '─────' && !/^(•|\d+\.)$/.test(t); })
+    .join('\n');
+}
+// 첫 줄이 소제목(# 제목 · **줄거리**)이면 '1화:' 다음 줄부터 쓰는 게 자연스러움
+function recHeadFirst(md) {
+  const first = String(md || '').trim().split('\n')[0].trim();
+  return /^#{1,6}\s/.test(first) || /^\*\*[^*]+\*\*:?$/.test(first);
+}
+function recAllPlainText(item) {
+  if (!item) return '';
+  const r = peekRecord(item);
+  const out = [];
+  let multi = false;
+  if (r && recEpisodic(item)) {
+    Object.keys(r.eps).map(Number).filter(n => n > 0).sort((a, b) => a - b).forEach(n => {
+      const t = recPlainClean(r.eps[n].text);
+      if (!t) return;
+      if (t.includes('\n')) multi = true;
+      out.push(`${epLabel(item, n)}:${recHeadFirst(r.eps[n].text) ? '\n' : ' '}${t}`);
+    });
+  }
+  // 기록이 여러 줄이면 회차 사이를 한 줄 띄워서 보기 편하게
+  let text = out.join(multi ? '\n\n' : '\n');
+  const memo = recPlainClean(item.memo);
+  if (memo) text += (text ? '\n\n' : '') + `총평:${recHeadFirst(item.memo) ? '\n' : ' '}${memo}`;
+  return text;
+}
+function copyRecAll(id, ev) {
+  if (ev) ev.stopPropagation();
+  const item = state.items.find(i => i.id === id);
+  if (!item) return;
+  const text = recAllPlainText(item);
+  if (!text) { showToast('복사할 회차 기록이나 총평이 없어요'); return; }
+  const r = peekRecord(item);
+  const n = r ? Object.keys(r.eps).filter(k => recPlainClean(r.eps[k].text)).length : 0;
+  copyPlain(text, n && recPlainClean(item.memo) ? `회차 기록 ${n}개와 총평을 복사했어요` : n ? `회차 기록 ${n}개를 복사했어요 (총평은 아직 없어요)` : '총평을 복사했어요');
 }
 
 // ---------- 총평 ----------
@@ -9618,7 +10266,7 @@ function recEnv(mode, k, totalH, onPage) {
       if (env.draw) {
         const c = env.ctx;
         if (opt.bar) { c.fillStyle = '#d9dbe4'; c.fillRect(PAD + (opt.barX || 0), env.y + 2, 6, lineH - 4); }
-        if (first && opt.bullet) { c.fillStyle = opt.bulletColor || '#3d4cc8'; env.font(true, size); c.fillText(opt.bullet, PAD + (opt.bulletX || 0), base); }
+        if (first && opt.bullet) { c.fillStyle = opt.bulletColor || accentInk(); env.font(true, size); c.fillText(opt.bullet, PAD + (opt.bulletX || 0), base); }
         if (first && opt.swatch) {
           c.fillStyle = opt.swatch.color;
           const cy = base - size * 0.34, sx = PAD + (opt.swatch.x || 0);
@@ -9643,7 +10291,7 @@ function recEnv(mode, k, totalH, onPage) {
           const c = env.ctx;
           if (t.mark) { c.fillStyle = '#fdf3c8'; c.fillRect(x, base - size * 0.82, cw + 1, size * 1.08); }
           if (t.code) { c.fillStyle = '#eef0f5'; c.fillRect(x, base - size * 0.82, cw + 1, size * 1.08); }
-          c.fillStyle = t.url ? '#3d4cc8' : (t.color || color);
+          c.fillStyle = t.url ? accentInk() : (t.color || color);
           c.fillText(ch, x, base);
           if (t.under || t.url) c.fillRect(x, base + 6, cw, 2.5);
           if (t.strike) c.fillRect(x, base - size * 0.32, cw, 2.5);
@@ -9725,7 +10373,7 @@ function recLayout(item, sec, env, map) {
   const section = title => {
     env.y += 20;
     env.ensure(52 + 110);
-    if (env.draw) { env.ctx.fillStyle = '#3d4cc8'; env.ctx.fillRect(env.PAD, env.y + 10, 8, 32); }
+    if (env.draw) { env.ctx.fillStyle = accentInk(); env.ctx.fillRect(env.PAD, env.y + 10, 8, 32); }
     env.text([{ text: title, bold: true }], 34, 52, '#17181c', { indent: 24 });
     env.y += 14;
   };
@@ -9774,9 +10422,9 @@ function recLayout(item, sec, env, map) {
         if (env.draw) {
           env.font(true, 26);
           const lw = env.ctx.measureText(lab).width + 36;
-          env.ctx.fillStyle = '#eceefb';
+          env.ctx.fillStyle = accentSoftInk();
           mmRoundRect(env.ctx, env.PAD, env.y + 4, lw, 44, 22); env.ctx.fill();
-          env.ctx.fillStyle = '#3d4cc8';
+          env.ctx.fillStyle = accentInk();
           env.ctx.fillText(lab, env.PAD + 18, env.y + 35);
         }
         env.y += 60;
@@ -9854,7 +10502,8 @@ function buildRecordWordHTML(item, sec) {
   const meta = [];
   if (item.rating > 0) meta.push(`<span style="color:#c87f3f;letter-spacing:1px;">${starString(item.rating)}</span>`);
   if (item.startDate || item.endDate) meta.push(`${item.startDate ? fmtDate(item.startDate) : '?'} → ${item.endDate ? fmtDate(item.endDate) : '진행중'}`);
-  const sh = t => `<h2 style="color:#3d4cc8;border-left:5px solid #3d4cc8;padding-left:8px;margin:20pt 0 8pt;">${t}</h2>`;
+  const ink = accentInk();
+  const sh = t => `<h2 style="color:${ink};border-left:5px solid ${ink};padding-left:8px;margin:20pt 0 8pt;">${t}</h2>`;
   let h = `<div style="font-size:9pt;color:#9e9a93;font-weight:bold;letter-spacing:1px;">${typeName(item.type)} 기록장</div>
     <h1 style="margin:2pt 0;">${escapeHTML(item.title || '')}</h1>
     ${item.creator ? `<div style="color:#5e5b56;">${escapeHTML(item.creator)}</div>` : ''}
@@ -9890,7 +10539,7 @@ function buildRecordWordHTML(item, sec) {
     if (nums.length) {
       h += sh('회차 기록');
       nums.forEach(n => {
-        h += `<h3 style="color:#3d4cc8;margin:14pt 0 4pt;">${recEpLabel(item, n)}</h3><div>${renderMarkdownForExport(r.eps[n].text)}</div>`;
+        h += `<h3 style="color:${ink};margin:14pt 0 4pt;">${recEpLabel(item, n)}</h3><div>${renderMarkdownForExport(r.eps[n].text)}</div>`;
       });
     }
   }
@@ -10825,6 +11474,7 @@ function confirmPlanCheck() {
   if (converted) msgs.push('띄엄띄엄 봐서 개별 모드로 바뀌었어요');
   showToast(msgs.join(' · ') || '체크했어요');
   if (becameDone) setTimeout(() => promptDoneReview(item.id), 350);
+  offerEpRecord(item, r.added, becameDone);
 }
 
 // ===== 체크 취소 (원상복구) =====
@@ -10955,6 +11605,13 @@ function closeUpdateModal() {
 }
 
 // ============ INIT ============
+// 회차 진행을 바꾸는 함수들: 새로 본 회차가 생기면 '✍️ 기록 쓰기' 제안
+toggleEpisode = withEpOffer(toggleEpisode);
+togglePodEpisode = withEpOffer(togglePodEpisode);
+toggleSideEp = withEpOffer(toggleSideEp);
+setEpProgress = withEpOffer(setEpProgress);
+setSideProgress = withEpOffer(setSideProgress);
+updatePodEp = withEpOffer(updatePodEp);
 load();
 render();
 updateBackupBanner();
@@ -10963,6 +11620,9 @@ updateSaveIndicator(false);
 mdFillToolbars();
 guardianStart();
 syncCopyDefaultPicker();
+syncEpRecPromptPicker();
+applyAccent(state.accentTheme);
+applyStyle(state.uiStyle);
 syncYtApiKey();
 checkVersionUpdate();
 document.querySelectorAll('#timelineSort .pill').forEach(p => p.classList.toggle('active', p.dataset.tsort === state.timelineSort));
