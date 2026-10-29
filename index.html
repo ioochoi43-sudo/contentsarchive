@@ -1433,6 +1433,32 @@
   .ep-mark { border: 1.5px solid var(--line); background: var(--bg-elev); color: var(--ink-dim); border-radius: 100px; padding: 6px 12px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: var(--sans); white-space: nowrap; }
   .ep-mark.on { border-color: var(--accent); background: var(--accent-soft, #eceefb); color: var(--accent); }
   .ep-mark-hint { font-size: 11px; color: var(--ink-mute); margin: -4px 0 10px; }
+  /* 좁은 화면에서 '업데이트'·'자동 백업 · 되돌리기'가 두 줄로 꺾이던 것 */
+  .episodes-section .btn { white-space: nowrap; padding-left: 6px !important; padding-right: 6px !important; }
+  .guard-box .btn { white-space: nowrap; font-size: 13px; padding-left: 6px; padding-right: 6px; }
+  /* 기록 창 제목: 〈작품〉 + [10화 ▾] (누르면 회차 고르기) */
+  .ep-title { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
+  .ep-work { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ep-pick-btn { flex-shrink: 0; display: inline-flex; align-items: center; gap: 4px; padding: 5px 12px; border-radius: 100px;
+    border: 1.5px solid var(--line); background: var(--bg-elev); color: var(--ink); font-size: 16px; font-weight: 800; font-family: var(--sans); cursor: pointer; }
+  .ep-pick-btn span { font-size: 11px; opacity: .6; }
+  /* 회차 고르기 창 */
+  .ep-pick-legend { display: flex; flex-wrap: wrap; gap: 12px; font-size: 11px; color: var(--ink-mute); margin-bottom: 4px; }
+  .ep-pick-legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -2px; margin-right: 4px; border: 1px solid var(--line); }
+  .ep-pick-legend i.w { background: var(--accent-fill); border-color: var(--accent-fill); }
+  .ep-pick-legend i.c { background: var(--ink); border-color: var(--ink); }
+  .ep-pick-track { margin-top: 16px; }
+  .ep-pick-track:first-of-type { margin-top: 8px; }
+  .ep-pick-head { font-size: 13px; font-weight: 800; color: var(--ink); }
+  .ep-pick-head span { font-size: 11px; font-weight: 500; color: var(--ink-mute); margin-left: 6px; }
+  #epPickBody .ep-btn { position: relative; }
+  #epPickBody .ep-btn.rec::after { content: '✎'; position: absolute; top: 1px; right: 3px; font-size: 9px; line-height: 1; font-weight: 700; }
+  #epPickBody .ep-btn.cur { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .ep-pick-go { display: flex; gap: 8px; margin-top: 10px; }
+  .ep-pick-go .form-input { flex: 1; min-width: 0; }
+  .ep-pick-go .btn { flex: 0 0 auto; padding: 12px 18px; }
+  .ep-pick-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .ep-pick-chips .lab { width: 100%; font-size: 11px; color: var(--ink-mute); margin-top: 4px; }
   .ep-mark-hint:empty { display: none; }
   .home-rec-btn { position: absolute; right: 8px; bottom: 8px; width: 36px; height: 36px; border-radius: 50%; border: 0; background: rgba(255,255,255,.94); box-shadow: 0 2px 10px rgba(0,0,0,.16); font-size: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
   .home-rec-btn:active { transform: scale(0.9); }
@@ -2379,10 +2405,11 @@
   :root:not([data-style="clean"])[data-accent="blue"] { --accent-fill: #8ab9ff; --on-accent: #121212; --accent-grad: #d6e8ff; --accent-bar: #9cc7ff; }
 
   /* 바탕: 위·아래 형광 띠 */
-  :root:not([data-style="clean"]) { background: #fff; }
+  :root:not([data-style="clean"]) { background: #fff; --ink-mute: #6f7280; } /* 굵은 테두리 옆에서 연회색 글자가 묻혀서 조금 진하게 */
   :root:not([data-style="clean"]) body { background: transparent; padding-bottom: calc(104px + env(safe-area-inset-bottom, 0px)); }
+  /* 위쪽 띠는 페이지와 같이 스크롤 (고정이면 내려도 회색 글자가 초록 위로 지나가서 안 읽힘) */
   :root:not([data-style="clean"]) body::before {
-    content: ''; position: fixed; left: 0; right: 0; top: 0; height: 340px; z-index: -1; pointer-events: none;
+    content: ''; position: absolute; left: 0; right: 0; top: 0; height: 340px; z-index: -1; pointer-events: none;
     background:
       repeating-linear-gradient(180deg, rgba(255,255,255,0) 0 4px, rgba(255,255,255,.26) 4px 6px) 0 120px / 100% 150px no-repeat,
       linear-gradient(180deg, var(--band) 0%, var(--band) 26%, rgba(255,255,255,0) 100%);
@@ -2486,8 +2513,19 @@
     font-size: 22px; font-weight: 400; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   }
   :root:not([data-style="clean"]) .mdt { border: 1.5px solid var(--ol); background: #fff; color: var(--ol); }
+  :root:not([data-style="clean"]) .template-list-btn { border: 1.5px solid var(--ol); border-radius: 100px; color: var(--ol); font-weight: 600; }
+  :root:not([data-style="clean"]) .template-list-btn.danger { color: var(--red); border-color: var(--red); }
+  :root:not([data-style="clean"]) .ott-manage-btn { border: 1.5px solid var(--ol); background: #fff; color: var(--ol); border-radius: 10px; }
+  :root:not([data-style="clean"]) .ott-manage-btn.danger { color: var(--red); border-color: var(--red); }
+  :root:not([data-style="clean"]) .ott-manage-btn:disabled { opacity: .3; }
   :root:not([data-style="clean"]) .mdt.mk { background: #fff08a; }
   :root:not([data-style="clean"]) .md-toolbar { border: 2px solid var(--ol); border-bottom: none; border-radius: 16px 16px 0 0; background: #fff; }
+
+  :root:not([data-style="clean"]) .ep-pick-btn { border: 2px solid var(--ol); background: #fff; color: var(--ol); }
+  :root:not([data-style="clean"]) .ep-pick-legend i { border: 1.5px solid var(--ol); }
+  :root:not([data-style="clean"]) .ep-pick-legend i.w { background: var(--gloss); }
+  :root:not([data-style="clean"]) .ep-pick-legend i.c { background: var(--ol); }
+  :root:not([data-style="clean"]) #epPickBody .ep-btn.cur { background: var(--ol); color: #fff; border-color: var(--ol); }
 
   /* 회차 칸 · 계획 */
   :root:not([data-style="clean"]) .ep-btn { border: 1.5px solid var(--ol); border-radius: 12px; color: var(--ol); }
@@ -2830,7 +2868,7 @@
     </div>
 
     <div id="versionText" style="text-align: center; margin-top: 40px; font-size: 11px; color: var(--ink-mute); letter-spacing: 0.04em; font-weight: 500;">
-      v5.4 · 데이터는 브라우저에 저장됩니다
+      v5.6 · 데이터는 브라우저에 저장됩니다
     </div>
   </section>
 </main>
@@ -3431,7 +3469,7 @@
   <div class="modal-content">
     <div class="modal-handle"></div>
     <div class="modal-header">
-      <div class="modal-title" id="epModalTitle" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">회차 기록</div>
+      <div class="modal-title ep-title" id="epModalTitle">회차 기록</div>
       <button class="modal-close" onclick="closeEpEditor()">×</button>
     </div>
     <div class="modal-body">
@@ -3451,6 +3489,18 @@
       </div>
       <button type="button" class="ep-del" id="epDeleteBtn" onclick="deleteEpRecord()">이 회차 기록 지우기</button>
     </div>
+  </div>
+</div>
+
+<!-- EPISODE PICKER (기록 창에서 다른 회차로 바로 가기) -->
+<div class="modal" id="epPickModal" style="z-index: 262;">
+  <div class="modal-content">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title">회차 고르기</div>
+      <button class="modal-close" onclick="closeEpPicker()">×</button>
+    </div>
+    <div class="modal-body" id="epPickBody"></div>
   </div>
 </div>
 
@@ -3804,9 +3854,20 @@ const DEFAULT_OTT = [
 ];
 
 // ============ VERSION ============
-const APP_VERSION = '5.4';
+const APP_VERSION = '5.6';
 const VERSION_KEY = 'contentsArchive_seenVersion';
 const VERSION_NOTES = {
+  '5.6': [
+    '버그 점검: 상세·수정·기록장 창을 다시 열면 이전에 내려간 위치가 아니라 맨 위부터 보여요',
+    '아이폰 XS처럼 좁은 화면에서 \'업데이트\'·\'자동 백업 · 되돌리기\' 버튼 글자가 두 줄로 꺾이던 것 고침',
+    '포닝 스타일: 연회색 글자를 조금 진하게, 위쪽 형광 띠는 화면과 같이 스크롤 (내려도 글자가 초록 위로 안 겹침)',
+    '방금 지운 기록의 \'되돌리기\' 바를 회차 기록 제안이 덮지 않아요'
+  ],
+  '5.5': [
+    '기록 창 제목의 회차(예: 9화 ▾)를 누르면 다른 회차로 바로 갈 수 있어요 — 전·후 버튼도 그대로',
+    '연재 중이거나 회차가 아주 많으면 번호를 넣거나, 가까운 회차·기록한 회차를 눌러 이동해요',
+    '통계 분포도 색을 앱과 맞추고, 고르기 칸·하단 탭 모양을 다듬었어요'
+  ],
   '5.4': [
     '포닝 스타일로 새 옷을 입었어요 💚💙💛 — 굵은 테두리, 형광 배경, 반짝이는 버튼',
     '탭마다 배경색이 달라요 (홈·모아보기 초록 · 전체·통계 파랑 · 계획·더보기 노랑)',
@@ -4463,7 +4524,7 @@ function showActionBar(msg, label, fn, ms, tag) {
   clearTimeout(undoTimer);
   undoTimer = setTimeout(hideUndo, ms || 8000);
 }
-function showUndo(msg, fn) { showActionBar(msg, '되돌리기', fn, 8000, 'undo'); }
+function showUndo(msg, fn, tag) { showActionBar(msg, '되돌리기', fn, 8000, tag || 'undo'); }
 function hideUndo() { const el = document.getElementById('undoBar'); if (el) el.classList.remove('show'); undoAction = null; actionBarTag = null; }
 function runUndo() { const f = undoAction; hideUndo(); if (f) f(); }
 
@@ -7100,7 +7161,7 @@ function confirmDeleteNote() {
       save(true);
       render();
       showToast('메모를 되살렸어요');
-    });
+    }, 'undo-del');
     setTimeout(() => openDetail(item.id), 100);
     showToast('메모가 삭제되었습니다');
   };
@@ -8202,7 +8263,7 @@ function confirmDelete(id) {
       save(true);
       render();
       showToast('되살렸어요');
-    });
+    }, 'undo-del');
   };
   document.getElementById('confirmModal').classList.add('active');
 }
@@ -9733,6 +9794,7 @@ function showEpOffer(id, n, open) {
   if (!item) return;
   const go = () => openQuickEpRecord(id, n);
   if (open) { setTimeout(() => { if (!isModalOpen('doneReviewModal') && !isModalOpen('confirmModal')) go(); }, 280); return; }
+  if (actionBarTag === 'undo-del') return; // 방금 지운 걸 되돌릴 기회는 덮지 않음 (✍️로 언제든 쓸 수 있음)
   const r = peekRecord(item);
   showActionBar(`${epLabel(item, n)} 기록${r && r.eps[n] ? '을 이어 쓸까요?' : '을 남길까요?'}`, '✍️ 기록 쓰기', go, 10000, 'epoffer:' + id);
 }
@@ -9855,7 +9917,8 @@ function openEpEditor(n) {
   // 이전·다음은 같은 묶음(본편/외전) 안에서만
   const lo = isSideEp(n) ? SIDE_BASE + 1 : 1;
   const hi = isSideEp(n) ? (sideTotalOf(item) ? SIDE_BASE + sideTotalOf(item) : Infinity) : (total || Infinity);
-  document.getElementById('epModalTitle').textContent = `${bracketTitle(item)} ${recEpLabel(item, n)}`;
+  document.getElementById('epModalTitle').innerHTML = `<span class="ep-work">${escapeHTML(bracketTitle(item))}</span>`
+    + `<button type="button" class="ep-pick-btn" id="epPickBtn" onclick="openEpPicker()" aria-label="다른 회차 고르기">${escapeHTML(recEpLabel(item, n))} <span>▾</span></button>`;
   // 빠른 기록으로 연 '다음 회차'는 기록을 쓰면 본 회차로 체크 (auto). 그 밖엔 직접 켜야 체크 (on/off)
   rec.epMark = (rec.quick && rec.quick.markEp === n && !watchedKeys(item).has(n)) ? 'auto' : 'off';
   renderEpStatus();
@@ -9958,6 +10021,7 @@ function closeEpEditor(skipSave) {
   const changed = skipSave ? false : saveEpRecord();
   const marked = skipSave ? false : applyEpMark();
   document.getElementById('epModal').classList.remove('active');
+  closeEpPicker();
   rec.epNum = null;
   rec.epMark = 'off';
   const quick = rec.quick;
@@ -9988,6 +10052,81 @@ function moveEp(d) {
   openEpEditor(n);
   if (isModalOpen('recordModal') && rec.tab === 'eps') renderRecEps();
 }
+// ----- 회차 고르기: 기록 창에서 아무 회차로 바로 이동 (전·후 버튼은 그대로) -----
+function epPickTracks(item) {
+  const tr = epTracks(item);
+  if (tr.length) return tr;
+  // 전체 회차를 모르는 팟캐스트·드라마: 번호로 입력
+  return [{ name: '', start: 1, end: Infinity, open: true, big: true, count: 0, restart: true, toKey: k => k, local: e => e }];
+}
+function openEpPicker() {
+  const item = recItem();
+  if (!item || rec.epNum == null) return;
+  const r = getRecord(item);
+  const seen = watchedKeys(item);
+  const cur = rec.epNum;
+  const tracks = epPickTracks(item);
+  const v = epVerb(item.type);
+  const recorded = new Set(Object.keys(r.eps).map(Number));
+  const cls = e => ['ep-btn', seen.has(e) ? 'watched' : '', recorded.has(e) ? 'rec' : '', e === cur ? 'cur' : ''].filter(Boolean).join(' ');
+  const multi = tracks.length > 1;
+  const html = tracks.map((t, ti) => {
+    const head = multi || t.name ? `<div class="ep-pick-head">${escapeHTML(t.name || (item.type === 'podcast' ? '에피소드' : '본편'))}${t.open ? '<span>연재 중</span>' : `<span>${t.count}${item.type === 'podcast' ? '편' : '화'}</span>`}</div>` : '';
+    if (!t.big) {
+      let grid = '';
+      for (let e = t.start; e <= t.end; e++) grid += `<button type="button" class="${cls(e)}" onclick="jumpEp(${e})">${t.local(e)}</button>`;
+      return `<div class="ep-pick-track">${head}<div class="episodes-grid">${grid}</div></div>`;
+    }
+    // 회차가 너무 많거나 끝을 모름: 번호 입력 + 가까운 회차 · 기록한 회차
+    const inTrack = e => e >= t.start && e <= t.end;
+    const ref = inTrack(cur) ? cur : Math.max(t.start, [...seen].filter(inTrack).reduce((a, b) => Math.max(a, b), t.start));
+    const near = [];
+    for (let e = Math.max(t.start, ref - 3); e <= Math.min(t.end, ref + 3); e++) near.push(e);
+    const recs = [...recorded].filter(inTrack).sort((a, b) => b - a).slice(0, 40).sort((a, b) => a - b);
+    const chip = e => `<button type="button" class="${cls(e)}" style="aspect-ratio:auto;padding:6px 10px;min-width:44px;" onclick="jumpEp(${e})">${t.local(e)}</button>`;
+    return `<div class="ep-pick-track">${head}
+      <div class="ep-pick-go">
+        <input type="number" class="form-input" id="epPickNum${ti}" min="1" inputmode="numeric" placeholder="몇 화로 갈까요?" onkeydown="if(event.key==='Enter')epPickGo(${ti})">
+        <button type="button" class="btn btn-primary" onclick="epPickGo(${ti})">이동</button>
+      </div>
+      <div class="ep-pick-chips"><div class="lab">가까운 회차</div>${near.map(chip).join('')}</div>
+      ${recs.length ? `<div class="ep-pick-chips"><div class="lab">기록한 회차</div>${recs.map(chip).join('')}</div>` : ''}
+    </div>`;
+  }).join('');
+  document.getElementById('epPickBody').innerHTML = `
+    <div class="ep-pick-legend"><span><i class="c"></i>지금 쓰는 회차</span><span><i class="w"></i>${v.seen} 회차</span><span>✎ 기록 있음</span></div>
+    ${html}
+    <div style="font-size: 11px; color: var(--ink-mute); margin-top: 14px;">회차를 누르면 지금 쓴 내용은 저장되고 그 회차 기록으로 넘어가요</div>`;
+  document.getElementById('epPickModal').classList.add('active');
+  const c = document.querySelector('#epPickBody .ep-btn.cur');
+  if (c && c.scrollIntoView) setTimeout(() => { try { c.scrollIntoView({ block: 'center' }); } catch (e) {} }, 60);
+}
+function closeEpPicker() { document.getElementById('epPickModal').classList.remove('active'); }
+function epPickGo(ti) {
+  const item = recItem();
+  if (!item) return;
+  const t = epPickTracks(item)[ti];
+  const k = parseInt((document.getElementById('epPickNum' + ti) || {}).value, 10);
+  if (!t || !(k > 0)) { showToast('회차 번호를 넣어주세요'); return; }
+  const e = t.toKey(k);
+  if (e < t.start || e > t.end) { showToast(`${t.name ? t.name + ' ' : ''}${t.local(t.start)}~${t.local(t.end)}화 사이로 넣어주세요`); return; }
+  jumpEp(e);
+}
+// 다른 회차로 이동: 지금 쓴 것 저장 + 체크 예약 반영 후 그 회차 열기
+function jumpEp(n) {
+  if (rec.epNum == null || !(n > 0)) return;
+  closeEpPicker();
+  if (n === rec.epNum) return;
+  const prev = rec.epNum;
+  cancelAutoSave('ep');
+  const changed = saveEpRecord();
+  const marked = applyEpMark();
+  if (rec.quick && marked && n === prev + 1) rec.quick.markEp = n; // 바로 다음 회차면 몰아보기처럼 이어서
+  if (changed && !marked) showToast('저장했어요');
+  openEpEditor(n);
+  if (isModalOpen('recordModal') && rec.tab === 'eps') renderRecEps();
+}
+
 function insertEpTemplate() {
   const ta = document.getElementById('recEpText');
   setMdPreview('recEpText', false);
@@ -11605,6 +11744,19 @@ function closeUpdateModal() {
 }
 
 // ============ INIT ============
+// 창(시트)을 새로 열 때는 맨 위부터 보이게. 예전엔 다른 작품 상세에서 내려간 위치가 그대로 남아 있었음.
+// (이미 열린 창을 다시 그리는 경우 — 회차 체크 후 상세 갱신 등 — 는 위치 유지)
+(function () {
+  if (typeof MutationObserver === 'undefined') return;
+  const mo = new MutationObserver(list => list.forEach(m => {
+    const el = m.target;
+    const was = /(^|\s)active(\s|$)/.test(m.oldValue || '');
+    if (!was && el.classList.contains('active')) {
+      el.querySelectorAll('.modal-content, .confirm-content').forEach(c => { c.scrollTop = 0; });
+    }
+  }));
+  document.querySelectorAll('.modal').forEach(el => mo.observe(el, { attributes: true, attributeFilter: ['class'], attributeOldValue: true }));
+})();
 // 회차 진행을 바꾸는 함수들: 새로 본 회차가 생기면 '✍️ 기록 쓰기' 제안
 toggleEpisode = withEpOffer(toggleEpisode);
 togglePodEpisode = withEpOffer(togglePodEpisode);
