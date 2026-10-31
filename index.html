@@ -2868,7 +2868,7 @@
     </div>
 
     <div id="versionText" style="text-align: center; margin-top: 40px; font-size: 11px; color: var(--ink-mute); letter-spacing: 0.04em; font-weight: 500;">
-      v5.6 · 데이터는 브라우저에 저장됩니다
+      v5.7 · 데이터는 브라우저에 저장됩니다
     </div>
   </section>
 </main>
@@ -3854,9 +3854,14 @@ const DEFAULT_OTT = [
 ];
 
 // ============ VERSION ============
-const APP_VERSION = '5.6';
+const APP_VERSION = '5.7';
 const VERSION_KEY = 'contentsArchive_seenVersion';
 const VERSION_NOTES = {
+  '5.7': [
+    '데이터 보존 재점검: 회차 기록·인물·관계·계획·템플릿·OTT·국가를 지워도 잠깐 \'되돌리기\'가 떠요',
+    '회차 기록·총평·메모 내용을 실수로 전부 지워도, 자동 저장이 바로 지우지 않아요 — 닫거나 저장할 때만 지워지고 되돌리기도 떠요',
+    'OTT·국가를 지우기 전에 자동 백업(복원 지점)도 남겨요'
+  ],
   '5.6': [
     '버그 점검: 상세·수정·기록장 창을 다시 열면 이전에 내려간 위치가 아니라 맨 위부터 보여요',
     '아이폰 XS처럼 좁은 화면에서 \'업데이트\'·\'자동 백업 · 되돌리기\' 버튼 글자가 두 줄로 꺾이던 것 고침',
@@ -7082,7 +7087,7 @@ function insertTemplate(templateId) {
 }
 
 // 메모 저장 (창은 그대로). 새 메모면 만들고 id 기억 → 이어서 저장해도 중복 안 생김. 바뀐 게 없으면 false
-function persistNote() {
+function persistNote(auto) {
   const item = state.items.find(i => i.id === state.noteEditingItemId);
   if (!item) return false;
   const rawTitle = document.getElementById('noteTitleInput').value.trim();
@@ -7094,7 +7099,22 @@ function persistNote() {
   const title = rawTitle || '제목 없음';
   const sameImgs = note && (note.images || []).length === images.length && images.every((s, i) => s === note.images[i]);
   if (note && note.title === title && (note.content || '') === content && sameImgs) return false;
+  const oldContent = note ? (note.content || '') : '';
+  if (auto === true && note && oldContent.trim() && !content.trim()) { setSaveState('noteSaveState', CLEAR_WAIT_MSG); return false; }
   const now = Date.now();
+  if (note && oldContent.trim() && !content.trim()) {
+    const nid = note.id, iid = item.id;
+    setTimeout(() => showUndo('메모 내용을 비웠어요', () => {
+      const it = state.items.find(i => i.id === iid);
+      const nn = it && (it.notes || []).find(x => x.id === nid);
+      if (!nn || (nn.content || '').trim()) return;
+      nn.content = oldContent; nn.updatedAt = Date.now(); it.updatedAt = Date.now();
+      save(true); render();
+      if (isModalOpen('noteModal') && state.noteEditingNoteId === nid) document.getElementById('noteContent').value = oldContent;
+      if (isModalOpen('detailModal')) openDetail(iid);
+      showToast('메모 내용을 되살렸어요');
+    }, 'undo-del'), 0);
+  }
   if (note) {
     note.title = title; note.content = content; note.images = images; note.updatedAt = now;
   } else {
@@ -7682,11 +7702,18 @@ function confirmDeleteTemplate(id) {
   document.getElementById('confirmTitle').textContent = '템플릿을 삭제할까요?';
   document.getElementById('confirmDesc').textContent = `"${t.name}" 템플릿이 영구적으로 삭제됩니다.`;
   confirmCallback = () => {
+    const at = state.templates.indexOf(t);
     state.templates = state.templates.filter(tt => tt.id !== id);
-    save();
+    save(true);
     renderTemplateList();
     closeConfirm();
-    showToast('템플릿이 삭제되었습니다');
+    showUndo('템플릿을 삭제했어요', () => {
+      if (state.templates.some(x => x.id === t.id)) return;
+      state.templates.splice(Math.min(at, state.templates.length), 0, t);
+      save(true);
+      renderTemplateList();
+      showToast('템플릿을 되살렸어요');
+    }, 'undo-del');
   };
   document.getElementById('confirmModal').classList.add('active');
 }
@@ -7888,18 +7915,29 @@ function confirmDeleteOtt(id) {
     ? `"${o.name}"이(가) ${usageCount}개 기록에서 사용 중입니다. 삭제하면 해당 기록의 OTT 정보가 비워집니다.`
     : `"${o.name}"이(가) 영구적으로 삭제됩니다.`;
   confirmCallback = () => {
+    takeSnapshot('delete'); // 여러 기록에 걸친 변경이라 복원 지점도 남김
+    const savedOtt = JSON.parse(JSON.stringify(o));
+    const used = state.items.filter(it => (it.otts || []).includes(id)).map(it => ({ id: it.id, at: it.otts.indexOf(id) }));
     // Clear from items that used this OTT
     state.items.forEach(it => { if (Array.isArray(it.otts)) it.otts = it.otts.filter(x => x !== id); });
     state.ottPlatforms = state.ottPlatforms.filter(o => o.id !== id);
+    setTimeout(() => showUndo(`${savedOtt.name}을(를) 삭제했어요`, () => {
+      if (state.ottPlatforms.some(x => x.id === savedOtt.id)) return;
+      state.ottPlatforms.push(savedOtt);
+      used.forEach(u => { const it = state.items.find(i => i.id === u.id); if (it) { if (!Array.isArray(it.otts)) it.otts = []; if (!it.otts.includes(savedOtt.id)) it.otts.splice(Math.min(u.at, it.otts.length), 0, savedOtt.id); } });
+      save(true);
+      render();
+      if (isModalOpen('ottManagerModal')) renderOttManagerList();
+      showToast(`${savedOtt.name}을(를) 되살렸어요`);
+    }, 'undo-del'), 0);
     if ((state.selectedOtts || []).includes(id)) {
       state.selectedOtts = state.selectedOtts.filter(x => x !== id);
       updateOttSelectButton();
     }
-    save();
+    save(true);
     render();
     renderOttManagerList();
     closeConfirm();
-    showToast('삭제되었습니다');
   };
   document.getElementById('confirmModal').classList.add('active');
 }
@@ -8012,15 +8050,26 @@ function confirmDeleteCountry(id) {
     ? `"${c.name}"이(가) ${usage}개 기록에서 사용 중입니다. 삭제하면 해당 기록의 국가 정보가 비워집니다.`
     : `"${c.name}"이(가) 영구적으로 삭제됩니다.`;
   confirmCallback = () => {
+    takeSnapshot('delete');
+    const savedC = JSON.parse(JSON.stringify(c));
+    const used = state.items.filter(it => it.country === id).map(it => it.id);
     state.items.forEach(it => { if (it.country === id) it.country = null; });
     state.countries = state.countries.filter(cc => cc.id !== id);
+    setTimeout(() => showUndo(`${savedC.name}을(를) 삭제했어요`, () => {
+      if (state.countries.some(x => x.id === savedC.id)) return;
+      state.countries.push(savedC);
+      used.forEach(iid => { const it = state.items.find(i => i.id === iid); if (it && !it.country) it.country = savedC.id; });
+      save(true);
+      render();
+      if (isModalOpen('countryManagerModal')) renderCountryManagerList();
+      showToast(`${savedC.name}을(를) 되살렸어요`);
+    }, 'undo-del'), 0);
     if (state.selectedCountry === id) { state.selectedCountry = null; updateCountrySelectButton(); }
     if (state.countryFilter === id) state.countryFilter = 'all';
-    save();
+    save(true);
     render();
     renderCountryManagerList();
     closeConfirm();
-    showToast('삭제되었습니다');
   };
   document.getElementById('confirmModal').classList.add('active');
 }
@@ -8316,28 +8365,77 @@ function nowHM() { const d = new Date(); return String(d.getHours()).padStart(2,
 function setSaveState(id, text) { const el = document.getElementById(id); if (el) el.textContent = text; }
 function isModalOpen(id) { const m = document.getElementById(id); return !!(m && m.classList.contains('active')); }
 
+const CLEAR_WAIT_MSG = '다 지운 내용은 저장하거나 닫을 때 반영돼요';
 function autoSaveEp() {
   if (!isModalOpen('epModal') || rec.epNum == null) return false;
-  const changed = saveEpRecord();
+  const changed = saveEpRecord(true);
   if (changed) setSaveState('epSaveState', `✓ 자동 저장됨 ${nowHM()}`);
+  else if (!document.getElementById('recEpText').value.trim() && (rec.epOrig || '').trim()) setSaveState('epSaveState', CLEAR_WAIT_MSG);
   return changed;
 }
-function autoSaveComment() {
+// explicit=true: 닫기·탭 바꾸기처럼 직접 한 동작 (총평을 비우는 것도 반영 + 되돌리기)
+function autoSaveComment(explicit) {
   const ta = document.getElementById('recComment');
   const item = recItem();
   if (!ta || !item || !isModalOpen('recordModal')) return false;
   const v = ta.value.trim();
   if (v === (item.memo || '')) return false;
+  const old = item.memo || '';
+  if (!v && old && explicit !== true) { setSaveState('recCommentState', CLEAR_WAIT_MSG); return false; }
   item.memo = v;
   recTouch(item);
   setSaveState('recCommentState', `✓ 자동 저장됨 ${nowHM()}`);
+  if (!v && old) offerRestoreMemo(item.id, old);
   return true;
 }
 function autoSaveNote() {
   if (!isModalOpen('noteModal')) return false;
-  const changed = persistNote();
+  const changed = persistNote(true);
   if (changed) setSaveState('noteSaveState', `✓ 자동 저장됨 ${nowHM()}`);
   return changed;
+}
+
+// ----- 지운 것 되살리기 (되돌리기 바) -----
+function restoreEpEntry(itemId, n, entry) {
+  const it = state.items.find(i => i.id === itemId);
+  if (!it) return;
+  const r = getRecord(it);
+  if (r.eps[n] && String(r.eps[n].text || '').trim()) { showToast('그 사이 새로 쓴 기록이 있어서 그대로 뒀어요'); return; }
+  r.eps[n] = { text: entry.text, updatedAt: entry.updatedAt || Date.now() };
+  recTouch(it);
+  if (isModalOpen('epModal') && rec.itemId === itemId && rec.epNum === n) {
+    document.getElementById('recEpText').value = entry.text;
+    rec.epOrig = entry.text;
+    setMdPreview('recEpText', true);
+    document.getElementById('epDeleteBtn').style.display = '';
+  }
+  if (isModalOpen('recordModal') && rec.itemId === itemId && rec.tab === 'eps') renderRecEps();
+  if (isModalOpen('detailModal')) openDetail(itemId);
+  showToast(`${epLabel(it, n)} 기록을 되살렸어요`);
+}
+function offerRestoreEp(itemId, n, entry, msg) {
+  showUndo(msg, () => restoreEpEntry(itemId, n, entry), 'undo-del');
+}
+function offerRestoreMemo(itemId, old) {
+  showUndo('총평을 비웠어요', () => {
+    const it = state.items.find(i => i.id === itemId);
+    if (!it || (it.memo || '').trim()) return;
+    it.memo = old;
+    recTouch(it);
+    if (isModalOpen('recordModal') && rec.itemId === itemId && rec.tab === 'comment') renderRecComment();
+    if (isModalOpen('detailModal')) openDetail(itemId);
+    showToast('총평을 되살렸어요');
+  }, 'undo-del');
+}
+// 기록 창을 닫거나 넘길 때 내용을 비워서 지워졌으면 되돌리기 제안
+function offerClearedEp() {
+  const cl = rec.cleared;
+  rec.cleared = null;
+  if (!cl) return false;
+  const it = state.items.find(i => i.id === cl.itemId);
+  if (!it) return false;
+  offerRestoreEp(cl.itemId, cl.n, cl.entry, `${epLabel(it, cl.n)} 기록을 비워서 지웠어요`);
+  return true;
 }
 
 document.addEventListener('input', e => {
@@ -8592,7 +8690,7 @@ document.querySelectorAll('.modal').forEach(modal => {
 // ============ 작품 기록장 (인물 관계도 · 회차 기록 · 총평) ============
 // item.record = { chars:[{id,name,group,desc,x,y}], rels:[{id,a,b,label,dir}], eps:{ '3': {text, updatedAt} }, manual }
 // 총평은 item.memo (예전 '한줄 메모'와 같은 칸)
-let rec = { itemId: null, tab: null, epFilter: 'all', epNum: null, epOrig: '', epMark: 'off', quick: null, pendingDone: null };
+let rec = { itemId: null, tab: null, epFilter: 'all', epNum: null, epOrig: '', epMark: 'off', quick: null, pendingDone: null, cleared: null };
 let mmPos = {};
 let mmDrag = null;
 
@@ -8702,7 +8800,7 @@ function openRecord(itemId, tab) {
 
 function closeRecord() {
   cancelAutoSave('comment');
-  autoSaveComment();
+  autoSaveComment(true);
   document.getElementById('recordModal').classList.remove('active');
   document.body.style.overflow = '';
   const id = rec.itemId;
@@ -8713,7 +8811,7 @@ function closeRecord() {
 
 function setRecTab(k) {
   cancelAutoSave('comment');
-  autoSaveComment(); // 총평 쓰다가 탭을 바꿔도 저장
+  autoSaveComment(true); // 총평 쓰다가 탭을 바꿔도 저장
   rec.tab = k;
   renderRecord();
 }
@@ -9474,13 +9572,31 @@ function deleteChar() {
   document.getElementById('confirmDesc').textContent = (relCount ? `이 인물과 연결된 관계 ${relCount}개도 함께 지워져요.` : '관계도에서 사라져요.')
     + (kidCount ? ` 이 인물에서 뻗은 인물 ${kidCount}명은 지우지 않고 한 칸 위로 붙여요.` : '');
   confirmCallback = () => {
+    const idx = r.chars.indexOf(c);
+    const saved = JSON.parse(JSON.stringify(c));
+    const kids = r.chars.filter(x => x.parent === c.id).map(x => x.id);
+    const gone = r.rels.filter(x => x.a === c.id || x.b === c.id).map(x => ({ rel: JSON.parse(JSON.stringify(x)), at: r.rels.indexOf(x) }));
     r.chars.forEach(x => { if (x.parent === c.id) { if (c.parent) x.parent = c.parent; else delete x.parent; } });
     r.chars = r.chars.filter(x => x.id !== c.id);
     r.rels = r.rels.filter(x => x.a !== c.id && x.b !== c.id);
     recTouch(item);
     closeConfirm();
     renderRecChars();
-    showToast('삭제했어요');
+    const iid = item.id;
+    showUndo(`${mmClip(saved.name, 10)}을(를) 지웠어요`, () => {
+      const it = state.items.find(i => i.id === iid);
+      if (!it) return;
+      const rr = getRecord(it);
+      if (rr.chars.some(x => x.id === saved.id)) return;
+      if (saved.parent && !rr.chars.some(x => x.id === saved.parent)) delete saved.parent;
+      rr.chars.splice(Math.min(idx, rr.chars.length), 0, saved);
+      kids.forEach(k => { const x = rr.chars.find(y => y.id === k); if (x && (x.parent || null) === (saved.parent || null)) x.parent = saved.id; });
+      const ids = new Set(rr.chars.map(x => x.id)), relIds = new Set(rr.rels.map(x => x.id));
+      gone.forEach(g => { if (!relIds.has(g.rel.id) && ids.has(g.rel.a) && ids.has(g.rel.b)) rr.rels.splice(Math.min(g.at, rr.rels.length), 0, g.rel); });
+      recTouch(it);
+      if (isModalOpen('recordModal') && rec.itemId === iid && rec.tab === 'chars') renderRecChars();
+      showToast(`${mmClip(saved.name, 10)}을(를) 되살렸어요`);
+    }, 'undo-del');
   };
   document.getElementById('confirmModal').classList.add('active');
 }
@@ -9565,11 +9681,25 @@ function deleteRel() {
   const item = recItem();
   if (!item || !rec.relId) return;
   const r = getRecord(item);
+  const at = r.rels.findIndex(q => q.id === rec.relId);
+  const saved = at >= 0 ? JSON.parse(JSON.stringify(r.rels[at])) : null;
   r.rels = r.rels.filter(q => q.id !== rec.relId);
   recTouch(item);
   closeRelEditor(true);
   renderRecChars();
-  showToast('삭제했어요');
+  if (!saved) { showToast('삭제했어요'); return; }
+  const iid = item.id;
+  showUndo(`관계${saved.label ? ` '${mmClip(saved.label, 8)}'` : ''}를 지웠어요`, () => {
+    const it = state.items.find(i => i.id === iid);
+    if (!it) return;
+    const rr = getRecord(it);
+    const ids = new Set(rr.chars.map(x => x.id));
+    if (rr.rels.some(x => x.id === saved.id) || !ids.has(saved.a) || !ids.has(saved.b)) return;
+    rr.rels.splice(Math.min(at, rr.rels.length), 0, saved);
+    recTouch(it);
+    if (isModalOpen('recordModal') && rec.itemId === iid && rec.tab === 'chars') renderRecChars();
+    showToast('관계를 되살렸어요');
+  }, 'undo-del');
 }
 
 function recCharsText(item) {
@@ -10003,14 +10133,20 @@ function applyEpMark(opts) {
 }
 
 // 저장 (내용을 비우면 그 회차 기록 삭제). 바뀐 게 있으면 true
-function saveEpRecord() {
+// auto=true(쓰는 중 자동 저장·앱 내릴 때): 내용을 전부 지운 상태면 기존 기록을 지우지 않고 기다림
+function saveEpRecord(auto) {
   const item = recItem();
   if (!item || rec.epNum == null) return false;
   const r = getRecord(item);
   const text = document.getElementById('recEpText').value.replace(/\s+$/, '');
   if (text === (rec.epOrig || '').replace(/\s+$/, '')) return false;
+  if (!text.trim() && auto === true && (rec.epOrig || '').trim()) return false;
   if (text.trim()) r.eps[rec.epNum] = { text, updatedAt: Date.now() };
-  else delete r.eps[rec.epNum];
+  else {
+    const old = r.eps[rec.epNum];
+    delete r.eps[rec.epNum];
+    if (old && String(old.text || '').trim()) rec.cleared = { itemId: item.id, n: rec.epNum, entry: { text: old.text, updatedAt: old.updatedAt } };
+  }
   rec.epOrig = text;
   recTouch(item);
   return true;
@@ -10035,7 +10171,7 @@ function closeEpEditor(skipSave) {
     if (isModalOpen('detailModal')) { if (id && state.items.some(i => i.id === id)) openDetail(id); }
     else if (!isModalOpen('planCheckModal')) document.body.style.overflow = '';
   }
-  if (changed && !marked) showToast('저장했어요'); // 체크했으면 아래 바가 같이 알려줌
+  if (!offerClearedEp() && changed && !marked) showToast('저장했어요'); // 체크했으면 아래 바가 같이 알려줌
   const pd = rec.pendingDone;
   rec.pendingDone = null;
   if (pd) setTimeout(() => promptDoneReview(pd), 320);
@@ -10048,7 +10184,7 @@ function moveEp(d) {
   const marked = applyEpMark();
   // 빠른 기록에서 기록 쓰고 다음 회차로 넘어가면, 다음 회차도 쓰면 체크되게 (몰아보기)
   if (rec.quick && d > 0 && marked) rec.quick.markEp = n;
-  if (changed && !marked) showToast('저장했어요');
+  if (!offerClearedEp() && changed && !marked) showToast('저장했어요');
   openEpEditor(n);
   if (isModalOpen('recordModal') && rec.tab === 'eps') renderRecEps();
 }
@@ -10122,7 +10258,7 @@ function jumpEp(n) {
   const changed = saveEpRecord();
   const marked = applyEpMark();
   if (rec.quick && marked && n === prev + 1) rec.quick.markEp = n; // 바로 다음 회차면 몰아보기처럼 이어서
-  if (changed && !marked) showToast('저장했어요');
+  if (!offerClearedEp() && changed && !marked) showToast('저장했어요');
   openEpEditor(n);
   if (isModalOpen('recordModal') && rec.tab === 'eps') renderRecEps();
 }
@@ -10143,12 +10279,15 @@ function deleteEpRecord() {
   document.getElementById('confirmDesc').textContent = '이 회차에 쓴 내용이 사라져요.';
   confirmCallback = () => {
     cancelAutoSave('ep');
-    delete getRecord(item).eps[n];
+    const r = getRecord(item);
+    const old = r.eps[n] ? { text: r.eps[n].text, updatedAt: r.eps[n].updatedAt } : null;
+    delete r.eps[n];
     rec.epMark = 'off';
     recTouch(item);
     closeConfirm();
     closeEpEditor(true);
-    showToast('삭제했어요');
+    if (old) offerRestoreEp(item.id, n, old, `${recEpLabel(item, n)} 기록을 지웠어요`);
+    else showToast('삭제했어요');
   };
   document.getElementById('confirmModal').classList.add('active');
 }
@@ -10241,10 +10380,12 @@ function saveRecComment() {
   const item = recItem();
   if (!item) return;
   cancelAutoSave('comment');
+  const old = item.memo || '';
   item.memo = document.getElementById('recComment').value.trim();
   recTouch(item);
   setMdPreview('recComment', !!item.memo);
-  showToast('총평을 저장했어요');
+  if (!item.memo && old) offerRestoreMemo(item.id, old);
+  else showToast('총평을 저장했어요');
 }
 function copyRecComment() {
   const item = recItem();
@@ -11224,11 +11365,21 @@ function deletePlan() {
   const p = (state.plans || []).find(x => x.id === id);
   document.getElementById('confirmDesc').textContent = p ? `${fmtPlanDay(p.date)} · ${planLine(p)}` : '';
   confirmCallback = () => {
+    const at = (state.plans || []).findIndex(x => x.id === id);
+    const saved = at >= 0 ? JSON.parse(JSON.stringify(state.plans[at])) : null;
     state.plans = (state.plans || []).filter(x => x.id !== id);
     save(true);
     renderPlanView();
     closeConfirm();
-    showToast('삭제되었습니다');
+    if (!saved) { showToast('삭제되었습니다'); return; }
+    showUndo('계획을 삭제했어요', () => {
+      if ((state.plans || []).some(x => x.id === saved.id)) return;
+      state.plans = state.plans || [];
+      state.plans.splice(Math.min(at, state.plans.length), 0, saved);
+      save(true);
+      renderPlanView();
+      showToast('계획을 되살렸어요');
+    }, 'undo-del');
   };
   document.getElementById('confirmModal').classList.add('active');
 }
