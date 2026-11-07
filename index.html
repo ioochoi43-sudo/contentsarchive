@@ -8344,6 +8344,7 @@ function closeConfirm() {
   const btn = document.getElementById('confirmBtn');
   btn.textContent = '삭제';
   btn.className = 'btn btn-danger';
+  document.getElementById('confirmDesc').style.whiteSpace = '';
 }
 // 확인창 (버튼 글자 지정). cb 안에서 closeConfirm 불러야 함
 function askConfirm(title, desc, okLabel, cb) {
@@ -11344,17 +11345,67 @@ function savePlan() {
     updatedAt: Date.now()
   };
   const existing = planEdit.id ? state.plans.find(p => p.id === planEdit.id) : null;
+  // 같은 회차가 다른 날(아직 체크 안 한 계획)에 있으면 경고 후 그쪽에서 빼기
+  const conflicts = planConflicts(item.id, data.eps, planEdit.id);
+  if (!conflicts.length) { commitPlan(existing, data, []); return; }
+  const pod = item.type === 'podcast';
+  const lines = conflicts.map(c => {
+    const rest = (c.plan.eps || []).filter(e => !c.eps.includes(e));
+    const willDelete = !rest.length && !c.plan.text;
+    return `· ${fmtPlanDay(c.plan.date)} ${formatEpRanges(c.eps, pod, item)}${willDelete ? ' → 계획 삭제' : ' → 이 회차만 빼기'}`;
+  });
+  askConfirm('다른 날 계획과 회차가 겹쳐요', `겹치는 회차는 다른 날 계획에서 자동으로 정리돼요.\n${lines.join('\n')}`, '정리하고 저장', () => {
+    closeConfirm();
+    commitPlan(existing, data, conflicts);
+  });
+  const btn = document.getElementById('confirmBtn');
+  btn.className = 'btn btn-primary';
+  document.getElementById('confirmDesc').style.whiteSpace = 'pre-line';
+}
+
+// 다른 미완료 계획 중 회차가 겹치는 것들
+function planConflicts(itemId, eps, selfId) {
+  const want = new Set(eps || []);
+  if (!want.size) return [];
+  return (state.plans || [])
+    .filter(p => p.id !== selfId && p.itemId === itemId && !p.done)
+    .map(p => ({ plan: p, eps: (p.eps || []).filter(e => want.has(e)) }))
+    .filter(c => c.eps.length)
+    .sort((a, b) => planOrderKey(a.plan).localeCompare(planOrderKey(b.plan)));
+}
+
+function commitPlan(existing, data, conflicts) {
+  const before = JSON.parse(JSON.stringify(state.plans || []));
+  let removed = 0, trimmed = 0;
+  conflicts.forEach(c => {
+    const x = state.plans.find(y => y.id === c.plan.id);
+    if (!x) return;
+    const rm = new Set(c.eps);
+    const rest = (x.eps || []).filter(e => !rm.has(e));
+    if (!rest.length && !x.text) { state.plans = state.plans.filter(y => y.id !== x.id); removed++; }
+    else { x.eps = rest; x.updatedAt = Date.now(); trimmed++; }
+  });
   if (existing && existing.check && !existing.check.simple && existing.itemId !== data.itemId) {
     existing.check = { simple: true };
   }
   if (existing) Object.assign(existing, data);
   else state.plans.push(Object.assign({ id: uid(), done: false, createdAt: Date.now() }, data));
   save(true);
-  planAnchor = date;
-  planSelectedDay = date;
+  planAnchor = data.date;
+  planSelectedDay = data.date;
   renderPlanView();
   closePlanEditor();
-  showToast(existing ? '계획을 수정했어요' : '계획을 추가했어요');
+  const msg = existing ? '계획을 수정했어요' : '계획을 추가했어요';
+  if (!conflicts.length) { showToast(msg); return; }
+  const bits = [];
+  if (trimmed) bits.push(`${trimmed}개 정리`);
+  if (removed) bits.push(`${removed}개 삭제`);
+  showUndo(`${msg} · 다른 날 계획 ${bits.join(', ')}`, () => {
+    state.plans = before;
+    save(true);
+    renderPlanView();
+    showToast('되돌렸어요');
+  });
 }
 
 function deletePlan() {
