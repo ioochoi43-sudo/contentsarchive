@@ -8,7 +8,8 @@
 ## 프로젝트 구조
 - `index.html` 한 파일에 HTML·CSS·JS 전부 들어 있음. **파일을 나누지 말 것.** 빌드 도구 없음.
 - GitHub Pages로 배포. 외부 라이브러리는 CDN(jspdf, html2canvas, xlsx)만 사용.
-- 사용 환경: 아이폰 17(390px)·아이폰 XS(375px), 홈 화면에 추가한 앱(PWA), 터치 조작.
+- 사용 환경: 아이폰 17(390px)·아이폰 XS(375px)·아이패드, 홈 화면에 추가한 앱(PWA), 터치 조작.
+- 앱 아이콘: `apple-touch-icon.png`(180×180, 투명 없음). `<head>`의 `apple-touch-icon` 링크로 연결.
 
 ## 배포할 때마다 꼭 할 것 (버전 안내)
 1. `APP_VERSION`을 0.1 올리기 (예: `'5.7'` → `'5.8'`).
