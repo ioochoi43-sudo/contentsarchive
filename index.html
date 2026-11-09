@@ -2870,7 +2870,7 @@
     </div>
 
     <div id="versionText" style="text-align: center; margin-top: 40px; font-size: 11px; color: var(--ink-mute); letter-spacing: 0.04em; font-weight: 500;">
-      v5.9 · 데이터는 브라우저에 저장됩니다
+      v6.0 · 데이터는 브라우저에 저장됩니다
     </div>
   </section>
 </main>
@@ -3856,9 +3856,13 @@ const DEFAULT_OTT = [
 ];
 
 // ============ VERSION ============
-const APP_VERSION = '5.9';
+const APP_VERSION = '6.0';
 const VERSION_KEY = 'contentsArchive_seenVersion';
 const VERSION_NOTES = {
+  '6.0': [
+    '계획 수정: 숫자로 넣는 회차(예: 88~100화)를 89~100화처럼 바꿀 수 있어요',
+    '이미 고른 회차가 입력칸에 채워져 있고, 숫자만 고친 뒤 \'바꾸기\'를 누르면 돼요'
+  ],
   '5.9': [
     '앱 아이콘이 생겼어요: 형광 초록 보관함 상자',
     '새 아이콘은 홈 화면 앱을 지우고 다시 추가해야 보여요',
@@ -11242,12 +11246,16 @@ function renderPlanEpPicker() {
     const nm = tr.name ? tr.name + ' ' : '';
     const info1 = `${cur >= tr.start ? `${nm}${tr.local(cur)}화까지 ${v.done}` : `${nm}아직 ${v.seen} 회차 없음`}${extra > 0 ? ` (+ 띄엄띄엄 ${extra}화)` : ''}${tr.open ? (tr.side ? ' · 전체 미정' : ' · 연재 중') : ` · ${tr.restart ? `${tr.count}화` : `${tr.start}~${tr.end}화`}`}`;
     const info2 = elsewhere.size ? `다른 날 계획: ${formatEpRanges([...elsewhere], info.podcast, item)}` : '';
+    // 이 부·외전에서 이미 고른 회차가 있으면 입력칸에 채워두고, 버튼은 '바꾸기'(그 범위로 교체)
+    const selTr = planEdit.eps.filter(e => e >= tr.start && e <= tr.end);
+    const pf = selTr.length ? tr.local(Math.min(...selTr)) : '';
+    const pt = selTr.length ? tr.local(Math.max(...selTr)) : '';
     rangeEl.innerHTML = `<div class="plan-range-info">${escapeHTML(info1)}${info2 ? '<br>' + escapeHTML(info2) : ''}</div>
       <div class="plan-range-row">
-        <input type="number" class="form-input" id="planRangeFrom" placeholder="시작 화" min="1" inputmode="numeric">
+        <input type="number" class="form-input" id="planRangeFrom" placeholder="시작 화" min="1" inputmode="numeric" value="${pf}">
         <span style="color: var(--ink-mute);">~</span>
-        <input type="number" class="form-input" id="planRangeTo" placeholder="끝 화" min="1" inputmode="numeric">
-        <button type="button" class="btn" onclick="planAddRange()">추가</button>
+        <input type="number" class="form-input" id="planRangeTo" placeholder="끝 화" min="1" inputmode="numeric" value="${pt}">
+        <button type="button" class="btn" onclick="planAddRange()">${selTr.length ? '바꾸기' : '추가'}</button>
       </div>
       ${planEdit.eps.length ? `<div class="plan-range-picked">선택: ${escapeHTML(formatEpRanges(planEdit.eps, info.podcast, item))}</div>` : ''}`;
     return;
@@ -11269,7 +11277,7 @@ function renderPlanEpPicker() {
 }
 function planPickTrack(i) { planEdit.track = i; renderPlanEpPicker(); }
 
-// 회차 범위 넣기 (예: 120 ~ 125)
+// 회차 범위 넣기·바꾸기 (예: 88~100 → 89~100)
 function planAddRange() {
   const item = state.items.find(i => i.id === planEdit.itemId);
   const info = planEpInfo(item);
@@ -11287,7 +11295,8 @@ function planAddRange() {
     return;
   }
   if (b - a >= 300) { showToast('한 번에 300화까지만 넣을 수 있어요'); return; }
-  const set = new Set(planEdit.eps);
+  // 지금 고른 부·외전 안의 선택은 이 범위로 바꾸고, 다른 부·외전에서 고른 회차는 그대로 둬요
+  const set = new Set(planEdit.eps.filter(e => !(e >= tr.start && e <= tr.end)));
   for (let e = ka; e <= kb; e++) set.add(e);
   planEdit.eps = [...set].sort((x, y) => x - y);
   renderPlanEpPicker();
