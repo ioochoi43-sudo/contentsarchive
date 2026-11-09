@@ -6,6 +6,8 @@
 <meta name="theme-color" content="#fafaf9">
 <script>try { var __a = localStorage.getItem('contentsArchive_accent'); if (__a) document.documentElement.setAttribute('data-accent', __a); var __s = localStorage.getItem('contentsArchive_style'); if (__s) document.documentElement.setAttribute('data-style', __s); document.documentElement.setAttribute('data-page', 'timeline'); } catch (e) {}</script>
 <title>Contents Archive</title>
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -2868,7 +2870,7 @@
     </div>
 
     <div id="versionText" style="text-align: center; margin-top: 40px; font-size: 11px; color: var(--ink-mute); letter-spacing: 0.04em; font-weight: 500;">
-      v5.8 · 데이터는 브라우저에 저장됩니다
+      v5.9 · 데이터는 브라우저에 저장됩니다
     </div>
   </section>
 </main>
@@ -3854,9 +3856,14 @@ const DEFAULT_OTT = [
 ];
 
 // ============ VERSION ============
-const APP_VERSION = '5.8';
+const APP_VERSION = '5.9';
 const VERSION_KEY = 'contentsArchive_seenVersion';
 const VERSION_NOTES = {
+  '5.9': [
+    '앱 아이콘이 생겼어요: 형광 초록 보관함 상자',
+    '새 아이콘은 홈 화면 앱을 지우고 다시 추가해야 보여요',
+    '⚠️ 지우기 전에 꼭 더보기 → \'백업 파일 저장\' 먼저! 다시 추가한 뒤 \'JSON 백업 가져오기\'로 되돌려요'
+  ],
   '5.8': [
     '계획: 다른 날에 넣어둔 회차를 이 날 계획에 넣으면, 경고창을 띄운 뒤 다른 날 계획에서 그 회차를 자동으로 빼줘요',
     '회차가 하나도 안 남은 다른 날 계획은 지워지고(메모가 있으면 남겨요), 저장 직후 \'되돌리기\'로 원래대로 돌릴 수 있어요'
