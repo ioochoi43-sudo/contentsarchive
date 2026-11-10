@@ -2624,14 +2624,7 @@
 
     <div class="home-scroll" id="homeScroll"></div>
 
-    <button class="entry-card" onclick="goTab('all')">
-      <span class="entry-icon">🗂</span>
-      <span class="entry-body">
-        <span class="entry-title" style="display:block;">전체 기록 보기</span>
-        <span class="entry-desc" style="display:block;">상태별·유형별로 모든 기록을 한눈에 볼 수 있어요</span>
-      </span>
-      <span class="entry-arrow">›</span>
-    </button>
+    <div id="homePlan"></div>
 
     <h2 class="section-title" style="font-size: 20px; margin-top: 28px;">진행중 목록</h2>
     <div class="filter-row" id="timelineSort" style="margin: 12px 0 14px;">
@@ -2870,7 +2863,7 @@
     </div>
 
     <div id="versionText" style="text-align: center; margin-top: 40px; font-size: 11px; color: var(--ink-mute); letter-spacing: 0.04em; font-weight: 500;">
-      v6.0 · 데이터는 브라우저에 저장됩니다
+      v6.1 · 데이터는 브라우저에 저장됩니다
     </div>
   </section>
 </main>
@@ -3856,9 +3849,15 @@ const DEFAULT_OTT = [
 ];
 
 // ============ VERSION ============
-const APP_VERSION = '6.0';
+const APP_VERSION = '6.1';
 const VERSION_KEY = 'contentsArchive_seenVersion';
 const VERSION_NOTES = {
+  '6.1': [
+    '홈에 \'오늘 계획\'이 보여요: 홈에서 바로 체크·수정·복사·추가할 수 있어요',
+    '홈의 \'전체 기록 보기\' 버튼은 뺐어요 (아래 \'전체\' 탭과 같은 화면이라서요)',
+    '버그 점검: 앱을 켜둔 채 날짜가 바뀌면, 다시 볼 때 \'오늘\' 표시와 오늘 계획이 새 날짜로 바뀌어요',
+    '계획 탭: 다른 주·달을 보고 있을 때는 \'이번 주\' 대신 \'이 주\'라고 나와요'
+  ],
   '6.0': [
     '계획 수정: 숫자로 넣는 회차(예: 88~100화)를 89~100화처럼 바꿀 수 있어요',
     '이미 고른 회차가 입력칸에 채워져 있고, 숫자만 고친 뒤 \'바꾸기\'를 누르면 돼요'
@@ -8472,6 +8471,19 @@ function flushAutoSaves() {
   try { if (isModalOpen('relModal') && relDirty()) persistRel(); } catch (e) { console.error(e); }
 }
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flushAutoSaves(); });
+// 앱을 켜둔 채 날짜가 바뀌면(자정 넘김) 다시 볼 때 '오늘' 표시·오늘 계획을 새 날짜로
+let renderedDay = today();
+function refreshIfDayChanged() {
+  const t = today();
+  if (t === renderedDay) return;
+  if (planAnchor === renderedDay) planAnchor = t;
+  if (planSelectedDay === renderedDay) planSelectedDay = t;
+  renderedDay = t;
+  try { render(); } catch (e) { console.error(e); }
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') refreshIfDayChanged(); });
+window.addEventListener('pageshow', refreshIfDayChanged);
+window.addEventListener('focus', refreshIfDayChanged);
 window.addEventListener('pagehide', flushAutoSaves);
 
 // ============ JSON IMPORT/EXPORT ============
@@ -8627,7 +8639,17 @@ function importData(event) {
   reader.onload = (e) => {
     try {
       const data = JSON.parse(e.target.result);
-      if (Array.isArray(data.items)) {
+      // 깨진 칸(빈 값·숫자 등)이 섞인 백업 파일도 나머지 기록은 가져오게 걸러냄 (앱을 열 때 applyData와 같은 기준)
+      const isObj = v => v && typeof v === 'object' && !Array.isArray(v);
+      if (isObj(data) && Array.isArray(data.items)) {
+        data.items = data.items.filter(isObj);
+        data.items.forEach(i => {
+          if (i.id == null || i.id === '') i.id = uid(); else if (typeof i.id !== 'string') i.id = String(i.id);
+          if (Array.isArray(i.notes)) i.notes = i.notes.filter(isObj);
+        });
+        ['templates', 'ottPlatforms', 'countries', 'plans'].forEach(k => { if (Array.isArray(data[k])) data[k] = data[k].filter(isObj); });
+      }
+      if (isObj(data) && Array.isArray(data.items)) {
         document.getElementById('confirmTitle').textContent = '데이터를 가져올까요?';
         const tCount = data.templates ? data.templates.length : 0;
         const oCount = data.ottPlatforms ? data.ottPlatforms.length : 0;
@@ -10957,16 +10979,40 @@ function planDayCardHTML(day, isToday, compact) {
       </div>
     </div>
     ${plans.length
-      ? plans.map(p => `<div class="plan-row ${p.done ? 'done' : ''}">
-          <button type="button" class="plan-check" onclick="onPlanCheck('${p.id}')" aria-label="봤어요 체크">${p.done ? '✓' : ''}</button>
-          <div class="plan-row-text" onclick="openPlanEditor('${day}', '${p.id}')"><span class="plan-row-line">${escapeHTML(planLine(p))}</span>${planRowNote(p)}</div>
-          <button type="button" class="plan-row-copy" onclick="copyPlanItem('${p.id}')" aria-label="복사">📋</button>
-        </div>`).join('')
+      ? plans.map(p => planRowHTML(p, day)).join('')
       : (slim ? '' : `<div class="plan-empty">계획 없음</div>`)}
   </div>`;
 }
 
+// 계획 한 줄 (계획 탭·홈 공용): 체크 · 눌러서 수정 · 복사
+function planRowHTML(p, day) {
+  return `<div class="plan-row ${p.done ? 'done' : ''}">
+    <button type="button" class="plan-check" onclick="onPlanCheck('${p.id}')" aria-label="봤어요 체크">${p.done ? '✓' : ''}</button>
+    <div class="plan-row-text" onclick="openPlanEditor('${day}', '${p.id}')"><span class="plan-row-line">${escapeHTML(planLine(p))}</span>${planRowNote(p)}</div>
+    <button type="button" class="plan-row-copy" onclick="copyPlanItem('${p.id}')" aria-label="복사">📋</button>
+  </div>`;
+}
+
+// 홈: 오늘 계획 (계획 탭의 오늘 칸과 같은 줄·같은 동작)
+function renderHomePlan() {
+  const el = document.getElementById('homePlan');
+  if (!el) return;
+  const day = today();
+  const plans = plansOn(day);
+  const done = plans.filter(p => p.done).length;
+  el.innerHTML = `<div class="plan-day today home-plan ${plans.length ? '' : 'slim'}">
+    <div class="plan-day-head">
+      <div class="plan-day-title">${plans.length ? `오늘 계획<span class="plan-today-badge">${done}/${plans.length}</span>` : '오늘 계획이 없어요'}</div>
+      <div class="plan-day-actions">
+        <button type="button" class="plan-mini-btn primary" onclick="openPlanEditor('${day}')">+ 추가</button>
+      </div>
+    </div>
+    ${plans.map(p => planRowHTML(p, day)).join('')}
+  </div>`;
+}
+
 function renderPlanView() {
+  renderHomePlan();
   const body = document.getElementById('planBody');
   if (!body) return;
   const todayYmd = today();
@@ -11107,15 +11153,18 @@ let planSummaryCache = [];
 function renderPlanSummary(mode) {
   const el = document.getElementById('planSummary');
   if (!el) return;
-  planSummaryCache = planSummaryRows(planRangeDays());
+  const days = planRangeDays();
+  planSummaryCache = planSummaryRows(days);
   if (!planSummaryCache.length) { el.innerHTML = ''; return; }
+  const isNow = days.includes(today()); // 오늘이 들어 있는 주·달만 '이번'
+  const head = mode === 'week' ? (isNow ? '이번 주' : '이 주') : (isNow ? '이번 달' : '이 달');
   const when = g => mode === 'week'
     ? g.dates.map(d => DOW_KO[parseYmd(d).getDay()]).join('·')
     : (g.dates.length === 1
         ? fmtPlanDay(g.dates[0])
         : `${parseYmd(g.dates[0]).getMonth() + 1}/${parseYmd(g.dates[0]).getDate()} ~ ${parseYmd(g.dates[g.dates.length - 1]).getMonth() + 1}/${parseYmd(g.dates[g.dates.length - 1]).getDate()} · ${g.dates.length}일`);
   el.innerHTML = `<div class="plan-summary">
-    <div class="plan-summary-title">${mode === 'week' ? '이번 주' : '이번 달'} 작품별 <span>탭해서 하나씩 복사</span></div>
+    <div class="plan-summary-title">${head} 작품별 <span>탭해서 하나씩 복사</span></div>
     ${planSummaryCache.map((g, i) => `<button type="button" class="plan-summary-row" onclick="copyPlanSummary(${i})">
       <span class="plan-summary-body">
         <span class="plan-summary-line">${escapeHTML(g.line)}</span>
