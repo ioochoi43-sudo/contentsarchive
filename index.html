@@ -1007,7 +1007,7 @@
   }
   .plan-pick.selected { border-color: var(--accent); background: var(--accent-soft); }
   .plan-pick-title { flex: 1; min-width: 0; font-size: 14px; font-weight: 600; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .plan-pick-prog { font-size: 11px; color: var(--ink-mute); flex-shrink: 0; font-variant-numeric: tabular-nums; }
+  .plan-pick-prog { font-size: 11px; color: var(--ink-mute); flex-shrink: 0; max-width: 55%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-variant-numeric: tabular-nums; }
   .plan-quick { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 2px; }
   .ep-btn.seen { background: var(--bg-soft); color: var(--ink-mute); border-color: transparent; }
   .ep-btn.elsewhere { border: 1.5px dashed var(--accent); }
@@ -2863,7 +2863,7 @@
     </div>
 
     <div id="versionText" style="text-align: center; margin-top: 40px; font-size: 11px; color: var(--ink-mute); letter-spacing: 0.04em; font-weight: 500;">
-      v6.1 · 데이터는 브라우저에 저장됩니다
+      v6.2 · 데이터는 브라우저에 저장됩니다
     </div>
   </section>
 </main>
@@ -3849,9 +3849,15 @@ const DEFAULT_OTT = [
 ];
 
 // ============ VERSION ============
-const APP_VERSION = '6.1';
+const APP_VERSION = '6.2';
 const VERSION_KEY = 'contentsArchive_seenVersion';
 const VERSION_NOTES = {
+  '6.2': [
+    '끝 회차가 없는 작품도 계획을 체크하면 목록에 바로 보여요 (예: 12화까지 · 연재 중, EP 7까지 들음)',
+    '전체 회차를 안 넣은 드라마·애니·팟캐스트도 계획에서 회차를 숫자로 넣을 수 있고, 체크하면 진행에 기록돼요',
+    '앞 회차를 안 적고 중간부터 읽어도 \'88~100화 읽음\'처럼 어디를 봤는지 나와요',
+    '버그 수정: 팟캐스트를 \'현재 EP\'를 적어서 추가한 뒤 계획을 체크하면 진행이 0으로 돌아가던 문제를 고쳤어요'
+  ],
   '6.1': [
     '홈에 \'오늘 계획\'이 보여요: 홈에서 바로 체크·수정·복사·추가할 수 있어요',
     '홈의 \'전체 기록 보기\' 버튼은 뺐어요 (아래 \'전체\' 탭과 같은 화면이라서요)',
@@ -4631,7 +4637,7 @@ function typeName(t) { return {youtube:'유튜브', movie:'영화', drama:'드�
 function isEpType(t) { return t === 'drama' || t === 'anime' || t === 'webnovel'; }
 // OTT·국가가 있는 영상물
 function isScreenType(t) { return t === 'movie' || t === 'drama' || t === 'anime'; }
-const OPEN_EP_TOTAL = 100000; // 연재 중이라 전체 회차를 모르는 웹소설의 가상 상한
+const OPEN_EP_TOTAL = 100000; // 전체 회차(끝 회차)를 모르는 작품의 가상 상한 (연재 중 웹소설, 전체를 안 넣은 드라마·애니·팟캐스트)
 const EP_GRID_MAX = 150;      // 이보다 회차가 많으면 버튼 대신 숫자로 입력
 // 유형별 동사
 function epVerb(t) {
@@ -4730,7 +4736,7 @@ function epTracks(item) {
     t.local = e => t.restart ? e - t.start + 1 : e;
     return t;
   };
-  if (item.type === 'podcast') return f.total > 0 ? [mk({ name: '', start: 1, end: f.total, restart: true })] : [];
+  if (item.type === 'podcast') return f.total > 0 ? [mk({ name: '', start: 1, end: f.open ? Infinity : f.total, restart: true })] : [];
   const tr = [];
   const mainEnd = f.open ? Infinity : f.total;
   const ps = epParts(item);
@@ -4783,17 +4789,51 @@ function getProgress(item) {
   return null;
 }
 
+// ----- 전체 회차(끝 회차)를 모르는 작품의 진행 문구 -----
+// 끝을 모를 때 붙는 말
+function openWord(type) { return type === 'webnovel' ? '연재 중' : '전체 미정'; }
+// 어디까지 봤나: { label: '12화까지' | '88~100화', gap: 띄엄띄엄인지, last: 가장 뒤 회차 } · 본 게 없으면 null
+function openProgressInfo(item) {
+  const f = progressSpec(item);
+  if (!f || !f.open) return null;
+  const pod = item.type === 'podcast';
+  const upTo = n => pod ? `EP ${n}까지` : `${epLabel(item, n)}까지`;
+  const cur = Math.min(Math.max(parseInt(item[f.cur], 10) || 0, 0), f.total);
+  if (f.seq) return cur > 0 ? { label: upTo(cur), gap: false, last: cur } : null;
+  const set = getWatchedSet(item);
+  if (!set || !set.size) return null;
+  const arr = [...set].sort((a, b) => a - b);
+  const last = arr[arr.length - 1];
+  if (arr.length === last) return { label: upTo(last), gap: false, last }; // 1부터 빠짐없이
+  if (epRuns(arr).length <= 3) return { label: formatEpRanges(arr, pod, item), gap: true, last };
+  return { label: `${upTo(last)} 띄엄띄엄 ${arr.length}${pod ? '편' : '화'}`, gap: true, last };
+}
+// 다음에 볼 회차 (가장 뒤에 본 회차 다음)
+function openNextEp(item) {
+  const p = openProgressInfo(item);
+  return (p ? p.last : 0) + 1;
+}
+// 목록·계획에 보이는 한 줄: '12화까지 · 연재 중' / '88~100화 읽음 · 연재 중' / '4화까지 봄' / 'EP 7까지 들음'
+function openProgressText(item) {
+  const p = openProgressInfo(item);
+  const novel = item.type === 'webnovel';
+  if (!p) return novel ? openWord(item.type) : '';
+  const head = novel && !p.gap ? p.label : `${p.label} ${epVerb(item.type).done}`;
+  return novel ? `${head} · ${openWord(item.type)}` : head;
+}
+
 function progressText(item) {
   if (isEpType(item.type) && (epParts(item) || hasSide(item))) {
     const cur = item.currentEp || 0, t = item.totalEp || 0;
-    let s = t > 0 ? `${cur} / ${t} 회` : (cur > 0 ? `${epLabel(item, cur)}까지 · 연재 중` : '연재 중');
+    let s = t > 0 ? `${cur} / ${t} 회` : openProgressText(item);
     if (t > 0 && epParts(item) && cur > 0) s = `${epLabel(item, cur)} · ${s}`;
-    if (hasSide(item)) s += ` · 외전 ${sideSet(item).size}/${sideTotalOf(item) || '?'}`;
+    if (hasSide(item)) s += `${s ? ' · ' : ''}외전 ${sideSet(item).size}/${sideTotalOf(item) || '?'}`;
     return s;
   }
   if (isEpType(item.type) && item.totalEp > 0) return `${item.currentEp || 0} / ${item.totalEp} 회`;
-  if (item.type === 'webnovel') return item.currentEp > 0 ? `${item.currentEp}화까지 · 연재 중` : '연재 중';
+  if (isEpType(item.type)) return openProgressText(item) || null; // 끝 회차를 모르는 웹소설·드라마·애니
   if (item.type === 'podcast' && item.totalPodEp > 0) return `EP ${item.currentPodEp || 0} / ${item.totalPodEp}`;
+  if (item.type === 'podcast') return openProgressText(item) || null;
   return null;
 }
 
@@ -4820,10 +4860,11 @@ function buildCopyText(item, withProgress) {
     const next = Math.min((item.currentEp || 0) + 1, item.totalEp);
     return `${t} ${epLabel(item, next)}~`;
   }
-  if (item.type === 'webnovel') return `${t} ${epLabel(item, (item.currentEp || 0) + 1)}~`; // 연재 중
+  // 끝 회차를 모를 때: 가장 뒤에 본 회차 다음부터 (드라마·애니는 회차를 적기 시작한 뒤에만)
+  if (isEpType(item.type)) return item.type === 'webnovel' || openProgressInfo(item) ? `${t} ${epLabel(item, openNextEp(item))}~` : t;
   if (item.type === 'podcast') {
     const cur = item.currentPodEp || 0;
-    const next = item.totalPodEp > 0 ? Math.min(cur + 1, item.totalPodEp) : cur + 1;
+    const next = item.totalPodEp > 0 ? Math.min(cur + 1, item.totalPodEp) : openNextEp(item);
     return `${t} EP${next}~`;
   }
   // 영화·유튜브 등은 진행 개념이 없으니 제목만
@@ -5492,6 +5533,7 @@ function renderTimeline() {
         }
         const prog = getProgress(item);
         const ptxt = progressText(item);
+        const openP = prog === null ? openProgressInfo(item) : null; // 끝 회차를 모르는 작품
         const thumb = item.thumb
           ? `<img src="${escapeHTML(item.thumb)}" alt="" loading="lazy" style="${thumbFitStyle(item)}">`
           : `<div class="home-poster-fallback">${typeEmoji[item.type] || '📌'}</div>`;
@@ -5499,7 +5541,7 @@ function renderTimeline() {
         return `<div class="home-poster" onclick="openDetail('${item.id}')">
           <div class="home-poster-thumb">${thumb}${dayBadge}${recBtn}</div>
           <div class="home-poster-title">${escapeHTML(item.title)}</div>
-          ${prog !== null ? `<div class="home-poster-bar"><div class="home-poster-fill" style="width:${prog}%"></div></div><div class="home-poster-pct">${prog}% (${ptxt})</div>` : `<div class="home-poster-pct">${item.type === 'webnovel' && item.currentEp > 0 ? `${epLabel(item, item.currentEp)}까지 ${epVerb(item.type).done}` : verb(item.type)}</div>`}
+          ${prog !== null ? `<div class="home-poster-bar"><div class="home-poster-fill" style="width:${prog}%"></div></div><div class="home-poster-pct">${prog}% (${ptxt})</div>` : `<div class="home-poster-pct">${openP ? escapeHTML(`${openP.label} ${epVerb(item.type).done}`) : verb(item.type)}</div>`}
         </div>`;
       }).join('');
   }
@@ -5821,6 +5863,9 @@ function cardHTML(item) {
   if (progress !== null && item.status === 'watching') {
     extra += `<div class="progress-bar"><div class="progress-fill" style="width: ${progress}%"></div></div>
       <div class="progress-text"><span>${ptext}</span><span class="progress-percent">${progress}%</span></div>`;
+  } else if (ptext && item.status === 'watching') {
+    // 끝 회차를 모르는 작품: 막대 없이 어디까지 봤는지만
+    extra += `<div class="progress-text"><span>${escapeHTML(ptext)}</span></div>`;
   }
   if (item.type === 'youtube' && item.link) {
     extra += `<a class="card-link" href="${escapeHTML(item.link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">▶ 영상 열기</a>`;
@@ -6290,8 +6335,8 @@ function applyFormProgress(item, prev) {
   const cur = item[f.cur] || 0;
   if (cur === before) return;
   const set = new Set((Array.isArray(item[f.list]) ? item[f.list] : []).map(Number).filter(n => n > 0));
-  if (cur > before) { for (let e = 1; e <= cur; e++) set.add(e); }
-  else { for (let e = cur + 1; e <= before; e++) set.delete(e); }
+  for (let e = 1; e <= cur; e++) set.add(e);
+  for (let e = cur + 1; e <= before; e++) set.delete(e);
   if (f.total > 0) setWatchedSet(item, set);
   else item[f.list] = [...set].sort((a, b) => a - b);
 }
@@ -6368,6 +6413,7 @@ function saveContent(e) {
   } else {
     form.notes = [];
     form.createdAt = Date.now();
+    applyFormProgress(form, { ep: 0, pod: 0 }); // 개별 체크 방식(팟캐스트 기본)이면 '현재 EP'까지 체크 목록에도 넣기
     applySideForm(form, 0);
     state.items.unshift(form);
   }
@@ -6385,8 +6431,8 @@ function openDetail(id) {
   const ptext = progressText(item);
 
   let episodesHTML = '';
-  if (isEpType(item.type) && (item.type === 'webnovel' ? !(item.totalEp > 0) || item.totalEp > EP_GRID_MAX : item.totalEp > EP_GRID_MAX)) {
-    episodesHTML = epCompactHTML(item);
+  if (isEpType(item.type) && (!(item.totalEp > 0) || item.totalEp > EP_GRID_MAX)) {
+    episodesHTML = epCompactHTML(item); // 끝 회차를 모르거나 회차가 많으면 숫자로
   } else if (isEpType(item.type) && item.totalEp > 0) {
     const watchedSet = new Set(item.epWatched || []);
     const seqMode = item.epSeqMode !== false; // 기본은 순차 모드(기존 동작 유지)
@@ -6417,7 +6463,7 @@ function openDetail(id) {
   if (hasSide(item)) episodesHTML += sideSectionHTML(item);
   // 팟캐스트: 전체 EP가 있으면 그리드(개별/순차 모드 토글)
   if (item.type === 'podcast' && item.totalPodEp > 0) {
-    const watchedSet = new Set(item.podWatched || []);
+    const watchedSet = getWatchedSet(item) || new Set();
     const seqMode = item.podSeqMode === true; // 기본은 개별 모드
     const watchedCount = seqMode ? (item.currentPodEp || 0) : watchedSet.size;
     let grid = '';
@@ -6443,9 +6489,11 @@ function openDetail(id) {
   let progressHTML = '';
   if (item.type === 'podcast' && !(item.totalPodEp > 0)) {
     const cur = item.currentPodEp || 0;
+    const beyond = [...(getWatchedSet(item) || [])].filter(e => e > cur).sort((a, b) => a - b);
     progressHTML = `<div class="detail-section">
       <div class="detail-label">청취 진행</div>
       <div class="detail-value">EP ${cur}까지</div>
+      ${beyond.length ? `<div style="font-size:11px;color:var(--ink-mute);margin-top:2px;">띄엄띄엄 들은 에피소드: ${escapeHTML(gapEpsText(item, beyond))}</div>` : ''}
       <div style="font-size:11px;color:var(--ink-mute);margin-top:4px;">전체 회차를 입력하면 그리드로 하나씩 체크할 수 있어요</div>
       <div style="margin-top: 10px; display: flex; gap: 8px;">
         <input type="number" id="quickPodEp" placeholder="현재 EP" value="${cur}" min="0" class="form-input" style="flex: 1;">
@@ -6516,9 +6564,9 @@ function openDetail(id) {
     ${recordCardHTML(item)}
 
     ${(() => {
-      const hasProgress = (isEpType(item.type) && item.totalEp > 0) || item.type === 'podcast' || item.type === 'webnovel';
       const titleOnly = buildCopyText(item, false);
       const withProg = buildCopyText(item, true);
+      const hasProgress = withProg !== titleOnly; // 회차로 진행하는 작품만 (끝 회차를 몰라도 본 회차가 있으면)
       return `<div class="detail-section">
         <div class="detail-label">복사하기</div>
         <div class="copy-options">
@@ -6568,11 +6616,12 @@ function epCompactHTML(item) {
   const restart = item.partRestart !== false;
   const curPart = ps ? (partOf(item, Math.max(cur, 1)) || ps[0]) : null;
   const curLocal = curPart && restart ? Math.max(0, cur - curPart.start + 1) : cur;
+  const beyond = seen && count > cur ? [...seen].filter(e => e > cur).sort((a, b) => a - b) : [];
   return `<div class="episodes-section">
     <div class="detail-label">${hasSide(item) ? '본편' : `${v.seen} 회차`}</div>
     <div class="detail-value" style="font-size: 17px; font-weight: 700;">${cur ? escapeHTML(epLabel(item, cur)) : '0화'}까지 ${v.done}
-      <span style="font-size: 12px; font-weight: 500; color: var(--ink-mute);">${total ? `/ 전체 ${total}화` : '· 연재 중'}</span></div>
-    ${count > cur ? `<div style="font-size: 11px; color: var(--ink-mute); margin-top: 2px;">띄엄띄엄 ${v.seen} 회차까지 합치면 ${count}화</div>` : ''}
+      <span style="font-size: 12px; font-weight: 500; color: var(--ink-mute);">${total ? `/ 전체 ${total}화` : `· ${openWord(item.type)}`}</span></div>
+    ${beyond.length ? `<div style="font-size: 11px; color: var(--ink-mute); margin-top: 2px;">띄엄띄엄 ${v.seen} 회차: ${escapeHTML(gapEpsText(item, beyond))}</div>` : ''}
     ${total ? `<div class="progress-bar" style="margin-top: 8px;"><div class="progress-fill" style="width: ${pct}%"></div></div>` : ''}
     <div style="margin-top: 10px; display: flex; gap: 8px;">
       <button type="button" class="btn" onclick="bumpEp('${item.id}', 1)" style="flex: 1; padding: 12px;">+1화</button>
@@ -6580,8 +6629,16 @@ function epCompactHTML(item) {
       <input type="number" id="quickEp" value="${curLocal}" min="0" inputmode="numeric" class="form-input" style="flex: 1; min-width: 0;">
       <button type="button" class="btn btn-primary" onclick="setEpFromInput('${item.id}')" style="flex: 1; padding: 12px;">업데이트</button>
     </div>
-    ${!total && item.type === 'webnovel' ? `<div style="font-size: 11px; color: var(--ink-mute); margin-top: 8px;">완결되면 '기록 수정'에서 전체 회차를 넣어주세요</div>` : ''}
+    ${!total ? `<div style="font-size: 11px; color: var(--ink-mute); margin-top: 8px;">${item.type === 'webnovel' ? '완결되면' : '전체 회차가 정해지면'} '기록 수정'에서 전체 회차를 넣어주세요</div>` : ''}
   </div>`;
+}
+// 띄엄띄엄 본 회차 한 줄: '88~100화 (13화)' · 너무 잘게 흩어져 있으면 개수와 마지막 회차만
+function gapEpsText(item, arr) {
+  const pod = item.type === 'podcast';
+  const u = pod ? '편' : '화';
+  if (epRuns(arr).length <= 6) return `${formatEpRanges(arr, pod, item)}${arr.length > 1 ? ` (${arr.length}${u})` : ''}`;
+  const last = arr[arr.length - 1];
+  return `${arr.length}${u} · 마지막 ${pod ? 'EP' + last : epLabel(item, last)}`;
 }
 function setEpProgress(id, n) {
   const item = state.items.find(i => i.id === id);
@@ -6821,8 +6878,8 @@ function togglePodEpisode(id, ep) {
     // 순차 모드: 드라마식
     item.currentPodEp = ep <= (item.currentPodEp || 0) ? ep - 1 : ep;
   } else {
-    // 개별 모드: 집합 토글
-    const set = new Set(item.podWatched || []);
+    // 개별 모드: 집합 토글 ('현재 EP' 숫자로만 적어 둔 회차도 본 것으로 치고 시작)
+    const set = getWatchedSet(item) || new Set(item.podWatched || []);
     if (set.has(ep)) set.delete(ep); else set.add(ep);
     item.podWatched = Array.from(set).sort((a,b) => a - b);
     // 개별 모드에서도 currentPodEp는 "최대 연속"으로 갱신(복사 텍스트용)
@@ -6848,8 +6905,10 @@ function togglePodEpisode(id, ep) {
 function updatePodEp(id) {
   const item = state.items.find(i => i.id === id);
   if (!item) return;
-  const newEp = parseInt(document.getElementById('quickPodEp').value) || 0;
+  const newEp = Math.min(Math.max(parseInt(document.getElementById('quickPodEp').value) || 0, 0), OPEN_EP_TOTAL);
+  const prev = { ep: item.currentEp || 0, pod: item.currentPodEp || 0 };
   item.currentPodEp = item.totalPodEp > 0 ? Math.min(newEp, item.totalPodEp) : newEp;
+  applyFormProgress(item, prev); // 개별 체크 방식이면 체크 목록도 맞춤 (계획 체크와 같은 기록을 써요)
   item.updatedAt = Date.now();
   let becameDone = false;
   if (item.totalPodEp > 0 && item.currentPodEp >= item.totalPodEp && item.status !== 'done') {
@@ -10245,7 +10304,7 @@ function openEpPicker() {
   const cls = e => ['ep-btn', seen.has(e) ? 'watched' : '', recorded.has(e) ? 'rec' : '', e === cur ? 'cur' : ''].filter(Boolean).join(' ');
   const multi = tracks.length > 1;
   const html = tracks.map((t, ti) => {
-    const head = multi || t.name ? `<div class="ep-pick-head">${escapeHTML(t.name || (item.type === 'podcast' ? '에피소드' : '본편'))}${t.open ? '<span>연재 중</span>' : `<span>${t.count}${item.type === 'podcast' ? '편' : '화'}</span>`}</div>` : '';
+    const head = multi || t.name ? `<div class="ep-pick-head">${escapeHTML(t.name || (item.type === 'podcast' ? '에피소드' : '본편'))}${t.open ? `<span>${t.side ? '전체 미정' : openWord(item.type)}</span>` : `<span>${t.count}${item.type === 'podcast' ? '편' : '화'}</span>`}</div>` : '';
     if (!t.big) {
       let grid = '';
       for (let e = t.start; e <= t.end; e++) grid += `<button type="button" class="${cls(e)}" onclick="jumpEp(${e})">${t.local(e)}</button>`;
@@ -11293,7 +11352,8 @@ function renderPlanEpPicker() {
     let inTr = 0; seen.forEach(e => { if (e >= tr.start && e <= tr.end) inTr++; });
     const extra = inTr - (cur - tr.start + 1);
     const nm = tr.name ? tr.name + ' ' : '';
-    const info1 = `${cur >= tr.start ? `${nm}${tr.local(cur)}화까지 ${v.done}` : `${nm}아직 ${v.seen} 회차 없음`}${extra > 0 ? ` (+ 띄엄띄엄 ${extra}화)` : ''}${tr.open ? (tr.side ? ' · 전체 미정' : ' · 연재 중') : ` · ${tr.restart ? `${tr.count}화` : `${tr.start}~${tr.end}화`}`}`;
+    const upTo = info.podcast ? `EP ${tr.local(cur)}까지` : `${nm}${tr.local(cur)}화까지`;
+    const info1 = `${cur >= tr.start ? `${upTo} ${v.done}` : `${nm}아직 ${v.seen} 회차 없음`}${extra > 0 ? ` (+ 띄엄띄엄 ${extra}${unit})` : ''}${tr.open ? ` · ${tr.side ? '전체 미정' : openWord(info.type)}` : ` · ${tr.restart ? `${tr.count}${unit}` : `${tr.start}~${tr.end}화`}`}`;
     const info2 = elsewhere.size ? `다른 날 계획: ${formatEpRanges([...elsewhere], info.podcast, item)}` : '';
     // 이 부·외전에서 이미 고른 회차가 있으면 입력칸에 채워두고, 버튼은 '바꾸기'(그 범위로 교체)
     const selTr = planEdit.eps.filter(e => e >= tr.start && e <= tr.end);
@@ -11301,9 +11361,9 @@ function renderPlanEpPicker() {
     const pt = selTr.length ? tr.local(Math.max(...selTr)) : '';
     rangeEl.innerHTML = `<div class="plan-range-info">${escapeHTML(info1)}${info2 ? '<br>' + escapeHTML(info2) : ''}</div>
       <div class="plan-range-row">
-        <input type="number" class="form-input" id="planRangeFrom" placeholder="시작 화" min="1" inputmode="numeric" value="${pf}">
+        <input type="number" class="form-input" id="planRangeFrom" placeholder="${info.podcast ? '시작 EP' : '시작 화'}" min="1" inputmode="numeric" value="${pf}">
         <span style="color: var(--ink-mute);">~</span>
-        <input type="number" class="form-input" id="planRangeTo" placeholder="끝 화" min="1" inputmode="numeric" value="${pt}">
+        <input type="number" class="form-input" id="planRangeTo" placeholder="${info.podcast ? '끝 EP' : '끝 화'}" min="1" inputmode="numeric" value="${pt}">
         <button type="button" class="btn" onclick="planAddRange()">${selTr.length ? '바꾸기' : '추가'}</button>
       </div>
       ${planEdit.eps.length ? `<div class="plan-range-picked">선택: ${escapeHTML(formatEpRanges(planEdit.eps, info.podcast, item))}</div>` : ''}`;
@@ -11520,14 +11580,17 @@ function deletePlan() {
 
 // ===== 시청 진행 기록 읽기/쓰기 (드라마·애니·팟캐스트 공용) =====
 // 순차 모드 = "N화까지", 개별 모드 = "본 회차 집합". 계획 체크는 항상 이 두 함수를 거쳐요.
+// 전체 회차(끝 회차)를 모르면 open: 연재 중 웹소설뿐 아니라 전체 회차를 안 넣은 드라마·애니·팟캐스트도
+// 번호로 계획하고 체크할 수 있게 가상 상한(OPEN_EP_TOTAL)을 써요.
 function progressSpec(item) {
   if (!item) return null;
   if (item.type === 'podcast') {
-    return { total: item.totalPodEp || 0, seq: item.podSeqMode === true, cur: 'currentPodEp', list: 'podWatched', mode: 'podSeqMode' };
+    const open = !(item.totalPodEp > 0);
+    return { total: open ? OPEN_EP_TOTAL : item.totalPodEp, open, seq: item.podSeqMode === true, cur: 'currentPodEp', list: 'podWatched', mode: 'podSeqMode' };
   }
   if (isEpType(item.type)) {
-    const open = item.type === 'webnovel' && !(item.totalEp > 0);
-    return { total: open ? OPEN_EP_TOTAL : (item.totalEp || 0), open, seq: item.epSeqMode !== false, cur: 'currentEp', list: 'epWatched', mode: 'epSeqMode' };
+    const open = !(item.totalEp > 0);
+    return { total: open ? OPEN_EP_TOTAL : item.totalEp, open, seq: item.epSeqMode !== false, cur: 'currentEp', list: 'epWatched', mode: 'epSeqMode' };
   }
   return null;
 }
@@ -11535,11 +11598,12 @@ function progressSpec(item) {
 function getWatchedSet(item) {
   const f = progressSpec(item);
   if (!f || !(f.total > 0)) return null;
-  if (f.seq) {
-    const n = Math.min(Math.max(item[f.cur] || 0, 0), f.total);
-    return new Set(Array.from({ length: n }, (_, i) => i + 1));
-  }
-  return new Set((item[f.list] || []).filter(e => e >= 1 && e <= f.total));
+  const n = Math.min(Math.max(parseInt(item[f.cur], 10) || 0, 0), f.total);
+  if (f.seq) return new Set(Array.from({ length: n }, (_, i) => i + 1));
+  // 개별 모드: 체크 목록 + 'N까지'로 적어 둔 회차 (목록 없이 숫자만 넣은 기록도 본 것으로)
+  const s = new Set((Array.isArray(item[f.list]) ? item[f.list] : []).map(Number).filter(e => e >= 1 && e <= f.total));
+  for (let e = 1; e <= n; e++) s.add(e);
+  return s;
 }
 
 // 본 회차 집합을 기록에 써넣기. 순차 모드인데 띄엄띄엄이면 개별 모드로 바꿔서 보존.

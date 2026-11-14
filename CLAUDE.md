@@ -39,7 +39,7 @@
   - `items[]`: id, type, status, title, totalEp/currentEp/epWatched/epSeqMode(팟캐스트는 totalPodEp/currentPodEp/podWatched/podSeqMode),
     `parts[{name,count}]`·`partRestart`(부), `hasSide`·`sideTotal`·`sideWatched`(외전), `record`, `notes[]`, `memo`(총평), `rating`
   - `record`: `chars[{id,name,group,desc,color,parent}]`, `rels[{id,a,b,label,dir,color}]`, `eps{회차키:{text,updatedAt}}`
-  - 회차 키: 본편 1..N, 외전 `SIDE_BASE(1000000) + n`. 연재 중 웹소설 상한 `OPEN_EP_TOTAL`, 150화 넘으면 버튼 대신 번호 입력(`EP_GRID_MAX`)
+  - 회차 키: 본편 1..N, 외전 `SIDE_BASE(1000000) + n`. 끝 회차(전체 회차)가 없는 작품의 상한 `OPEN_EP_TOTAL`, 150화 넘으면 버튼 대신 번호 입력(`EP_GRID_MAX`)
   - `plans[]`: date, itemId, eps, done, check(되돌리기용 정보)
 
 ## 디자인 규칙
@@ -59,6 +59,7 @@
 - 제목 괄호: 웹소설 `《 》`, 나머지 `〈 〉`. 웹소설 플랫폼 기본값은 포스타입·네이버블로그 + 직접 입력.
 - 외전은 별도로 기록, **외전까지 다 봐야 완료**. 1부·2부·3부 옵션, 작품마다 “부마다 1화부터 / 이어서” 선택.
 - 계획 체크: 계획보다 더 본 회차도 기록, 못 본 회차는 다음 계획으로 넘김.
+- 끝 회차(전체 회차)가 없는 작품(연재 중 웹소설, 전체를 안 넣은 드라마·애니·팟캐스트)도 계획에서 회차를 숫자로 넣고, 체크하면 진행에 기록 + 목록에 `12화까지 · 연재 중`처럼 한 줄로 표시. 완료로 자동 전환은 안 함.
 - 계획 저장: 다른 날 계획과 회차가 겹치면 경고 창 뒤에 그쪽에서 빼기(+ 되돌리기). 숫자로 넣는 회차는 ‘바꾸기’로 고침.
 - 홈: ‘보는 중’ 포스터 아래에 **오늘 계획**(계획 탭 오늘 칸과 같은 줄·같은 동작). ‘전체 기록 보기’ 버튼은 없앰.
 - 빠른 회차 기록(✍️): 다음 회차가 열리고 내용을 쓰면 본 회차로 체크. 기록 창 제목의 `[N화 ▾]`로 회차 고르기, ‹ › 버튼도 유지.
